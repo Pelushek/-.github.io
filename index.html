@@ -84,7 +84,6 @@ function render(){
 function boardHTML(a){
  let aw=aWorks(a);let tags=(a.profile||'').split(/[,;\n]/).map(x=>x.trim()).filter(Boolean);
  
- // Формируем блок ссылок
  let linksHtml = '';
  if (a.catwarUrl) linksHtml += `<a href="${esc(a.catwarUrl)}" target="_blank" rel="noopener">↗ CatWar</a>`;
  if (a.vk) linksHtml += `<a href="https://vk.com/${esc(a.vk.replace(/^.*vk\.com\//,''))}" target="_blank" rel="noopener">↗ VK</a>`;
@@ -109,6 +108,7 @@ function boardHTML(a){
 }
 
 function workCardHTML(w){
+ // Возвращаем надежную проверку ссылки
  const hasUrl = w.url && /^https?:\/\//i.test(w.url);
  let thumb = hasUrl ? `<img class="thumb" src="${esc(w.url)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="thumb-fallback" style="display:none">🖼</div>` : `<div class="thumb-fallback">🖼</div>`;
  return `<div class="work-card">${thumb}${w.url?`<a href="${esc(w.url)}" target="_blank">${esc(w.title||'Без названия')} ↗</a>`:`<b>${esc(w.title||'Без названия')}</b>`}<div class="meta"><span>${esc(w.date||'')}</span><span class="points">+${+w.points||0}</span></div></div>`;
@@ -147,33 +147,61 @@ function importRows(rows){
  artists=[]; works=[];
  let headers=rows[0].map(norm),idx=(...names)=>headers.findIndex(h=>names.some(n=>h.includes(norm(n))));
  
- // Ищем новые столбцы
- let ni=idx('имя','художник'),ci=idx('ник','catwar'),vi=idx('вк','vk'),pi=idx('профиль','спец'),bi=idx('описание','коммент'),wi=idx('работа','название'),cati=idx('категория','тип'),ui=idx('ссылка','url'),di=idx('дата'),pti=idx('баллы','очки');
- let cui=idx('ссылканапрофиль','профильcatwar','ссылкапрофиль'); // Ссылка на профиль
- let avi=idx('аватар','картинка','фото'); // Ссылка на аватар
+ // Ищем столбцы
+ let ni=idx('имя','художник');
+ let ci=idx('ник','catwar');
+ let vi=idx('вк','vk');
+ let pi=idx('профиль','спец');
+ let bi=idx('описание','коммент');
+ let wi=idx('работа','название'); // Название работы
+ let cati=idx('категория','тип');
+ let di=idx('дата');
+ let pti=idx('баллы','очки');
+ 
+ // ВАЖНО: Для ссылки на работу ищем точное совпадение "ссылканаработу"
+ let ui = headers.findIndex(h => h === 'ссылканаработу' || h === 'ссылканаработуurl');
+ if (ui === -1) ui = idx('url', 'ссылка'); // Запасной вариант
+ 
+ // Для аватара ищем слово "аватар"
+ let avi=idx('аватар','картинка','фото'); 
+ 
+ // Для ссылки на профиль ищем "профиль"
+ let cui=idx('ссылканапрофиль','профильcatwar'); 
 
  rows.slice(1).forEach(r=>{
-  let name=(r[ni]||'').trim();if(!name)return;let catwar=ci>=0?(r[ci]||'').trim():'';
-  let a=artists.find(a=>slug(a.name)===slug(name)&&(!catwar||slug(a.catwar)===slug(catwar)));
+  let name=(r[ni]||'').trim();if(!name)return;
+  let catwar=ci>=0?(r[ci]||'').trim():'';
   
+  let a=artists.find(a=>slug(a.name)===slug(name)&&(!catwar||slug(a.catwar)===slug(catwar)));
   if(!a){
     a={
       id:'a'+artists.length, name, catwar, 
       vk: vi>=0?r[vi]||'':'', 
       profile: pi>=0?r[pi]||'':'', 
       bio: bi>=0?r[bi]||'':'',
-      catwarUrl: cui>=0?r[cui]||'':'', // Подтягиваем ссылку
-      avatar: avi>=0?r[avi]||'':''    // Подтягиваем аватар
+      catwarUrl: cui>=0?r[cui]||'':'',
+      avatar: avi>=0?r[avi]||'':''
     };
     artists.push(a);
+  } else {
+    if (!a.vk && vi>=0) a.vk = r[vi]||'';
+    if (!a.avatar && avi>=0) a.avatar = r[avi]||'';
+    if (!a.catwarUrl && cui>=0) a.catwarUrl = r[cui]||'';
   }
   
-  if(wi>=0&&(r[wi]||'').trim()){
-   let category=(cati>=0?r[cati]:'').trim(),known=CATS.find(c=>norm(c)===norm(category))||'Иное';
-   works.push({id:'w'+works.length,artistId:a.id,title:r[wi].trim(),category:known,url:ui>=0?r[ui]||'':'',date:di>=0?r[di]||'':'',points:pti>=0?Number(String(r[pti]||'0').replace(',','.'))||0:0});
+  if(wi>=0 && (r[wi]||'').trim()){
+   let category=(cati>=0?r[cati]:'').trim();
+   let known=CATS.find(c=>norm(c)===norm(category))||'Иное';
+   
+   works.push({
+       id:'w'+works.length,
+       artistId:a.id,
+       title:r[wi].trim(),
+       category:known,
+       url:ui>=0?r[ui]||'':'', // Теперь берет именно ссылку на работу
+       date:di>=0?r[di]||'':'',
+       points:pti>=0?Number(String(r[pti]||'0').replace(',','.'))||0:0
+   });
   }
  });
 }
-$('search').oninput=render;$('artistFilter').onchange=render;$('sort').onchange=render;
-fetchData();
-</script></body></html>
