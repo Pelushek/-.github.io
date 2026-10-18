@@ -20,6 +20,7 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
  <div style="width:100%"><div class="side-label">Рабочее место</div><nav class="nav">
  <button class="active" data-view="board"><span class="ico">▦</span><span class="nav-text">Доска</span></button>
  <button data-view="artists"><span class="ico">♙</span><span class="nav-text">Художники</span></button>
+ <button data-view="works"><span class="ico">✎</span><span class="nav-text">Все работы</span></button>
  </nav></div>
  <div class="side-note"><b>Только просмотр</b>Данные берутся из Google Таблицы. Для изменения данных отредактируйте таблицу.</div>
 </aside>
@@ -37,8 +38,8 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
 </main></div>
 
 <script>
-// ⚠️ ВСТАВЬТЕ СЮДА ССЫЛКУ ИЗ GOOGLE ТАБЛИЦЫ
-const CSV_URL = 'https://docs.google.com/spreadsheets/d/1hjiRKo9s39_sUv9JCfZ70GAffxHH5K306Lyv-Yfu7os/export?format=csv&gid=0';
+// ⚠️ ССЫЛКА НА ВАШУ ТАБЛИЦУ
+const CSV_URL = 'https://docs.google.com/spreadsheets/d/1hjiRKo9s39_sUv9JCfZ70GAffxHH5K306Lyv-Yfu7os/export?format=csv&gid=0'; 
 
 const CATS=['Фон с нуля','Украш. фон','Костюм фулл & боты','Костюм','Предметы','Медаль','Шапка','Иное'];
 let artists=[], works=[], currentArtist=null, view='board';
@@ -53,7 +54,7 @@ async function fetchData() {
     const text = await res.text();
     importRows(parseCSV(text));
   } catch (e) {
-    alert('Ошибка загрузки. Проверьте ссылку на CSV и доступ к таблице (должно быть "Читатель по ссылке").');
+    alert('Ошибка загрузки. Проверьте ссылку на CSV и доступ к таблице.');
   } finally {
     $('loadingOverlay').style.display = 'none';
     render();
@@ -70,7 +71,10 @@ function render(){
  updateStats();let q=slug($('search').value),filter=$('artistFilter').value,sort=$('sort').value;
  let list=artists.filter(a=>(!filter||a.id===filter)&&(!q||slug([a.name,a.catwar,a.vk,a.profile].join(' ')).includes(q)));
  list.sort((a,b)=>sort==='points'?points(b)-points(a):a.name.localeCompare(b.name,'ru'));
+ 
+ if(view==='works'){renderAllWorks();return}
  if(view==='artists'){renderArtists(list);return}
+ 
  if(!currentArtist||!artists.some(a=>a.id===currentArtist))currentArtist=(list[0]||{}).id;
  if(!list.length){$('content').innerHTML='<div class="empty-state"><b>Пока никого нет</b>Заполните данные в Google Таблице.</div>';return}
  if(!list.some(a=>a.id===currentArtist))currentArtist=list[0].id;
@@ -94,10 +98,22 @@ function renderArtists(list){
  document.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>{currentArtist=el.dataset.open;setView('board')});
 }
 
+function renderAllWorks(){
+ let ws=works.filter(w=>(!$('artistFilter').value||w.artistId===$('artistFilter').value)&&(!slug($('search').value)||slug([w.title,w.category,(artists.find(a=>a.id===w.artistId)||{}).name].join(' ')).includes(slug($('search').value))));
+ $('content').innerHTML=ws.length?`<div style="background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:auto"><table style="border-collapse:collapse;width:100%;min-width:650px"><thead><tr>${['Превью','Художник','Работа','Категория','Дата','Баллы'].map(x=>`<th style="text-align:left;padding:12px;border-bottom:1px solid var(--line);font-size:11px;color:var(--muted)">${x}</th>`).join('')}</tr></thead><tbody>${ws.map(w=>{
+  const hasUrl = w.url && /^https?:\/\//i.test(w.url);
+  const thumbCell = hasUrl 
+    ? `<td style="padding:6px 12px;border-bottom:1px solid var(--line)"><img src="${esc(w.url)}" alt="" style="width:56px;height:40px;object-fit:cover;border-radius:5px;background:#f0ebe5" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span style="display:none;width:56px;height:40px;align-items:center;justify-content:center;color:#b5a99c;background:#f0ebe5;border-radius:5px">🖼</span></td>`
+    : `<td style="padding:6px 12px;border-bottom:1px solid var(--line)"><span style="display:flex;width:56px;height:40px;align-items:center;justify-content:center;color:#b5a99c;background:#f0ebe5;border-radius:5px">🖼</span></td>`;
+  return `<tr>${thumbCell}<td style="padding:12px;border-bottom:1px solid var(--line)">${esc((artists.find(a=>a.id===w.artistId)||{}).name||'—')}</td><td style="padding:12px;border-bottom:1px solid var(--line)">${w.url?`<a href="${esc(w.url)}" target="_blank">${esc(w.title||'Без названия')} ↗</a>`:esc(w.title||'Без названия')}</td><td style="padding:12px;border-bottom:1px solid var(--line)">${esc(w.category)}</td><td style="padding:12px;border-bottom:1px solid var(--line)">${esc(w.date||'—')}</td><td style="padding:12px;border-bottom:1px solid var(--line);font-weight:800;color:var(--green)">+${+w.points||0}</td></tr>`
+}).join('')}</tbody></table></div>`:'<div class="empty-state"><b>Работ пока нет</b>Добавьте первую работу в Google Таблицу.</div>';
+}
+
 function setView(v){
  view=v;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
- $('pageTitle').textContent=({board:'Доска художников',artists:'Все художники'})[v];
- $('listTitle').textContent=({board:'Рабочее пространство',artists:'Список художников'})[v];
+ $('pageTitle').textContent=({board:'Доска художников',artists:'Все художники',works:'Все работы'})[v];
+ $('listTitle').textContent=({board:'Рабочее пространство',artists:'Список художников',works:'Реестр работ'})[v];
+ $('listSub').textContent=({board:'Выберите художника',artists:'Нажмите на карточку',works:'Все начисления в одном списке'})[v];
  render();
 }
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>setView(b.dataset.view));
