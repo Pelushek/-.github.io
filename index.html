@@ -4,162 +4,122 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Живописцы — рабочее пространство</title>
 <style>
-:root{--bg:#f5f2ee;--paper:#fffdfa;--ink:#292723;--muted:#8c877f;--line:#e6e0d8;--accent:#c86f52;--accent2:#e9c7b9;--green:#647b62;--shadow:0 8px 28px #31261b0b}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
-button,input,textarea,select{font:inherit}button{cursor:pointer}.app{min-height:100vh;display:grid;grid-template-columns:248px 1fr}
-.sidebar{background:#292824;color:#f8f4ee;padding:25px 17px;display:flex;flex-direction:column;gap:24px;min-height:100vh}.brand{display:flex;align-items:center;gap:12px;padding:0 7px}.logo{width:39px;height:39px;border-radius:13px;background:#d48a6f;color:#292824;display:grid;place-items:center;font-size:21px;font-weight:800}.brand strong{font-size:16px;letter-spacing:.02em}.brand small{display:block;color:#aaa49b;font-size:11px;margin-top:2px}.side-label{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:#8e8981;padding:0 10px;margin-bottom:7px}.nav{display:grid;gap:5px}.nav button{border:0;color:#d7d0c7;background:transparent;text-align:left;padding:11px 12px;border-radius:10px;display:flex;align-items:center;gap:11px}.nav button.active,.nav button:hover{background:#414039;color:#fff}.nav .ico{width:19px;text-align:center;font-size:16px}.side-note{margin-top:auto;border:1px solid #48463f;background:#33322d;border-radius:13px;padding:13px;color:#bcb6ad;font-size:12px}.side-note b{color:#f8f4ee;display:block;margin-bottom:5px}
-main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:25px}.eyebrow{font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.14em;font-weight:750}.topbar h1{font-size:27px;line-height:1.2;margin:5px 0 0;letter-spacing:-.04em}.actions{display:flex;gap:8px;align-items:center}.btn{border:1px solid var(--line);background:var(--paper);padding:10px 13px;border-radius:10px;color:var(--ink);font-weight:650}.btn.primary{background:var(--accent);border-color:var(--accent);color:white}.btn:hover{filter:brightness(.97)}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:22px}.stat{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px 17px;box-shadow:var(--shadow)}.stat span{color:var(--muted);font-size:12px}.stat strong{display:block;font-size:25px;letter-spacing:-.04em;margin-top:6px}.stat small{color:var(--green);font-size:11px}
-.toolbar{display:flex;gap:10px;align-items:center;margin-bottom:17px;flex-wrap:wrap}.search{position:relative;flex:1;min-width:190px}.search input{width:100%;border:1px solid var(--line);background:var(--paper);border-radius:11px;padding:12px 14px 12px 38px;outline:none}.search:before{content:"⌕";position:absolute;left:14px;top:7px;font-size:23px;color:var(--muted)}select{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:11px;color:var(--ink);max-width:200px}.section-head{display:flex;align-items:center;justify-content:space-between;margin:24px 0 12px}.section-head h2{font-size:15px;margin:0}.section-head p{color:var(--muted);font-size:12px;margin:3px 0 0}.board{display:grid;grid-template-columns:260px minmax(0,1fr);gap:14px;align-items:stretch}.artist-panel,.work-area{background:var(--paper);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow);min-width:0}.artist-panel{padding:17px;display:flex;flex-direction:column;gap:14px}.artist-hero{display:flex;align-items:center;gap:13px}.avatar{width:76px;height:76px;flex:none;border-radius:12px;background:#e9ded4;display:grid;place-items:center;overflow:hidden;color:#a27b69;font-size:28px;font-weight:750}.avatar img{width:100%;height:100%;object-fit:cover}.artist-name{font-size:17px;font-weight:800;line-height:1.25}.artist-sub{color:var(--muted);font-size:12px;margin-top:4px}.links{display:flex;gap:7px;flex-wrap:wrap}.links a{font-size:11px;color:#a85840;text-decoration:none;border-bottom:1px solid #e5c1b4}.links a:hover{color:#703724}.divider{height:1px;background:var(--line)}.field-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:750;margin-bottom:5px}.bio{font-size:13px;white-space:pre-wrap}.chips{display:flex;flex-wrap:wrap;gap:5px}.chip{border-radius:6px;padding:4px 7px;background:#f2e9e1;color:#765d4e;font-size:11px}.mini-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mini-stat{background:#f7f3ee;border-radius:10px;padding:10px}.mini-stat span{display:block;color:var(--muted);font-size:11px}.mini-stat b{display:block;font-size:18px;margin-top:2px}.edit-note{color:var(--muted);font-size:11px}
-.work-area{padding:15px;overflow:hidden}.work-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 12px}.work-head h3{font-size:14px;margin:0}.work-head span{font-size:11px;color:var(--muted)}.work-columns{display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));gap:9px;overflow-x:auto;padding-bottom:3px}.work-col{min-width:0;background:#f7f4ef;border-radius:10px;padding:9px;min-height:180px}.col-title{font-size:11px;font-weight:800;min-height:32px;line-height:1.3;display:flex;justify-content:space-between;gap:5px}.count{color:var(--muted);font-weight:500}.work-card{background:white;border:1px solid #e9e2d9;border-radius:8px;margin-top:8px;padding:8px;font-size:11px}.work-card a{color:var(--ink);font-weight:700;text-decoration:none}.work-card a:hover{color:var(--accent)}.work-card .meta{display:flex;justify-content:space-between;gap:5px;color:var(--muted);font-size:10px;margin-top:5px}.points{font-weight:800;color:var(--green)}.empty{color:#a49b90;font-size:11px;text-align:center;padding:18px 5px}.bottom-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.empty-state{padding:48px 18px;text-align:center;background:var(--paper);border:1px dashed #d9cec2;border-radius:14px;color:var(--muted)}.empty-state b{display:block;color:var(--ink);font-size:16px;margin-bottom:6px}.notice{padding:11px 13px;border-radius:10px;background:#f2e6d8;color:#76573f;font-size:12px;margin-bottom:15px;display:none}.notice.show{display:block}.modal-backdrop{position:fixed;inset:0;background:#211d19a6;display:none;align-items:center;justify-content:center;padding:18px;z-index:10}.modal-backdrop.open{display:flex}.modal{width:min(600px,100%);max-height:90vh;overflow:auto;background:var(--paper);border-radius:17px;padding:22px;box-shadow:0 25px 80px #0003}.modal h2{margin:0 0 17px;font-size:20px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.form-field{display:flex;flex-direction:column;gap:5px}.form-field.full{grid-column:1/-1}.form-field label{font-size:12px;color:var(--muted);font-weight:650}.form-field input,.form-field textarea,.form-field select{width:100%;max-width:none;border:1px solid var(--line);border-radius:9px;padding:10px;background:white}.form-field textarea{min-height:75px;resize:vertical}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.toast{position:fixed;bottom:20px;right:20px;background:#292824;color:#fff;padding:12px 16px;border-radius:10px;display:none;z-index:20;box-shadow:var(--shadow)}.toast.show{display:block}
-.work-card .thumb{width:100%;height:84px;object-fit:cover;border-radius:6px;background:#f0ebe5;display:block;margin-bottom:6px;border:1px solid #e9e2d9}
-.work-card .thumb-fallback{width:100%;height:84px;border-radius:6px;background:#f0ebe5;display:flex;align-items:center;justify-content:center;color:#b5a99c;font-size:20px;margin-bottom:6px;border:1px solid #e9e2d9}
-#loadingOverlay{position:fixed;inset:0;background:#f5f2eecc;backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:100;font-size:16px;font-weight:bold;color:var(--accent)}
-@media(max-width:1000px){.app{grid-template-columns:70px 1fr}.sidebar{padding:20px 9px}.brand{justify-content:center;padding:0}.brand>div:last-child,.side-label,.nav button .nav-text,.side-note{display:none}.nav button{justify-content:center;padding:12px 8px}.board{grid-template-columns:220px minmax(0,1fr)}.work-columns{grid-template-columns:repeat(8,145px)}.stats{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:650px){.app{display:block}.sidebar{min-height:auto;height:auto;display:flex;flex-direction:row;align-items:center;padding:10px 13px;gap:12px}.brand{display:none}.nav{display:flex;flex:1;justify-content:space-around}.nav button{padding:9px 12px}.nav .ico{font-size:18px}.topbar{align-items:flex-start}.topbar h1{font-size:23px}.actions .btn:not(.primary){display:none}main{padding:19px 13px 35px}.stats{gap:8px}.stat{padding:12px}.stat strong{font-size:22px}.board{grid-template-columns:1fr}.artist-panel{display:grid;grid-template-columns:1fr 1fr;gap:12px}.artist-hero,.links,.divider{grid-column:1/-1}.work-columns{grid-template-columns:repeat(8,140px)}.form-grid{grid-template-columns:1fr}.form-field.full{grid-column:auto}}
+:root{--bg:#f5f2ee;--paper:#fffdfa;--ink:#292723;--muted:#8c877f;--line:#e6e0d8;--accent:#c86f52;--green:#647b62;--shadow:0 8px 28px #31261b0b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,ui-sans-serif,system-ui,sans-serif}
+button,input,select{font:inherit}button{cursor:pointer}.app{min-height:100vh;display:grid;grid-template-columns:248px 1fr}
+.sidebar{background:#292824;color:#f8f4ee;padding:25px 17px;display:flex;flex-direction:column;gap:24px;min-height:100vh}.brand{display:flex;align-items:center;gap:12px;padding:0 7px}.logo{width:39px;height:39px;border-radius:13px;background:#d48a6f;color:#292824;display:grid;place-items:center;font-size:21px;font-weight:800}.brand strong{font-size:16px}.brand small{display:block;color:#aaa49b;font-size:11px;margin-top:2px}.side-label{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:#8e8981;padding:0 10px;margin-bottom:7px}.nav{display:grid;gap:5px}.nav button{border:0;color:#d7d0c7;background:transparent;text-align:left;padding:11px 12px;border-radius:10px;display:flex;align-items:center;gap:11px}.nav button.active,.nav button:hover{background:#414039;color:#fff}.nav .ico{width:19px;text-align:center;font-size:16px}.side-note{margin-top:auto;border:1px solid #48463f;background:#33322d;border-radius:13px;padding:13px;color:#bcb6ad;font-size:12px}.side-note b{color:#f8f4ee;display:block;margin-bottom:5px}
+main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:25px}.eyebrow{font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.14em;font-weight:750}.topbar h1{font-size:27px;margin:5px 0 0;letter-spacing:-.04em}.btn{border:1px solid var(--line);background:var(--paper);padding:10px 13px;border-radius:10px;color:var(--ink);font-weight:650}.btn:hover{filter:brightness(.97)}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}.stat{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px 17px;box-shadow:var(--shadow)}.stat span{color:var(--muted);font-size:12px}.stat strong{display:block;font-size:25px;margin-top:6px}.stat small{color:var(--green);font-size:11px}
+.toolbar{display:flex;gap:10px;margin-bottom:17px;flex-wrap:wrap}.search{position:relative;flex:1;min-width:190px}.search input{width:100%;border:1px solid var(--line);background:var(--paper);border-radius:11px;padding:12px 14px 12px 38px;outline:none}.search:before{content:"⌕";position:absolute;left:14px;top:7px;font-size:23px;color:var(--muted)}select{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:11px;color:var(--ink);max-width:200px}.section-head{display:flex;justify-content:space-between;margin:24px 0 12px}.section-head h2{font-size:15px;margin:0}.section-head p{color:var(--muted);font-size:12px;margin:3px 0 0}.board{display:grid;grid-template-columns:260px 1fr;gap:14px}.artist-panel,.work-area{background:var(--paper);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow)}.artist-panel{padding:17px;display:flex;flex-direction:column;gap:14px}.artist-hero{display:flex;align-items:center;gap:13px}.avatar{width:76px;height:76px;border-radius:12px;background:#e9ded4;display:grid;place-items:center;color:#a27b69;font-size:28px;font-weight:750}.artist-name{font-size:17px;font-weight:800;line-height:1.25}.artist-sub{color:var(--muted);font-size:12px}.links{display:flex;gap:7px;flex-wrap:wrap}.links a{font-size:11px;color:#a85840;text-decoration:none;border-bottom:1px solid #e5c1b4}.divider{height:1px;background:var(--line)}.field-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:750;margin-bottom:5px}.bio{font-size:13px;white-space:pre-wrap}.chips{display:flex;flex-wrap:wrap;gap:5px}.chip{border-radius:6px;padding:4px 7px;background:#f2e9e1;color:#765d4e;font-size:11px}.mini-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mini-stat{background:#f7f3ee;border-radius:10px;padding:10px}.mini-stat span{display:block;color:var(--muted);font-size:11px}.mini-stat b{display:block;font-size:18px;margin-top:2px}.work-area{padding:15px}.work-head{display:flex;justify-content:space-between;margin:0 0 12px}.work-head h3{font-size:14px;margin:0}.work-head span{font-size:11px;color:var(--muted)}.work-columns{display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));gap:9px;overflow-x:auto}.work-col{background:#f7f4ef;border-radius:10px;padding:9px;min-height:180px}.col-title{font-size:11px;font-weight:800;min-height:32px;display:flex;justify-content:space-between}.count{color:var(--muted)}.work-card{background:white;border:1px solid #e9e2d9;border-radius:8px;margin-top:8px;padding:8px;font-size:11px}.work-card a{color:var(--ink);font-weight:700;text-decoration:none}.work-card a:hover{color:var(--accent)}.work-card .meta{display:flex;justify-content:space-between;color:var(--muted);font-size:10px;margin-top:5px}.points{font-weight:800;color:var(--green)}.empty{color:#a49b90;font-size:11px;text-align:center;padding:18px 5px}.work-card .thumb{width:100%;height:84px;object-fit:cover;border-radius:6px;background:#f0ebe5;display:block;margin-bottom:6px;border:1px solid #e9e2d9}.work-card .thumb-fallback{width:100%;height:84px;border-radius:6px;background:#f0ebe5;display:flex;align-items:center;justify-content:center;color:#b5a99c;font-size:20px;margin-bottom:6px;border:1px solid #e9e2d9}.empty-state{padding:48px;text-align:center;background:var(--paper);border:1px dashed #d9cec2;border-radius:14px;color:var(--muted)}.empty-state b{display:block;color:var(--ink);font-size:16px;margin-bottom:6px}#loadingOverlay{position:fixed;inset:0;background:#f5f2eecc;backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:100;font-size:16px;font-weight:bold;color:var(--accent)}
+@media(max-width:1000px){.app{grid-template-columns:70px 1fr}.sidebar{padding:20px 9px}.brand>div:last-child,.side-label,.nav-text,.side-note{display:none}.nav button{justify-content:center}.board{grid-template-columns:220px 1fr}.work-columns{grid-template-columns:repeat(8,145px)}.stats{grid-template-columns:repeat(2,1fr)}}
 </style></head>
 <body>
-<div id="loadingOverlay">Загрузка данных с сервера...</div>
-
+<div id="loadingOverlay">Загрузка данных из Google Таблицы...</div>
 <div class="app">
 <aside class="sidebar">
  <div class="brand"><div class="logo">Ж</div><div><strong>Живописцы</strong><small>рабочее пространство</small></div></div>
  <div style="width:100%"><div class="side-label">Рабочее место</div><nav class="nav">
- <button class="active" data-view="board"><span class="ico">▦</span><span class="nav-text">Доска художников</span></button>
- <button data-view="artists"><span class="ico">♙</span><span class="nav-text">Все художники</span></button>
- <button data-view="works"><span class="ico">✎</span><span class="nav-text">Все работы</span></button>
- <button data-view="settings"><span class="ico">⚙</span><span class="nav-text">Источник данных</span></button>
+ <button class="active" data-view="board"><span class="ico">▦</span><span class="nav-text">Доска</span></button>
+ <button data-view="artists"><span class="ico">♙</span><span class="nav-text">Художники</span></button>
  </nav></div>
- <div class="side-note"><b>Синхронизация</b>Данные теперь сохраняются в облаке. Все изменения видны другим пользователям.</div>
+ <div class="side-note"><b>Только просмотр</b>Данные берутся из Google Таблицы. Для изменения данных отредактируйте таблицу.</div>
 </aside>
 <main>
- <div class="topbar"><div><div class="eyebrow">Панель координатора</div><h1 id="pageTitle">Доска художников</h1></div><div class="actions"><button class="btn" id="refreshBtn">↻ Обновить</button><button class="btn primary" id="addBtn">＋ Добавить работу</button></div></div>
- <div id="notice" class="notice"></div>
+ <div class="topbar"><div><div class="eyebrow">Панель координатора</div><h1 id="pageTitle">Доска художников</h1></div><div class="actions"><button class="btn" onclick="location.reload()">↻ Обновить</button></div></div>
  <section class="stats">
- <div class="stat"><span>Художников</span><strong id="statArtists">0</strong><small>в рабочем списке</small></div>
- <div class="stat"><span>Работ учтено</span><strong id="statWorks">0</strong><small>во всех категориях</small></div>
- <div class="stat"><span>Начислено баллов</span><strong id="statPoints">0</strong><small>по внесённым работам</small></div>
- <div class="stat"><span>Без работ</span><strong id="statEmpty">0</strong><small>проверьте активность</small></div>
+ <div class="stat"><span>Художников</span><strong id="statArtists">0</strong></div>
+ <div class="stat"><span>Работ учтено</span><strong id="statWorks">0</strong></div>
+ <div class="stat"><span>Начислено баллов</span><strong id="statPoints">0</strong></div>
+ <div class="stat"><span>Без работ</span><strong id="statEmpty">0</strong></div>
  </section>
- <div class="toolbar"><div class="search"><input id="search" placeholder="Поиск по имени, VK или профилю…"></div><select id="artistFilter"><option value="">Все художники</option></select><select id="sort"><option value="name">По имени</option><option value="points">По баллам ↓</option><option value="works">По количеству работ ↓</option></select></div>
- <div class="section-head"><div><h2 id="listTitle">Рабочее пространство</h2><p id="listSub">Выберите художника, чтобы посмотреть его работы</p></div><button class="btn" id="addArtistBtn">＋ Художник</button></div>
+ <div class="toolbar"><div class="search"><input id="search" placeholder="Поиск по имени, VK или профилю…"></div><select id="artistFilter"><option value="">Все художники</option></select><select id="sort"><option value="name">По имени</option><option value="points">По баллам ↓</option></select></div>
+ <div class="section-head"><div><h2 id="listTitle">Рабочее пространство</h2><p id="listSub">Выберите художника</p></div></div>
  <div id="content"></div>
 </main></div>
-<div class="modal-backdrop" id="modalBackdrop"><div class="modal"><h2 id="modalTitle">Добавить работу</h2><form id="entryForm"><div class="form-grid" id="formFields"></div><div class="modal-actions"><button type="button" class="btn" id="cancelModal">Отмена</button><button class="btn primary" type="submit">Сохранить</button></div></form></div></div>
-<div class="toast" id="toast"></div>
+
 <script>
-const SHEET_ID='1qq0j4UezAaRqbfYNi10YwvIq368hKz3s0lXDy8lIz-A', GID='1451933879';
+// ⚠️ ВСТАВЬТЕ СЮДА ССЫЛКУ ИЗ GOOGLE ТАБЛИЦЫ
+const CSV_URL = https://docs.google.com/spreadsheets/d/1hjiRKo9s39_sUv9JCfZ70GAffxHH5K306Lyv-Yfu7os/edit?gid=0#gid=0; 
+
 const CATS=['Фон с нуля','Украш. фон','Костюм фулл & боты','Костюм','Предметы','Медаль','Шапка','Иное'];
-let artists=[], works=[], currentArtist=null, view='board', source='server';
+let artists=[], works=[], currentArtist=null, view='board';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const slug=s=>String(s||'').toLowerCase().trim();
 
-function toast(s){$('toast').textContent=s;$('toast').classList.add('show');setTimeout(()=>$('toast').classList.remove('show'),2600)}
-
-// --- СЕРВЕРНАЯ ЛОГИКА ---
 async function fetchData() {
   try {
-    $('loadingOverlay').style.display = 'flex';
-    const res = await fetch('/.netlify/functions/data');
-    if (res.ok) {
-      const data = await res.json();
-      artists = data.artists || [];
-      works = data.works || [];
-    }
+    const res = await fetch(CSV_URL);
+    if (!res.ok) throw new Error();
+    const text = await res.text();
+    importRows(parseCSV(text));
   } catch (e) {
-    toast('Ошибка загрузки данных с сервера');
-    console.error(e);
+    alert('Ошибка загрузки. Проверьте ссылку на CSV и доступ к таблице (должно быть "Читатель по ссылке").');
   } finally {
     $('loadingOverlay').style.display = 'none';
     render();
   }
 }
 
-async function saveData() {
-  try {
-    toast('Сохранение...');
-    const res = await fetch('/.netlify/functions/data', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ artists, works })
-    });
-    if (res.ok) {
-      toast('Данные сохранены в облаке!');
-    } else {
-      toast('Ошибка сохранения на сервере');
-    }
-  } catch (e) {
-    toast('Ошибка сети при сохранении');
-    console.error(e);
-  }
-}
-// ------------------------
-
-function id(){return 'id'+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 function aWorks(a){return works.filter(w=>w.artistId===a.id)}
 function points(a){return aWorks(a).reduce((s,w)=>s+(Number(w.points)||0),0)}
 function initials(a){return (a.name||'?').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()}
-function artistLink(a){return a.vk?`https://vk.com/${esc(a.vk.replace(/^.*vk\.com\//,''))}`:'#'}
 function updateStats(){ $('statArtists').textContent=artists.length;$('statWorks').textContent=works.length;$('statPoints').textContent=works.reduce((s,w)=>s+(+w.points||0),0);$('statEmpty').textContent=artists.filter(a=>!aWorks(a).length).length;
  const old=$('artistFilter').value;$('artistFilter').innerHTML='<option value="">Все художники</option>'+artists.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('');$('artistFilter').value=old;}
-function render(){updateStats();let q=slug($('search').value),filter=$('artistFilter').value,sort=$('sort').value;
+
+function render(){
+ updateStats();let q=slug($('search').value),filter=$('artistFilter').value,sort=$('sort').value;
  let list=artists.filter(a=>(!filter||a.id===filter)&&(!q||slug([a.name,a.catwar,a.vk,a.profile].join(' ')).includes(q)));
- list.sort((a,b)=>sort==='points'?points(b)-points(a):sort==='works'?aWorks(b).length-aWorks(a).length:a.name.localeCompare(b.name,'ru'));
- if(view==='settings'){renderSettings();return}
- if(view==='works'){renderAllWorks();return}
+ list.sort((a,b)=>sort==='points'?points(b)-points(a):a.name.localeCompare(b.name,'ru'));
  if(view==='artists'){renderArtists(list);return}
  if(!currentArtist||!artists.some(a=>a.id===currentArtist))currentArtist=(list[0]||{}).id;
- if(!list.length){$('content').innerHTML='<div class="empty-state"><b>Пока никого нет</b>Добавьте художника или загрузите данные из таблицы.</div>';return}
+ if(!list.length){$('content').innerHTML='<div class="empty-state"><b>Пока никого нет</b>Заполните данные в Google Таблице.</div>';return}
  if(!list.some(a=>a.id===currentArtist))currentArtist=list[0].id;
- const a=artists.find(a=>a.id===currentArtist);$('content').innerHTML=boardHTML(a);bindBoard();}
-function boardHTML(a){let aw=aWorks(a);let tags=(a.profile||'').split(/[,;\n]/).map(x=>x.trim()).filter(Boolean);
-return `<div class="board"><section class="artist-panel"><div class="artist-hero"><div class="avatar">${a.avatar?`<img src="${esc(a.avatar)}" alt="">`:esc(initials(a))}</div><div><div class="artist-name">${esc(a.name)}</div><div class="artist-sub">${esc(a.catwar||'Имя в CatWar не указано')}</div></div></div><div class="links">${a.catwarUrl?`<a href="${esc(a.catwarUrl)}" target="_blank" rel="noopener">↗ CatWar</a>`:''}${a.vk?`<a href="${artistLink(a)}" target="_blank" rel="noopener">↗ VK</a>`:''}<a href="#" id="editArtistLink">✎ Изменить профиль</a></div><div class="divider"></div><div><div class="field-label">Профильность</div><div class="bio">${esc(a.bio||'Пока нет описания профильности.')}</div><div class="chips" style="margin-top:9px">${tags.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div></div><div class="divider"></div><div class="mini-stats"><div class="mini-stat"><span>Всего баллов</span><b>${points(a)}</b></div><div class="mini-stat"><span>Работ учтено</span><b>${aw.length}</b></div></div><div class="edit-note">Данные синхронизированы с облаком.</div><button class="btn" id="deleteArtistBtn">Удалить художника</button></section>
-<section class="work-area"><div class="work-head"><h3>Работы художника</h3><span>${aw.length} шт. · ${points(a)} баллов</span></div><div class="work-columns">${CATS.map(cat=>{let ws=aw.filter(w=>w.category===cat);return `<div class="work-col"><div class="col-title"><span>${esc(cat)}</span><span class="count">${ws.length}</span></div>${ws.length?ws.map(w=>workCardHTML(w)).join(''):'<div class="empty">Нет работ</div>'}</div>`}).join('')}</div><div class="bottom-actions"><button class="btn primary" id="addWorkForArtist">＋ Добавить работу</button><button class="btn" id="exportArtist">Экспорт работ CSV</button></div></section></div>`}
-function workCardHTML(w){
-  const hasUrl = w.url && /^https?:\/\//i.test(w.url);
-  let thumbHtml;
-  if (hasUrl) {
-    thumbHtml = `<img class="thumb" src="${esc(w.url)}" alt="${esc(w.title||'Работа')}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="thumb-fallback" style="display:none">🖼</div>`;
-  } else {
-    thumbHtml = `<div class="thumb-fallback">🖼</div>`;
-  }
-  return `<div class="work-card">${thumbHtml}${w.url?`<a href="${esc(w.url)}" target="_blank" rel="noopener">${esc(w.title||'Работа без названия')} ↗</a>`:`<b>${esc(w.title||'Работа без названия')}</b>`}<div class="meta"><span>${esc(w.date||'Дата не указана')}</span><span class="points">+${+w.points||0}</span></div>${w.note?`<div style="color:#8c877f;margin-top:5px">${esc(w.note)}</div>`:''}<div style="text-align:right;margin-top:5px"><a href="#" data-delete-work="${w.id}" style="font-weight:500;color:#a49b90">удалить</a></div></div>`;
+ const a=artists.find(a=>a.id===currentArtist);$('content').innerHTML=boardHTML(a);
 }
-function renderArtists(list){$('content').innerHTML=list.length?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px">${list.map(a=>`<div class="artist-panel" style="cursor:pointer" data-open-artist="${a.id}"><div class="artist-hero"><div class="avatar" style="width:55px;height:55px">${a.avatar?`<img src="${esc(a.avatar)}">`:esc(initials(a))}</div><div><div class="artist-name">${esc(a.name)}</div><div class="artist-sub">${esc(a.catwar||'CatWar не указан')}</div></div></div><div class="divider"></div><div class="bio">${esc(a.bio||'Профильность не заполнена')}</div><div class="mini-stats"><div class="mini-stat"><span>Баллы</span><b>${points(a)}</b></div><div class="mini-stat"><span>Работы</span><b>${aWorks(a).length}</b></div></div></div>`).join('')}</div>`:'<div class="empty-state"><b>Ничего не найдено</b>Попробуйте изменить запрос или добавить художника.</div>';document.querySelectorAll('[data-open-artist]').forEach(el=>el.onclick=()=>{currentArtist=el.dataset.openArtist;view='board';setView('board');render()})}
-function renderAllWorks(){let ws=works.filter(w=>(!$('artistFilter').value||w.artistId===$('artistFilter').value)&&(!slug($('search').value)||slug([w.title,w.category,w.note,(artists.find(a=>a.id===w.artistId)||{}).name].join(' ')).includes(slug($('search').value))));$('content').innerHTML=ws.length?`<div style="background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:auto"><table style="border-collapse:collapse;width:100%;min-width:650px"><thead><tr>${['Превью','Художник','Работа','Категория','Дата','Баллы',''].map(x=>`<th style="text-align:left;padding:12px;border-bottom:1px solid var(--line);font-size:11px;color:var(--muted)">${x}</th>`).join('')}</tr></thead><tbody>${ws.map(w=>{
-  const hasUrl = w.url && /^https?:\/\//i.test(w.url);
-  const thumbCell = hasUrl 
-    ? `<td style="padding:6px 12px;border-bottom:1px solid var(--line)"><img src="${esc(w.url)}" alt="" style="width:56px;height:40px;object-fit:cover;border-radius:5px;background:#f0ebe5" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span style="display:none;width:56px;height:40px;align-items:center;justify-content:center;color:#b5a99c;background:#f0ebe5;border-radius:5px">🖼</span></td>`
-    : `<td style="padding:6px 12px;border-bottom:1px solid var(--line)"><span style="display:flex;width:56px;height:40px;align-items:center;justify-content:center;color:#b5a99c;background:#f0ebe5;border-radius:5px">🖼</span></td>`;
-  return `<tr>${thumbCell}<td style="padding:12px;border-bottom:1px solid var(--line)">${esc((artists.find(a=>a.id===w.artistId)||{}).name||'—')}</td><td style="padding:12px;border-bottom:1px solid var(--line)">${w.url?`<a href="${esc(w.url)}" target="_blank">${esc(w.title||'Без названия')} ↗</a>`:esc(w.title||'Без названия')}</td><td style="padding:12px;border-bottom:1px solid var(--line)">${esc(w.category)}</td><td style="padding:12px;border-bottom:1px solid var(--line)">${esc(w.date||'—')}</td><td style="padding:12px;border-bottom:1px solid var(--line);font-weight:800;color:var(--green)">+${+w.points||0}</td><td><button class="btn" data-delete-work="${w.id}">Удалить</button></td></tr>`
-}).join('')}</tbody></table></div>`:'<div class="empty-state"><b>Работ пока нет</b>Добавьте первую работу, чтобы начать подсчёт.</div>';bindDeleteWorks()}
-function renderSettings(){$('content').innerHTML=`<div class="artist-panel" style="max-width:760px"><h3 style="margin:0">Источник данных: Облако (Netlify Blobs)</h3><p style="color:var(--muted);margin:0">Ваши данные теперь сохраняются на сервере и доступны всем посетителям сайта.</p><div class="divider"></div><div class="field-label">Синхронизация</div><p id="sourceStatus">Активна.</p><div class="bottom-actions"><button class="btn primary" id="connectSheet">Загрузить данные из Google Таблицы (вручную)</button><label class="btn" for="csvFile">Загрузить CSV</label><input type="file" id="csvFile" accept=".csv,text/csv" style="display:none"><button class="btn" id="downloadBackup">Скачать резервную копию</button></div></div>`;$('connectSheet').onclick=connectSheet;$('csvFile').onchange=e=>{if(e.target.files[0])importCSVFile(e.target.files[0])};$('downloadBackup').onclick=backup;}
-function setView(v){view=v;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));$('pageTitle').textContent=({board:'Доска художников',artists:'Все художники',works:'Все работы',settings:'Источник данных'})[v];$('listTitle').textContent=({board:'Рабочее пространство',artists:'Список художников',works:'Реестр работ',settings:'Настройка источника'})[v];$('listSub').textContent=({board:'Выберите художника, чтобы посмотреть его работы',artists:'Нажмите на карточку, чтобы открыть рабочее место',works:'Все начисления в одном списке',settings:'Импорт, экспорт и резервное копирование'})[v];$('addBtn').style.display=v==='settings'?'none':'';$('addArtistBtn').style.display=v==='settings'||v==='works'?'none':'';render()}
+
+function boardHTML(a){
+ let aw=aWorks(a);let tags=(a.profile||'').split(/[,;\n]/).map(x=>x.trim()).filter(Boolean);
+ return `<div class="board"><section class="artist-panel"><div class="artist-hero"><div class="avatar">${esc(initials(a))}</div><div><div class="artist-name">${esc(a.name)}</div><div class="artist-sub">${esc(a.catwar||'Нет ника')}</div></div></div><div class="links">${a.vk?`<a href="https://vk.com/${esc(a.vk)}" target="_blank">↗ VK</a>`:''}</div><div class="divider"></div><div><div class="field-label">Профильность</div><div class="bio">${esc(a.bio||'Нет описания.')}</div><div class="chips" style="margin-top:9px">${tags.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div></div><div class="divider"></div><div class="mini-stats"><div class="mini-stat"><span>Всего баллов</span><b>${points(a)}</b></div><div class="mini-stat"><span>Работ</span><b>${aw.length}</b></div></div></section>
+ <section class="work-area"><div class="work-head"><h3>Работы</h3><span>${aw.length} шт.</span></div><div class="work-columns">${CATS.map(cat=>{let ws=aw.filter(w=>w.category===cat);return `<div class="work-col"><div class="col-title"><span>${esc(cat)}</span><span class="count">${ws.length}</span></div>${ws.length?ws.map(w=>workCardHTML(w)).join(''):'<div class="empty">Нет работ</div>'}</div>`}).join('')}</div></section></div>`;
+}
+
+function workCardHTML(w){
+ const hasUrl = w.url && /^https?:\/\//i.test(w.url);
+ let thumb = hasUrl ? `<img class="thumb" src="${esc(w.url)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="thumb-fallback" style="display:none">🖼</div>` : `<div class="thumb-fallback">🖼</div>`;
+ return `<div class="work-card">${thumb}${w.url?`<a href="${esc(w.url)}" target="_blank">${esc(w.title||'Без названия')} ↗</a>`:`<b>${esc(w.title||'Без названия')}</b>`}<div class="meta"><span>${esc(w.date||'')}</span><span class="points">+${+w.points||0}</span></div></div>`;
+}
+
+function renderArtists(list){
+ $('content').innerHTML=list.length?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px">${list.map(a=>`<div class="artist-panel" style="cursor:pointer" data-open="${a.id}"><div class="artist-hero"><div class="avatar" style="width:55px;height:55px">${esc(initials(a))}</div><div><div class="artist-name">${esc(a.name)}</div><div class="artist-sub">${esc(a.catwar)}</div></div></div><div class="bio">${esc(a.bio)}</div><div class="mini-stats"><div class="mini-stat"><span>Баллы</span><b>${points(a)}</b></div><div class="mini-stat"><span>Работы</span><b>${aWorks(a).length}</b></div></div></div>`).join('')}</div>`:'<div class="empty-state"><b>Ничего не найдено</b></div>';
+ document.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>{currentArtist=el.dataset.open;setView('board')});
+}
+
+function setView(v){
+ view=v;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
+ $('pageTitle').textContent=({board:'Доска художников',artists:'Все художники'})[v];
+ $('listTitle').textContent=({board:'Рабочее пространство',artists:'Список художников'})[v];
+ render();
+}
 document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>setView(b.dataset.view));
-function openModal(type,initial={}){$('modalBackdrop').classList.add('open');$('entryForm').dataset.type=type;$('entryForm').dataset.id=initial.id||'';$('modalTitle').textContent=type==='artist'?(initial.id?'Изменить художника':'Добавить художника'):'Добавить работу';let fields=type==='artist'?[['name','Имя художника *',initial.name,'text',1],['catwar','Имя в CatWar',initial.catwar,'text'],['vk','VK (ссылка или короткое имя)',initial.vk,'text'],['catwarUrl','Ссылка на профиль CatWar',initial.catwarUrl,'url'],['avatar','Ссылка на превью / аватар',initial.avatar,'url'],['profile','Профильность / специализации',initial.profile,'text'],['bio','Описание профильности',initial.bio,'textarea',1]]:[['artistId','Художник',initial.artistId,'select',1],['category','Категория работы',initial.category,'category',1],['title','Название работы *',initial.title,'text',1],['url','Ссылка на работу (используется как превью)',initial.url,'url'],['date','Дата',initial.date||new Date().toISOString().slice(0,10),'date'],['points','Баллы',initial.points??0,'number'],['note','Комментарий',initial.note,'textarea',1]];
-$('formFields').innerHTML=fields.map(([key,label,val,kind,full])=>`<div class="form-field ${full?'full':''}"><label for="f_${key}">${label}</label>${kind==='textarea'?`<textarea id="f_${key}" name="${key}">${esc(val||'')}</textarea>`:kind==='select'?`<select id="f_${key}" name="${key}" required>${artists.map(a=>`<option value="${a.id}" ${val===a.id?'selected':''}>${esc(a.name)}</option>`).join('')}</select>`:kind==='category'?`<select id="f_${key}" name="${key}" required>${CATS.map(c=>`<option ${val===c?'selected':''}>${esc(c)}</option>`).join('')}</select>`:`<input id="f_${key}" name="${key}" type="${kind}" value="${esc(val??'')}" ${key==='name'||key==='title'?'required':''}>`}</div>`).join('');}
 
-$('entryForm').onsubmit=async e=>{e.preventDefault();let type=e.target.dataset.type,id0=e.target.dataset.id,fd=new FormData(e.target),o=Object.fromEntries(fd.entries());if(type==='artist'){if(id0){artists=artists.map(a=>a.id===id0?{...a,...o}:a)}else{let a={...o,id:id()};artists.push(a);currentArtist=a.id}}else{if(!o.artistId){toast('Сначала добавьте художника');return}o.points=Number(o.points)||0;if(id0)works=works.map(w=>w.id===id0?{...w,...o}:w);else works.push({...o,id:id()})}
-$('modalBackdrop').classList.remove('open');render();await saveData();};
-
-$('cancelModal').onclick=()=>$('modalBackdrop').classList.remove('open');$('modalBackdrop').onclick=e=>{if(e.target===$('modalBackdrop'))$('modalBackdrop').classList.remove('open')};
-$('addBtn').onclick=()=>openModal('work',{artistId:currentArtist});$('addArtistBtn').onclick=()=>openModal('artist');
-function bindBoard(){ $('editArtistLink').onclick=e=>{e.preventDefault();openModal('artist',artists.find(a=>a.id===currentArtist))};$('deleteArtistBtn').onclick=async()=>{let a=artists.find(a=>a.id===currentArtist);if(confirm(`Удалить ${a.name} и все его работы?`)){artists=artists.filter(x=>x.id!==a.id);works=works.filter(w=>w.artistId!==a.id);currentArtist=null;render();await saveData();}};$('addWorkForArtist').onclick=()=>openModal('work',{artistId:currentArtist});$('exportArtist').onclick=()=>downloadCSV(works.filter(w=>w.artistId===currentArtist),'raboty-hudozhnika.csv');bindDeleteWorks()}
-function bindDeleteWorks(){document.querySelectorAll('[data-delete-work]').forEach(el=>el.onclick=async e=>{e.preventDefault();let wid=el.dataset.deleteWork;if(confirm('Удалить эту работу?')){works=works.filter(w=>w.id!==wid);render();await saveData();}})}
-function downloadCSV(rows,name){let head=['artistId','title','category','url','date','points','note'];let csv=[head.join(';'),...rows.map(w=>head.map(k=>String(w[k]??'').replace(/"/g,'""')).map(v=>`"${v}"`).join(';'))].join('\r\n');let blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();URL.revokeObjectURL(a.href)}
-function backup(){downloadCSV(works,'rezerv-raboty.csv');let blob=new Blob([JSON.stringify({artists,works},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='zhivopiscy-backup.json';a.click();URL.revokeObjectURL(a.href)}
-function importCSVFile(file){let r=new FileReader();r.onload=async()=>{let rows=parseCSV(r.result);await importRows(rows);toast('CSV импортирован');await saveData();};r.readAsText(file,'UTF-8')}
 function parseCSV(text){let first=text.split(/\r?\n/)[0]||'',del=(first.match(/;/g)||[]).length>(first.match(/,/g)||[]).length?';':',';let rows=[],row=[],v='',q=false,s=text.replace(/^\ufeff/,'');for(let i=0;i<s.length;i++){let c=s[i];if(c==='"'&&q&&s[i+1]==='"'){v+='"';i++}else if(c==='"')q=!q;else if(c===del&&!q){row.push(v);v=''}else if((c==='\n'||c==='\r')&&!q){if(c==='\r'&&s[i+1]==='\n')i++;row.push(v);if(row.some(x=>x.trim()))rows.push(row);row=[];v=''}else v+=c}row.push(v);if(row.some(x=>x.trim()))rows.push(row);return rows}
 function norm(s){return String(s||'').toLowerCase().replace(/[ё]/g,'е').replace(/[^a-zа-я0-9]+/g,'')}
-async function importRows(rows){if(!rows.length)return;let headers=rows[0].map(norm),idx=(...names)=>headers.findIndex(h=>names.some(n=>h.includes(norm(n))));let ni=idx('имяхудожника','художник','artist','имя'),ci=idx('catwar','кетвар','ник'),vi=idx('vk','вконтакте'),pi=idx('профильность','специализация'),bi=idx('описание','комментарийпрофиля'),wi=idx('названиеработы','название','работа','work'),cati=idx('категория','типработы','category'),ui=idx('ссылка','url','ссылка на работу'),di=idx('дата','date'),pti=idx('баллы','очки','points');
-if(ni<0){toast('Не найден столбец с именем художника. Проверьте заголовки CSV.');return}
-let imported=0;rows.slice(1).forEach(r=>{let name=(r[ni]||'').trim();if(!name)return;let catwar=ci>=0?(r[ci]||'').trim():'';let a=artists.find(a=>slug(a.name)===slug(name)&&(!catwar||slug(a.catwar)===slug(catwar)));if(!a){a={id:id(),name,catwar,vk:vi>=0?r[vi]||'':'',profile:pi>=0?r[pi]||'':'',bio:bi>=0?r[bi]||'':'',avatar:'',catwarUrl:''};artists.push(a)}else{if(catwar&&!a.catwar)a.catwar=catwar;if(vi>=0&&!a.vk)a.vk=r[vi]||'';if(pi>=0&&!a.profile)a.profile=r[pi]||'';if(bi>=0&&!a.bio)a.bio=r[bi]||''}
-if(wi>=0&&cati>=0&&(r[wi]||'').trim()){let category=(r[cati]||'').trim(),known=CATS.find(c=>norm(c)===norm(category))||CATS.find(c=>norm(c).includes(norm(category))||norm(category).includes(norm(c)))||'Иное';let title=(r[wi]||'').trim();if(!works.some(w=>w.artistId===a.id&&w.title===title&&w.category===known)){works.push({id:id(),artistId:a.id,title,category:known,url:ui>=0?r[ui]||'':'',date:di>=0?r[di]||'':'',points:pti>=0?Number(String(r[pti]||'0').replace(',','.'))||0:0,note:''});imported++}}});source='sheet';render();toast(`Загружено художников: ${artists.length}; новых работ: ${imported}`)}
-async function connectSheet(){let btn=$('connectSheet');btn.disabled=true;btn.textContent='Загрузка…';let urls=[`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=${GID}`,`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=${GID}`];for(let url of urls){try{let res=await fetch(url);if(!res.ok)continue;let txt=await res.text();if(!txt||txt.includes('<!DOCTYPE html'))continue;let rows=parseCSV(txt);if(rows.length>1){await importRows(rows);await saveData();btn.disabled=false;btn.textContent='Загрузить данные из Google Таблицы (вручную)';return}}catch(e){}}btn.disabled=false;btn.textContent='Загрузить данные из Google Таблицы (вручную)';alert('Не удалось прочитать таблицу напрямую. Возможно, она не опубликована для чтения.');}
 
-$('refreshBtn').onclick=()=>fetchData();
+function importRows(rows){
+ if(!rows.length)return;
+ artists=[]; works=[];
+ let headers=rows[0].map(norm),idx=(...names)=>headers.findIndex(h=>names.some(n=>h.includes(norm(n))));
+ let ni=idx('имя','художник'),ci=idx('ник','catwar'),vi=idx('вк','vk'),pi=idx('профиль','спец'),bi=idx('описание','коммент'),wi=idx('работа','название'),cati=idx('категория','тип'),ui=idx('ссылка','url'),di=idx('дата'),pti=idx('баллы','очки');
+ rows.slice(1).forEach(r=>{
+  let name=(r[ni]||'').trim();if(!name)return;let catwar=ci>=0?(r[ci]||'').trim():'';
+  let a=artists.find(a=>slug(a.name)===slug(name)&&(!catwar||slug(a.catwar)===slug(catwar)));
+  if(!a){a={id:'a'+artists.length,name,catwar,vk:vi>=0?r[vi]||'':'',profile:pi>=0?r[pi]||'':'',bio:bi>=0?r[bi]||'':''};artists.push(a)}
+  if(wi>=0&&(r[wi]||'').trim()){
+   let category=(cati>=0?r[cati]:'').trim(),known=CATS.find(c=>norm(c)===norm(category))||'Иное';
+   works.push({id:'w'+works.length,artistId:a.id,title:r[wi].trim(),category:known,url:ui>=0?r[ui]||'':'',date:di>=0?r[di]||'':'',points:pti>=0?Number(String(r[pti]||'0').replace(',','.'))||0:0});
+  }
+ });
+}
 $('search').oninput=render;$('artistFilter').onchange=render;$('sort').onchange=render;
-
-// Старт программы
 fetchData();
 </script></body></html>
