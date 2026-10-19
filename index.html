@@ -79,9 +79,8 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
 // ⚠️ ССЫЛКА НА ВАШУ ТАБЛИЦУ (Работы)
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/1hjiRKo9s39_sUv9JCfZ70GAffxHH5K306Lyv-Yfu7os/export?format=csv&gid=0'; 
 
-// ⚠️ ССЫЛКА НА ВАШУ ТАБЛИЦУ (Списания) 
-// Если вкладка "Списания" не первая (gid=0), а вторая, поменяй gid=0 на gid=1
-const DEDUCTIONS_URL = 'https://docs.google.com/spreadsheets/d/1hjiRKo9s39_sUv9JCfZ70GAffxHH5K306Lyv-Yfu7os/export?format=csv&gid=1';
+// ⚠️ ССЫЛКА НА ВАШУ ТАБЛИЦУ (Списания). Если вкладка вторая - поменяй gid=0 на gid=1
+const DEDUCTIONS_URL = 'https://docs.google.com/spreadsheets/d/1hjiRKo9s39_sUv9JCfZ70GAffxHH5K306Lyv-Yfu7os/export?format=csv&gid=0';
 
 const CATS=['Фон с нуля','Украш. фон','Костюм фулл & боты','Костюм','Предметы','Медаль','Шапка','Иное'];
 let artists=[], works=[], deductions=[], currentArtist=null, view='board';
@@ -111,20 +110,18 @@ function parseDate(dStr) {
 async function fetchData() {
   try {
     $('loadingOverlay').style.display = 'flex';
-    // Загружаем работы
     const resWorks = await fetch(CSV_URL);
     if (resWorks.ok) {
         const textWorks = await resWorks.text();
         importRows(parseCSV(textWorks));
     }
-    // Загружаем списания
     const resDeductions = await fetch(DEDUCTIONS_URL);
     if (resDeductions.ok) {
         const textDed = await resDeductions.text();
         importDeductions(parseCSV(textDed));
     }
   } catch (e) {
-    console.error(e);
+    alert('Ошибка загрузки. Проверьте ссылки на CSV.');
   } finally {
     $('loadingOverlay').style.display = 'none';
     render();
@@ -133,16 +130,16 @@ async function fetchData() {
 
 function aWorks(a){return works.filter(w=>w.artistId===a.id)}
 
-// Считает общие баллы за работы
+// Сырые баллы (без учета трат)
 function rawPoints(a){return aWorks(a).reduce((s,w)=>s+(Number(w.points)||0),0)}
 
-// Считает обычные баллы с учетом списаний
+// Текущие баллы (с учетом трат)
 function currentPoints(a){
     let spent = deductions.filter(d => d.artistId === a.id).reduce((s,d)=>s+d.pts, 0);
     return Math.max(0, rawPoints(a) - spent);
 }
 
-// Считает ВСЕГО заработанных НБ (для порогов)
+// Сырые НБ (для порогов)
 function rawBonusPoints(a) {
     let aw = aWorks(a);
     if (aw.length < 3) return 0;
@@ -155,7 +152,7 @@ function rawBonusPoints(a) {
     return Math.round(totalBonus * 10) / 10;
 }
 
-// Считает ТЕКУЩИЕ НБ (с учетом списаний для магазина)
+// Текущие НБ (для магазина)
 function currentBonusPoints(a) {
     let spentNb = deductions.filter(d => d.artistId === a.id).reduce((s,d)=>s+d.nb, 0);
     let raw = rawBonusPoints(a);
@@ -309,11 +306,8 @@ function renderRewards() {
   });
 
   let checkedArtist = artists.find(a => a.id === rewardCheckArtistId);
-  // Для наград за обычные баллы смотрим ТЕКУЩИЕ баллы (за вычетом)
   let aPts = checkedArtist ? currentPoints(checkedArtist) : 0;
-  // Для наград в магазине смотрим ТЕКУЩИЕ НБ (баланс)
   let aNb = checkedArtist ? currentBonusPoints(checkedArtist) : 0;
-  // Для порогов "за всю жизнь" смотрим ВСЕГО ЗАРАБОТАНО (без вычета)
   let aRawNb = checkedArtist ? rawBonusPoints(checkedArtist) : 0;
 
   const card = (title, desc, price, isNb, imgUrl, isLifetime = false) => {
@@ -359,26 +353,26 @@ function renderRewards() {
     <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--accent); padding-bottom:5px; color:var(--accent);">Награды за Наградные баллы (НБ)</h3>
     <h4 style="margin: 15px 0 10px 0; font-size:14px;">Магазин (Баллы снимаются)</h4>
     <div class="rewards-grid">
-      ${card('Обмен на жетоны', 'Не более 15 в месяц', 1, true, 'https://i.ibb.co/ВАША_ССЫЛКА_1.png')}
-      ${card('Медаль мероприятия', 'На усмотрение Ведущего Творца', 0, true, 'https://i.ibb.co/ВАША_ССЫЛКА_2.png')}
-      ${card('След на фоне (1 сезон)', 'Добавить свой след на любой фон сроком на 1 сезон', 15, true, 'https://i.ibb.co/ВАША_ССЫЛКА_3.png')}
-      ${card('Личный костюм (1 неделя)', 'Костюм на неделю', 30, true, 'https://i.ibb.co/ВАША_ССЫЛКА_4.png')}
-      ${card('Личный костюм (2 недели)', 'Костюм на две недели', 50, true, 'https://i.ibb.co/ВАША_ССЫЛКА_5.png')}
-      ${card('Оформление плашки (Одаз/Манназ)', 'Личное оформление плашки живописцев', 70, true, 'https://i.ibb.co/ВАША_ССЫЛКА_6.png')}
-      ${card('Оформление сокровищницы', 'Кастомное оформление', 100, true, 'https://i.ibb.co/ВАША_ССЫЛКА_7.png')}
+      ${card('Обмен на жетоны', 'Не более 15 в месяц', 1, true, 'https://i.ibb.co/zWkPkVyt/utt-BQa9-Xi0u-JUQs-Dx-GY8-Ll-HQ0-FF3se-Ql-Wy1p-TGFH54y-Qcd-Zgh-Q0b-Ge-Lpw-Kn-GX-KLflwnb1-G1-GGj-LU4-HLKz-R.png')}
+      ${card('Медаль мероприятия', 'На усмотрение Ведущего Творца', 0, true, 'https://i.ibb.co/ynk8nHDn/1890.png')}
+      ${card('След на фоне (1 сезон)', 'Добавить свой след на любой фон сроком на 1 сезон', 15, true, 'https://i.ibb.co/0RFx5HZN/7-cmi-Hp73ct4n-ZZt-B0-Anq-Laep-HUqiv4-Y95jq-Y6u-SO6ne-WXZJ5-ahu-IIg-UIc-JCn5-6jo6-JSGZ-7-Xhvd-S08-Fg-CVr7.jpg')}
+      ${card('Личный костюм (1 неделя)', 'Костюм на неделю', 30, true, null)}
+      ${card('Личный костюм (2 недели)', 'Костюм на две недели', 50, true, null)}
+      ${card('Оформление плашки (Одаз/Манназ)', 'Личное оформление плашки живописцев', 70, true, null)}
+      ${card('Оформление сокровищницы', 'Кастомное оформление', 100, true, null)}
     </div>
 
-    <h4 style="margin: 20px 0 10px 0; font-size:14px;">За всю жизнь (По желанию игрока)</h4>
+    <h4 style="margin: 20px 0 10px 0; font-size:14px;">Награды за достижение определенного порога НБ (выдается по желанию игрока)</h4>
     <div class="rewards-grid">
-      ${card('Личная ачивка', 'Убирается при смене персонажа, но можно поставить снова', 50, true, 'https://i.ibb.co/ВАША_ССЫЛКА_8.png', true)}
-      ${card('След на фоне (НАВСЕГДА)', 'Может потеряться, если фон перерисуется с нуля', 100, true, 'https://i.ibb.co/ВАША_ССЫЛКА_9.png', true)}
-      ${card('Упоминание в блоге', 'Упоминание в блоге мастерской чудес', 150, true, 'https://i.ibb.co/ВАША_ССЫЛКА_10.png', true)}
+      ${card('Личная ачивка', 'Убирается при смене персонажа, но можно поставить снова', 50, true, 'https://i.ibb.co/9k037Wt1/54324234.png', true)}
+      ${card('След на фоне (НАВСЕГДА)', 'Может потеряться, если фон перерисуется с нуля', 100, true, 'https://i.ibb.co/TDY645GJ/L0-PCm4-Thb-QKCFGHJtc-T716es-X5o-L6-N1i9-Wx-Wc-ULk-M7k-Vbx-CHN-Nm-Y15-N-v-WSJLGLFat0i-RDOTuvp4-Z50q8-Zg-K8-D.jpg', true)}
+      ${card('Упоминание в блоге', 'Упоминание в блоге мастерской чудес', 150, true, null, true)}
     </div>
 
     <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--line); padding-bottom:5px;">Информационная сводка</h3>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:15px;">
         <div class="info-block">
-            <h3 style="border-bottom:none; color:var(--accent);">| РАЗБАЛЛОВКА | ИВЕНТЫ</h3>
+            <h3 style="border-bottom:none; color:var(--accent);">| РАЗБАЛЛОВКА |</h3>
             <ul>
                 <li><b>фон с нуля</b> — от 20 до 30 баллов;</li>
                 <li><b>украшенный фон</b> — от 5 до 10 баллов;</li>
@@ -394,9 +388,9 @@ function renderRewards() {
         <div class="info-block">
             <h3 style="border-bottom:none; color:var(--accent);">За что можно получить НБ</h3>
             <ul>
-                <li><b>фиксированная выдача НБ</b>: За каждую третью работу вы получаете наградные баллы, равные половине полученных отрядных баллов за наиболее дорогую в троице работу.</li>
-                <li><b>срочность работ (по запросу ВТ)</b>: За каждую работу, нарисованную менее, чем за неделю, вы получите половину от полученных художественных баллов.</li>
-                <li><b>важность работ (по усмотрению верха или ВТ)</b>: Строго по одобрению ВТ или предводителя.</li>
+                <li><b>фиксированная выдача НБ</b>: За каждую третью работу вы получаете наградные баллы, равные среднему значению полученных отрядных баллов во всей троице работ.</li>
+                <li><b>срочность работ (по запросу Ведущего Творца)</b>: За каждую работу, нарисованную менее, чем за неделю, вы получите половину от полученных художественных баллов.</li>
+                <li><b>важность работ (по усмотрению верха или Ведущего Творца)</b>: Строго по одобрению ВТ или предводителя.</li>
             </ul>
         </div>
     </div>
@@ -543,7 +537,7 @@ function importDeductions(rows) {
     let name = (r[ni]||'').trim();
     if(!name) return;
     let a = artists.find(a => slug(a.name) === slug(name));
-    if(!a) return; // Если такого художника нет в основной таблице, пропускаем
+    if(!a) return;
 
     deductions.push({
       artistId: a.id,
