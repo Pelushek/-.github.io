@@ -42,9 +42,20 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
 .reward-title{font-size:14px;font-weight:800;margin:0 0 5px 0;line-height:1.2}
 .reward-desc{font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.4}
 .reward-price{font-size:12px;font-weight:700;color:var(--accent)}
-.reward-status{font-size:11px;font-weight:700;margin-top:5px}
-.status-avail{display:none;}
-.status-no{color:#a85840}
+
+/* Стили для выделения нехватки баллов */
+.reward-status.status-no {
+    background: #fff1f0;
+    color: #c0392b;
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-block;
+    margin-top: 8px;
+    border: 1px solid #ffcdd2;
+}
+
 .info-block{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:20px;box-shadow:var(--shadow);margin-bottom:20px}
 .info-block h3{margin:0 0 15px 0;font-size:16px;border-bottom:1px solid var(--line);padding-bottom:10px}
 .info-block ul{margin:0;padding-left:20px;font-size:13px;line-height:1.6}
@@ -287,10 +298,10 @@ function renderRewards() {
       if (checkedArtist) {
           if (isNb) {
               avail = aNb >= price;
-              statusHtml = avail ? `` : `<div class="reward-status status-no">Не хватает ${price - aNb} НБ</div>`;
+              statusHtml = avail ? `` : `<div class="reward-status status-no">До награды: не хватает ${price - aNb} НБ</div>`;
           } else {
               avail = aPts >= price;
-              statusHtml = avail ? `` : `<div class="reward-status status-no">Не хватает ${price - aPts} баллов</div>`;
+              statusHtml = avail ? `` : `<div class="reward-status status-no">До награды: не хватает ${price - aPts} баллов</div>`;
           }
       }
 
