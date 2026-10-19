@@ -15,7 +15,6 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
 .show-more-btn {display:block; width:100%; text-align:center; background:#fff; border:1px solid var(--line); color:var(--accent); font-size:11px; font-weight:700; padding:6px 0; border-radius:6px; margin-top:6px; cursor:pointer; transition:0.2s;}
 .show-more-btn:hover {background:#fdf9f6; border-color:var(--accent);}
 
-/* Стили для новой вкладки "Награды" */
 .rewards-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:14px;margin-bottom:25px}
 .reward-card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:15px;display:flex;gap:15px;align-items:flex-start;box-shadow:var(--shadow);transition:border-color 0.2s}
 .reward-card.available{border-color:var(--green);background:#f4f7f4;}
@@ -46,7 +45,7 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
 </aside>
 <main>
  <div class="topbar"><div><div class="eyebrow">Панель координатора</div><h1 id="pageTitle">Доска художников</h1></div><div class="actions"><button class="btn" onclick="location.reload()">↻ Обновить</button></div></div>
- <section class="stats">
+ <section class="stats" style="display:none;">
  <div class="stat"><span>Художников</span><strong id="statArtists">0</strong></div>
  <div class="stat"><span>Работ учтено</span><strong id="statWorks">0</strong></div>
  <div class="stat"><span>Начислено баллов</span><strong id="statPoints">0</strong></div>
@@ -69,7 +68,7 @@ const CSV_URL = 'https://docs.google.com/spreadsheets/d/1hjiRKo9s39_sUv9JCfZ70GA
 const CATS=['Фон с нуля','Украш. фон','Костюм фулл & боты','Костюм','Предметы','Медаль','Шапка','Иное'];
 let artists=[], works=[], currentArtist=null, view='board';
 let expandedCats = {}; 
-let rewardCheckArtistId = ''; // Для вкладки наград
+let rewardCheckArtistId = ''; 
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -251,10 +250,9 @@ function renderAllWorks(){
 }).join('')}</tbody></table></div>`:'<div class="empty-state"><b>Работ пока нет</b>Добавьте первую работу в Google Таблицу.</div>';
 }
 
-// === ВКЛАДКА НАГРАДЫ ===
 function renderRewards() {
   let options = '<option value="">-- Выберите художника для проверки --</option>';
-  artists.sort((a,b)=>a.name.localeCompare(b.name,'ru')).forEach(a => {
+  artists.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).forEach(a => {
       options += `<option value="${a.id}" ${rewardCheckArtistId === a.id ? 'selected' : ''}>${esc(a.name)}</option>`;
   });
 
@@ -262,7 +260,6 @@ function renderRewards() {
   let aPts = checkedArtist ? points(checkedArtist) : 0;
   let aNb = checkedArtist ? bonusPoints(checkedArtist) : 0;
 
-  // Функция для рендера одной карточки награды
   const card = (title, desc, price, isNb, imgUrl) => {
       let avail = false;
       let statusHtml = '';
@@ -355,10 +352,9 @@ function renderRewards() {
 
   $('rewardArtistSelect').onchange = (e) => {
       rewardCheckArtistId = e.target.value;
-      renderRewards(); // Перерисовываем только вкладку наград
+      renderRewards(); 
   };
 }
-// =======================
 
 function setView(v){
  view=v;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
@@ -366,14 +362,12 @@ function setView(v){
  $('listTitle').textContent=({board:'Рабочее пространство',artists:'Список художников',works:'Реестр работ',rewards:'Награды'})[v];
  $('listSub').textContent=({board:'Выберите художника',artists:'Нажмите на карточку',works:'Все начисления в одном списке',rewards:'Информация о наградах и баллах'})[v];
  
- // Скрываем поиск и фильтры на вкладке наград
  if (v === 'rewards') {
      document.querySelector('.toolbar').style.display = 'none';
  } else {
      document.querySelector('.toolbar').style.display = 'flex';
  }
 
- // Скрываем блок со статистикой (цифрами) на выбранных вкладках
  const statsBlock = document.querySelector('.stats');
  if (v === 'board' || v === 'works' || v === 'rewards') {
      statsBlock.style.display = 'none';
@@ -445,4 +439,9 @@ function importRows(rows){
  });
 }
 $('search').oninput=render;$('artistFilter').onchange=render;$('sort').onchange=render;
+
+// Инициализация: сразу применяем вид "Доска", чтобы скрыть лишние блоки
+setView('board');
+
 fetchData();
+</script></body></html>
