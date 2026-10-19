@@ -63,6 +63,7 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
      <option value="плашк">Плашки</option>
      <option value="ачивк">Ачивки</option>
    </select>
+   <select id="artistFilter"><option value="">Все художники</option></select>
    <select id="sort">
      <option value="name">По имени</option>
      <option value="points">По баллам ↓</option>
@@ -133,15 +134,18 @@ function bonusPoints(a) {
 }
 
 function initials(a){return (a.name||'?').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()}
-function updateStats(){ $('statArtists').textContent=artists.length;$('statWorks').textContent=works.length;$('statPoints').textContent=works.reduce((s,w)=>s+(+w.points||0),0);$('statEmpty').textContent=artists.filter(a=>!aWorks(a).length).length; }
+function updateStats(){ $('statArtists').textContent=artists.length;$('statWorks').textContent=works.length;$('statPoints').textContent=works.reduce((s,w)=>s+(+w.points||0),0);$('statEmpty').textContent=artists.filter(a=>!aWorks(a).length).length;
+ const old=$('artistFilter').value;$('artistFilter').innerHTML='<option value="">Все художники</option>'+artists.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('');$('artistFilter').value=old;}
 
 function render(){
  updateStats();
  let q = slug($('search').value);
+ let filter = $('artistFilter').value;
  let spec = $('specFilter').value; 
  let sort = $('sort').value;
  
  let list=artists.filter(a=>{
+   if (filter && a.id !== filter) return false;
    if (q && !slug([a.name,a.catwar,a.vk,a.profile].join(' ')).includes(q)) return false;
    if (spec && !slug(a.profile).includes(spec)) return false;
    return true;
@@ -246,7 +250,7 @@ function renderArtists(list){
 }
 
 function renderAllWorks(){
- let ws=works.filter(w=>(!slug($('search').value)||slug([w.title,w.category,(artists.find(a=>a.id===w.artistId)||{}).name].join(' ')).includes(slug($('search').value))));
+ let ws=works.filter(w=>(!$('artistFilter').value||w.artistId===$('artistFilter').value)&&(!slug($('search').value)||slug([w.title,w.category,(artists.find(a=>a.id===w.artistId)||{}).name].join(' ')).includes(slug($('search').value))));
  
  let sortMode = $('sort').value;
  if (sortMode === 'date_desc') ws.sort((x,y)=>parseDate(y.date)-parseDate(x.date));
@@ -392,9 +396,11 @@ function setView(v){
  if (v === 'board') {
      document.getElementById('specFilter').style.display = 'none';
      document.getElementById('sort').style.display = 'none';
+     document.getElementById('artistFilter').style.display = 'block';
  } else if (v === 'artists') {
      document.getElementById('specFilter').style.display = 'block';
      document.getElementById('sort').style.display = 'block';
+     document.getElementById('artistFilter').style.display = 'none'; // Прячем выпадающий список художников
      
      // Оставляем только "По имени" и "По баллам" для художников
      let sortSelect = document.getElementById('sort');
@@ -405,6 +411,7 @@ function setView(v){
  } else if (v === 'works') {
      document.getElementById('specFilter').style.display = 'none';
      document.getElementById('sort').style.display = 'block';
+     document.getElementById('artistFilter').style.display = 'block';
      
      // Возвращаем все варианты для работ
      let sortSelect = document.getElementById('sort');
@@ -487,6 +494,7 @@ function importRows(rows){
  });
 }
 $('search').oninput=render;
+$('artistFilter').onchange=render;
 $('sort').onchange=render;
 $('specFilter').onchange=render;
 
