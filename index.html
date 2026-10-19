@@ -251,7 +251,7 @@ function renderAllWorks(){
 }
 
 function renderRewards() {
-  let options = '<option value="">-- Выберите художника для проверки --</option>';
+  let options = '<option value="">Выберите художника</option>';
   artists.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).forEach(a => {
       options += `<option value="${a.id}" ${rewardCheckArtistId === a.id ? 'selected' : ''}>${esc(a.name)}</option>`;
   });
