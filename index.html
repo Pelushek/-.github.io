@@ -52,8 +52,8 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
  <div class="stat"><span>Без работ</span><strong id="statEmpty">0</strong></div>
  </section>
  <div class="toolbar">
-   <div class="search"><input id="search" placeholder="Поиск по имени или нику..."></div>
-   <select id="specFilter">
+   <div class="search"><input id="search" placeholder="Поиск по имени или VK..."></div>
+   <select id="specFilter" style="display:none;">
      <option value="">Все специальности</option>
      <option value="фон">Фоны</option>
      <option value="костюм">Костюмы</option>
@@ -141,17 +141,13 @@ function render(){
  updateStats();
  let q = slug($('search').value);
  let filter = $('artistFilter').value;
- let spec = $('specFilter').value; // Получаем выбранную специальность
+ let spec = $('specFilter').value; 
  let sort = $('sort').value;
  
  let list=artists.filter(a=>{
-   // Фильтр по имени/нику
    if (filter && a.id !== filter) return false;
    if (q && !slug([a.name,a.catwar,a.vk,a.profile].join(' ')).includes(q)) return false;
-   
-   // Фильтр по специальности
    if (spec && !slug(a.profile).includes(spec)) return false;
-   
    return true;
  });
  
@@ -396,12 +392,32 @@ function setView(v){
      document.querySelector('.toolbar').style.display = 'flex';
  }
 
+ // Настройка видимости фильтров и сортировки
  if (v === 'board') {
+     document.getElementById('specFilter').style.display = 'none';
      document.getElementById('sort').style.display = 'none';
-     document.getElementById('specFilter').style.display = 'block'; // Показываем фильтр специальностей на доске
- } else {
+ } else if (v === 'artists') {
+     document.getElementById('specFilter').style.display = 'block';
      document.getElementById('sort').style.display = 'block';
-     document.getElementById('specFilter').style.display = 'none'; // Скрываем на других вкладках
+     
+     // Оставляем только "По имени" и "По баллам" для художников
+     let sortSelect = document.getElementById('sort');
+     sortSelect.innerHTML = `
+        <option value="name">По имени</option>
+        <option value="points">По баллам ↓</option>
+     `;
+ } else if (v === 'works') {
+     document.getElementById('specFilter').style.display = 'none';
+     document.getElementById('sort').style.display = 'block';
+     
+     // Возвращаем все варианты для работ
+     let sortSelect = document.getElementById('sort');
+     sortSelect.innerHTML = `
+        <option value="name">По имени</option>
+        <option value="points">По баллам ↓</option>
+        <option value="date_desc">По дате (сначала новые)</option>
+        <option value="date_asc">По дате (сначала старые)</option>
+     `;
  }
 
  const statsBlock = document.querySelector('.stats');
@@ -477,9 +493,9 @@ function importRows(rows){
 $('search').oninput=render;
 $('artistFilter').onchange=render;
 $('sort').onchange=render;
-$('specFilter').onchange=render; // Добавляем обработчик для нового фильтра
+$('specFilter').onchange=render;
 
-// Инициализация: сразу применяем вид "Доска", чтобы скрыть лишние блоки
+// Инициализация: сразу применяем вид "Доска"
 setView('board');
 
 fetchData();
