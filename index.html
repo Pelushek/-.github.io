@@ -445,5 +445,8 @@ function importRows(rows){
  });
 }
 $('search').oninput=render;$('artistFilter').onchange=render;$('sort').onchange=render;
+
+// Инициализация: сразу применяем вид "Доска", чтобы скрыть лишние блоки
+setView('board');
+
 fetchData();
-</script></body></html>
