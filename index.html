@@ -16,15 +16,35 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
 .show-more-btn:hover {background:#fdf9f6; border-color:var(--accent);}
 
 .rewards-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:14px;margin-bottom:25px}
-.reward-card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:15px;display:flex;gap:15px;align-items:flex-start;box-shadow:var(--shadow);transition:border-color 0.2s}
-.reward-card.available{border-color:var(--green);background:#f4f7f4;}
+.reward-card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:15px;display:flex;gap:15px;align-items:flex-start;box-shadow:var(--shadow);transition:all 0.2s;position: relative;}
+.reward-card.available {
+    border: 2px solid var(--green);
+    background: #f4f9f4;
+    box-shadow: 0 4px 12px rgba(100, 123, 98, 0.15);
+}
+.reward-card.available::after {
+    content: "✓ ДОСТУПНО";
+    position: absolute;
+    top: -10px;
+    right: 10px;
+    background: var(--green);
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 3px 8px;
+    border-radius: 12px;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 2;
+}
 .reward-img{width:80px;height:80px;flex:none;border-radius:8px;background:#f0ebe5;object-fit:contain;border:1px solid var(--line);padding:4px;display:flex;align-items:center;justify-content:center;color:#b5a99c;font-size:12px;text-align:center;}
 .reward-info{flex:1;min-width:0}
 .reward-title{font-size:14px;font-weight:800;margin:0 0 5px 0;line-height:1.2}
 .reward-desc{font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.4}
 .reward-price{font-size:12px;font-weight:700;color:var(--accent)}
 .reward-status{font-size:11px;font-weight:700;margin-top:5px}
-.status-avail{color:var(--green)}.status-no{color:#a85840}
+.status-avail{display:none;}
+.status-no{color:#a85840}
 .info-block{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:20px;box-shadow:var(--shadow);margin-bottom:20px}
 .info-block h3{margin:0 0 15px 0;font-size:16px;border-bottom:1px solid var(--line);padding-bottom:10px}
 .info-block ul{margin:0;padding-left:20px;font-size:13px;line-height:1.6}
@@ -267,10 +287,10 @@ function renderRewards() {
       if (checkedArtist) {
           if (isNb) {
               avail = aNb >= price;
-              statusHtml = avail ? `<div class="reward-status status-avail">Доступно!</div>` : `<div class="reward-status status-no">Не хватает ${price - aNb} НБ</div>`;
+              statusHtml = avail ? `` : `<div class="reward-status status-no">Не хватает ${price - aNb} НБ</div>`;
           } else {
               avail = aPts >= price;
-              statusHtml = avail ? `<div class="reward-status status-avail">Доступно!</div>` : `<div class="reward-status status-no">Не хватает ${price - aPts} баллов</div>`;
+              statusHtml = avail ? `` : `<div class="reward-status status-no">Не хватает ${price - aPts} баллов</div>`;
           }
       }
 
