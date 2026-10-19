@@ -366,11 +366,19 @@ function setView(v){
  $('listTitle').textContent=({board:'Рабочее пространство',artists:'Список художников',works:'Реестр работ',rewards:'Награды'})[v];
  $('listSub').textContent=({board:'Выберите художника',artists:'Нажмите на карточку',works:'Все начисления в одном списке',rewards:'Информация о наградах и баллах'})[v];
  
- // Скрываем поиск и фильтры на вкладке наград, чтобы не мешали
+ // Скрываем поиск и фильтры на вкладке наград
  if (v === 'rewards') {
      document.querySelector('.toolbar').style.display = 'none';
  } else {
      document.querySelector('.toolbar').style.display = 'flex';
+ }
+
+ // Скрываем блок со статистикой (цифрами) на выбранных вкладках
+ const statsBlock = document.querySelector('.stats');
+ if (v === 'board' || v === 'works' || v === 'rewards') {
+     statsBlock.style.display = 'none';
+ } else {
+     statsBlock.style.display = 'grid';
  }
 
  render();
