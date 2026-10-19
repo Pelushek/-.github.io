@@ -362,12 +362,21 @@ function setView(v){
  $('listTitle').textContent=({board:'Рабочее пространство',artists:'Список художников',works:'Реестр работ',rewards:'Награды'})[v];
  $('listSub').textContent=({board:'Выберите художника',artists:'Нажмите на карточку',works:'Все начисления в одном списке',rewards:'Информация о наградах и баллах'})[v];
  
+ // Скрываем поиск и фильтры на вкладке наград
  if (v === 'rewards') {
      document.querySelector('.toolbar').style.display = 'none';
  } else {
      document.querySelector('.toolbar').style.display = 'flex';
  }
 
+ // Скрываем выпадающий список сортировки на вкладке "Доска"
+ if (v === 'board') {
+     document.getElementById('sort').style.display = 'none';
+ } else {
+     document.getElementById('sort').style.display = 'block';
+ }
+
+ // Скрываем блок со статистикой
  const statsBlock = document.querySelector('.stats');
  if (v === 'board' || v === 'works' || v === 'rewards') {
      statsBlock.style.display = 'none';
