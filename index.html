@@ -59,13 +59,20 @@ const slug=s=>String(s||'').toLowerCase().trim();
 // Функция для безопасного перевода даты в timestamp для сортировки
 function parseDate(dStr) {
     if (!dStr) return 0;
-    // Если дата в формате ДД.ММ.ГГГГ
-    let parts = dStr.match(/(\d{2})\.(\d{2})\.(\d{4})/);
-    if (parts) return new Date(parts[3], parts[2]-1, parts[1]).getTime();
-    // Если дата в формате ГГГГ-ММ-ДД
-    parts = dStr.match(/(\d{4})-(\d{2})-(\d{2})/);
-    if (parts) return new Date(parts[1], parts[2]-1, parts[3]).getTime();
-    // Пытаемся распарсить как есть
+    // Ищем формат ДД.ММ.ГГ или ДД.ММ.ГГГГ (например, 18.10.26)
+    let parts = dStr.match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})/);
+    if (parts) {
+        let day = parseInt(parts[1], 10);
+        let month = parseInt(parts[2], 10) - 1;
+        let year = parseInt(parts[3], 10);
+        if (year < 100) year += 2000; // Делаем из 26 -> 2026
+        return new Date(year, month, day).getTime();
+    }
+    // Ищем формат ГГГГ-ММ-ДД
+    parts = dStr.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (parts) {
+        return new Date(parts[1], parts[2]-1, parts[3]).getTime();
+    }
     let t = Date.parse(dStr);
     return isNaN(t) ? 0 : t;
 }
