@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Живописцы — рабочее пространство</title>
+<title>Мастерская чудес</title>
 <style>
 :root{--bg:#f5f2ee;--paper:#fffdfa;--ink:#292723;--muted:#8c877f;--line:#e6e0d8;--accent:#c86f52;--green:#647b62;--shadow:0 8px 28px #31261b0b}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,ui-sans-serif,system-ui,sans-serif}
@@ -14,6 +14,14 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
 .work-area{padding:15px}.work-head{display:flex;justify-content:space-between;margin:0 0 12px}.work-head h3{font-size:14px;margin:0}.work-head span{font-size:11px;color:var(--muted)}.work-columns{display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));gap:9px;overflow-x:auto}.work-col{background:#f7f4ef;border-radius:10px;padding:9px;min-height:180px}.col-title{font-size:11px;font-weight:800;min-height:32px;display:flex;justify-content:space-between}.count{color:var(--muted)}.work-card{background:white;border:1px solid #e9e2d9;border-radius:8px;margin-top:8px;padding:8px;font-size:11px}.work-card a{color:var(--ink);font-weight:700;text-decoration:none}.work-card a:hover{color:var(--accent)}.work-card .meta{display:flex;justify-content:space-between;color:var(--muted);font-size:10px;margin-top:5px}.points{font-weight:800;color:var(--green)}.empty{color:#a49b90;font-size:11px;text-align:center;padding:18px 5px}.work-card .thumb{width:100%;height:84px;object-fit:cover;border-radius:6px;background:#f0ebe5;display:block;margin-bottom:6px;border:1px solid #e9e2d9}.work-card .thumb-fallback{width:100%;height:84px;border-radius:6px;background:#f0ebe5;display:flex;align-items:center;justify-content:center;color:#b5a99c;font-size:20px;margin-bottom:6px;border:1px solid #e9e2d9}.empty-state{padding:48px;text-align:center;background:var(--paper);border:1px dashed #d9cec2;border-radius:14px;color:var(--muted)}.empty-state b{display:block;color:var(--ink);font-size:16px;margin-bottom:6px}#loadingOverlay{position:fixed;inset:0;background:#f5f2eecc;backdrop-filter:blur(2px);display:flex;align-items:center;justify-content:center;z-index:100;font-size:16px;font-weight:bold;color:var(--accent)}
 .show-more-btn {display:block; width:100%; text-align:center; background:#fff; border:1px solid var(--line); color:var(--accent); font-size:11px; font-weight:700; padding:6px 0; border-radius:6px; margin-top:6px; cursor:pointer; transition:0.2s;}
 .show-more-btn:hover {background:#fdf9f6; border-color:var(--accent);}
+.home-grid{display:grid;grid-template-columns:repeat(2,minmax(220px,1fr));gap:16px;max-width:900px}
+.home-card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:25px;text-align:left;box-shadow:var(--shadow);transition:transform .18s,border-color .18s;min-height:150px}
+.home-card:hover{transform:translateY(-2px);border-color:var(--accent)}
+.home-card .home-icon{font-size:27px;margin-bottom:15px;display:block}
+.home-card strong{display:block;font-size:18px;margin-bottom:5px}
+.home-card small{color:var(--muted);font-size:12px}
+.home-back{margin-bottom:18px}
+@media(max-width:700px){.app{grid-template-columns:1fr}.sidebar{min-height:auto;padding:15px}.side-note{display:none}.home-grid{grid-template-columns:1fr}main{padding:20px 14px}}
 
 .rewards-grid{display:grid;grid-template-columns:repeat(auto-fill, minmax(280px, 1fr));gap:14px;margin-bottom:25px}
 .reward-card{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:15px;display:flex;gap:15px;align-items:flex-start;box-shadow:var(--shadow);transition:all 0.2s;position: relative;}
@@ -36,9 +44,9 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
 <div id="loadingOverlay">Загрузка данных из Google Таблицы...</div>
 <div class="app">
 <aside class="sidebar">
- <div class="brand"><div class="logo">Ж</div><div><strong>Живописцы</strong><small>рабочее пространство</small></div></div>
+ <div class="brand"><div class="logo">✦</div><div><strong>Мастерская чудес</strong><small>рабочее пространство</small></div></div>
  <div style="width:100%"><div class="side-label">Рабочее место</div><nav class="nav">
- <button class="active" data-view="artists"><span class="ico">♙</span><span class="nav-text">Художники</span></button>
+ <button class="active" data-view="artists"><span class="ico">♙</span><span class="nav-text">Живописцы</span></button>
  <button data-view="board"><span class="ico">▦</span><span class="nav-text">Доска</span></button>
  <button data-view="works"><span class="ico">✎</span><span class="nav-text">Все работы</span></button>
  <button data-view="rewards"><span class="ico">★</span><span class="nav-text">Награды</span></button>
@@ -46,7 +54,7 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
  <div class="side-note"><b>Только просмотр</b>Данные берутся из Google Таблицы. Для изменения данных отредактируйте таблицу.</div>
 </aside>
 <main>
- <div class="topbar"><div><div class="eyebrow">Панель координатора</div><h1 id="pageTitle">Все художники</h1></div><div class="actions"><button class="btn" onclick="location.reload()">↻ Обновить</button></div></div>
+ <div class="topbar"><div><div class="eyebrow">Панель координатора</div><h1 id="pageTitle">Все живописцы</h1></div><div class="actions"><button class="btn" onclick="location.reload()">↻ Обновить</button></div></div>
  <section class="stats" style="display:none;">
  <div class="stat"><span>Художников</span><strong id="statArtists">0</strong></div>
  <div class="stat"><span>Работ учтено</span><strong id="statWorks">0</strong></div>
@@ -65,7 +73,7 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
      <option value="плашк">Плашки</option>
      <option value="ачивк">Ачивки</option>
    </select>
-   <select id="artistFilter"><option value="">Все художники</option></select>
+   <select id="artistFilter"><option value="">Все живописцы</option></select>
    <select id="sort">
      <option value="name">По имени</option>
      <option value="points">По баллам ↓</option>
@@ -73,7 +81,7 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
      <option value="date_asc">По дате (сначала старые)</option>
    </select>
  </div>
- <div class="section-head"><div><h2 id="listTitle">Список художников</h2><p id="listSub">Нажмите на карточку</p></div></div>
+ <div class="section-head"><div><h2 id="listTitle">Список живописцев</h2><p id="listSub">Нажмите на карточку</p></div></div>
  <div id="content"></div>
 </main></div>
 
@@ -85,7 +93,7 @@ const CSV_URL = 'https://docs.google.com/spreadsheets/d/1hjiRKo9s39_sUv9JCfZ70GA
 const PURCHASES_URL = 'https://docs.google.com/spreadsheets/d/1hjiRKo9s39_sUv9JCfZ70GAffxHH5K306Lyv-Yfu7os/export?format=csv&gid=1168996610';
 
 const CATS=['Фон с нуля','Украш. фон','Костюм фулл & боты','Костюм','Предметы','Медаль','Шапка','Иное'];
-let artists=[], works=[], purchases=[], currentArtist=null, view='board';
+let artists=[], works=[], purchases=[], currentArtist=null, view='home', activeDepartment='';
 let expandedCats = {}; 
 let rewardCheckArtistId = ''; 
 
@@ -180,7 +188,7 @@ function currentBonusPoints(a) {
 
 function initials(a){return (a.name||'?').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()}
 function updateStats(){ $('statArtists').textContent=artists.length;$('statWorks').textContent=works.length;$('statPoints').textContent=works.reduce((s,w)=>s+(+w.points||0),0);$('statEmpty').textContent=artists.filter(a=>!aWorks(a).length).length;
- const old=$('artistFilter').value;$('artistFilter').innerHTML='<option value="">Все художники</option>'+artists.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('');$('artistFilter').value=old;}
+ const old=$('artistFilter').value;$('artistFilter').innerHTML='<option value="">Все живописцы</option>'+artists.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('');$('artistFilter').value=old;}
 
 function render(){
  updateStats();
@@ -319,7 +327,7 @@ function renderAllWorks(){
 }
 
 function renderRewards() {
-  let options = '<option value="">Выбрать художника</option>';
+  let options = '<option value="">Выбрать живописца</option>';
   artists.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).forEach(a => {
       options += `<option value="${a.id}" ${rewardCheckArtistId === a.id ? 'selected' : ''}>${esc(a.name)}</option>`;
   });
@@ -452,8 +460,8 @@ function renderRewards() {
 
 function setView(v){
  view=v;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
- $('pageTitle').textContent=({board:'Доска художников',artists:'Все художники',works:'Все работы',rewards:'Награды и разбалловка'})[v];
- $('listTitle').textContent=({board:'Рабочее пространство',artists:'Список художников',works:'Реестр работ',rewards:'Награды'})[v];
+ $('pageTitle').textContent=({board:'Доска живописцев',artists:'Все живописцы',works:'Все работы',rewards:'Награды и разбалловка'})[v];
+ $('listTitle').textContent=({board:'Рабочее пространство',artists:'Список живописцев',works:'Реестр работ',rewards:'Награды'})[v];
  $('listSub').textContent=({board:'Выберите художника',artists:'Нажмите на карточку',works:'Все начисления в одном списке',rewards:'Информация о наградах и баллах'})[v];
  
  if (v === 'rewards') {
@@ -598,8 +606,8 @@ $('artistFilter').onchange=render;
 $('sort').onchange=render;
 $('specFilter').onchange=render;
 
-// Инициализация: сразу применяем вид "Все художники"
-setView('artists');
-
+// При первом открытии показываем выбор направления.
+showHome();
 fetchData();
+$('loadingOverlay').style.display='none';
 </script></body></html>
