@@ -348,7 +348,7 @@ function renderRewards() {
               avail = true;
               statusHtml = `<div class="reward-status status-avail" style="display:block; background:#e8f5e9; color:#2e7d32; padding:5px; border-radius:6px; margin-top:8px;">Выдан (внесен в таблицу)</div>`;
           } else {
-              statusHtml = `<div class="reward-status status-no" style="background:#f0f0f0; color:#666; border-color:#ddd;">Выдается вручную (Ведущим Творцом)</div>`;
+              statusHtml = `<div class="reward-status status-no" style="background:#f0f0f0; color:#666; border-color:#ddd;">Выдается вручную</div>`;
           }
       } else if (checkedArtist && !isBought) {
           avail = currentValue >= price;
