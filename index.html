@@ -130,7 +130,7 @@ async function fetchData() {
   }
 }
 
-// Список всех наград с их ценами и типами (для подсчета)
+// Список всех наград с их ценами и типами
 const ALL_REWARDS = [
   { name: 'За проявление творческой жилки', price: 100, isNb: false },
   { name: 'Ачивка живописцев', price: 100, isNb: false },
@@ -153,14 +153,9 @@ function aWorks(a){return works.filter(w=>w.artistId===a.id)}
 
 function rawPoints(a){return aWorks(a).reduce((s,w)=>s+(Number(w.points)||0),0)}
 
-// Считаем потраченные баллы
+// Считаем потраченные баллы (теперь только НБ)
 function spentPoints(a) {
-    let spent = 0;
-    purchases.filter(p => p.artistId === a.id).forEach(p => {
-        let reward = ALL_REWARDS.find(r => slug(r.name) === slug(p.rewardName));
-        if (reward && !reward.isNb) spent += reward.price;
-    });
-    return spent;
+    return 0; // Баллы за обычные награды больше не списываются
 }
 
 function currentPoints(a){
