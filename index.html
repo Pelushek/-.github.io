@@ -38,15 +38,15 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
 <aside class="sidebar">
  <div class="brand"><div class="logo">Ж</div><div><strong>Живописцы</strong><small>рабочее пространство</small></div></div>
  <div style="width:100%"><div class="side-label">Рабочее место</div><nav class="nav">
- <button class="active" data-view="board"><span class="ico">▦</span><span class="nav-text">Доска</span></button>
- <button data-view="artists"><span class="ico">♙</span><span class="nav-text">Художники</span></button>
+ <button class="active" data-view="artists"><span class="ico">♙</span><span class="nav-text">Художники</span></button>
+ <button data-view="board"><span class="ico">▦</span><span class="nav-text">Доска</span></button>
  <button data-view="works"><span class="ico">✎</span><span class="nav-text">Все работы</span></button>
  <button data-view="rewards"><span class="ico">★</span><span class="nav-text">Награды</span></button>
  </nav></div>
  <div class="side-note"><b>Только просмотр</b>Данные берутся из Google Таблицы. Для изменения данных отредактируйте таблицу.</div>
 </aside>
 <main>
- <div class="topbar"><div><div class="eyebrow">Панель координатора</div><h1 id="pageTitle">Доска художников</h1></div><div class="actions"><button class="btn" onclick="location.reload()">↻ Обновить</button></div></div>
+ <div class="topbar"><div><div class="eyebrow">Панель координатора</div><h1 id="pageTitle">Все художники</h1></div><div class="actions"><button class="btn" onclick="location.reload()">↻ Обновить</button></div></div>
  <section class="stats" style="display:none;">
  <div class="stat"><span>Художников</span><strong id="statArtists">0</strong></div>
  <div class="stat"><span>Работ учтено</span><strong id="statWorks">0</strong></div>
@@ -73,7 +73,7 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
      <option value="date_asc">По дате (сначала старые)</option>
    </select>
  </div>
- <div class="section-head"><div><h2 id="listTitle">Рабочее пространство</h2><p id="listSub">Выберите художника</p></div></div>
+ <div class="section-head"><div><h2 id="listTitle">Список художников</h2><p id="listSub">Нажмите на карточку</p></div></div>
  <div id="content"></div>
 </main></div>
 
@@ -81,7 +81,7 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
 // ⚠️ ССЫЛКА НА ВАШУ ТАБЛИЦУ (Работы)
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/1hjiRKo9s39_sUv9JCfZ70GAffxHH5K306Lyv-Yfu7os/export?format=csv&gid=0'; 
 
-// ⚠️ ССЫЛКА НА ВАШУ ТАБЛИЦУ (Покупки) - не забудь поменять gid, если вкладка не первая!
+// ⚠️ ССЫЛКА НА ВАШУ ТАБЛИЦУ (Покупки)
 const PURCHASES_URL = 'https://docs.google.com/spreadsheets/d/1hjiRKo9s39_sUv9JCfZ70GAffxHH5K306Lyv-Yfu7os/export?format=csv&gid=1168996610';
 
 const CATS=['Фон с нуля','Украш. фон','Костюм фулл & боты','Костюм','Предметы','Медаль','Шапка','Иное'];
@@ -157,7 +157,6 @@ function rawPoints(a){return aWorks(a).reduce((s,w)=>s+(Number(w.points)||0),0)}
 function spentPoints(a) {
     let spent = 0;
     purchases.filter(p => p.artistId === a.id).forEach(p => {
-        // Ищем цену награды
         let reward = ALL_REWARDS.find(r => slug(r.name) === slug(p.rewardName));
         if (reward && !reward.isNb) spent += reward.price;
     });
@@ -351,12 +350,10 @@ function renderRewards() {
       let typeName = isNb ? 'НБ' : 'баллов';
       let isBought = false;
 
-      // Проверяем, куплено ли уже
       if (checkedArtist) {
           isBought = purchases.some(p => p.artistId === checkedArtist.id && slug(p.rewardName) === slug(title));
       }
       
-      // Если куплено и это НЕ награда за всю жизнь (которые можно брать по желанию), то оно недоступно для повторной покупки
       if (checkedArtist && !isBought) {
           avail = currentValue >= price;
           statusHtml = avail ? `` : `<div class="reward-status status-no">До награды: не хватает ${Math.round((price - currentValue) * 10) / 10} ${typeName}</div>`;
@@ -597,8 +594,8 @@ $('artistFilter').onchange=render;
 $('sort').onchange=render;
 $('specFilter').onchange=render;
 
-// Инициализация: сразу применяем вид "Доска"
-setView('board');
+// Инициализация: сразу применяем вид "Все художники"
+setView('artists');
 
 fetchData();
 </script></body></html>
