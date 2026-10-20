@@ -130,13 +130,12 @@ async function fetchData() {
   }
 }
 
-// Список всех наград с их ценами и типами
 const ALL_REWARDS = [
   { name: 'За проявление творческой жилки', price: 100, isNb: false },
   { name: 'Ачивка живописцев', price: 100, isNb: false },
   { name: 'Плашки живописцев', price: 250, isNb: false },
   { name: 'Отрядное оформление сокровищницы', price: 400, isNb: false },
-  { name: 'Костюм живописцев', price: 0, isNb: false },
+  { name: 'Костюм живописцев', price: 0, isNb: false }, // Особый случай
   { name: 'Обмен на жетоны', price: 1, isNb: true },
   { name: 'Медаль мероприятия', price: 0, isNb: true },
   { name: 'След на фоне (1 сезон)', price: 15, isNb: true },
@@ -150,17 +149,9 @@ const ALL_REWARDS = [
 ];
 
 function aWorks(a){return works.filter(w=>w.artistId===a.id)}
-
 function rawPoints(a){return aWorks(a).reduce((s,w)=>s+(Number(w.points)||0),0)}
-
-// Считаем потраченные баллы (теперь только НБ)
-function spentPoints(a) {
-    return 0; // Баллы за обычные награды больше не списываются
-}
-
-function currentPoints(a){
-    return Math.max(0, rawPoints(a) - spentPoints(a));
-}
+function spentPoints(a){return 0;} // Обычные баллы не списываются
+function currentPoints(a){return Math.max(0, rawPoints(a) - spentPoints(a));}
 
 function rawBonusPoints(a) {
     let aw = aWorks(a);
@@ -344,12 +335,22 @@ function renderRewards() {
       let currentValue = isNb ? (isLifetime ? aRawNb : aNb) : aPts;
       let typeName = isNb ? 'НБ' : 'баллов';
       let isBought = false;
+      let isSpecialCostume = (title === 'Костюм живописцев');
 
       if (checkedArtist) {
           isBought = purchases.some(p => p.artistId === checkedArtist.id && slug(p.rewardName) === slug(title));
       }
       
-      if (checkedArtist && !isBought) {
+      // Особое условие для Костюма: он не берется за баллы, а только выдается вручную
+      if (isSpecialCostume) {
+          if (isBought) {
+              avail = true;
+              statusHtml = `<div class="reward-status status-avail" style="display:block; background:#e8f5e9; color:#2e7d32; padding:5px; border-radius:6px; margin-top:8px;">Выдан (внесен в таблицу)</div>`;
+          } else {
+              statusHtml = `<div class="reward-status status-no" style="background:#f0f0f0; color:#666; border-color:#ddd;">Выдается по итогам сезона (вручную)</div>`;
+          }
+      } else if (checkedArtist && !isBought) {
+          // Обычная логика для остальных наград
           avail = currentValue >= price;
           statusHtml = avail ? `` : `<div class="reward-status status-no">До награды: не хватает ${Math.round((price - currentValue) * 10) / 10} ${typeName}</div>`;
       }
@@ -366,7 +367,7 @@ function renderRewards() {
           <div class="reward-info">
               <div class="reward-title">${esc(title)}</div>
               ${descHtml}
-              <div class="reward-price">${isNb ? 'НБ: ' : 'Баллов: '}${price} ${isLifetime ? '<span style="font-size:10px;font-weight:400;color:var(--muted)">(за всю жизнь)</span>' : ''}</div>
+              <div class="reward-price">${isNb ? 'НБ: ' : (isSpecialCostume ? 'Особое условие' : 'Баллов: ')}${price && !isSpecialCostume ? price : ''} ${isLifetime ? '<span style="font-size:10px;font-weight:400;color:var(--muted)">(за всю жизнь)</span>' : ''}</div>
               ${statusHtml}
           </div>
       </div>`;
@@ -409,7 +410,7 @@ function renderRewards() {
     <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--line); padding-bottom:5px;">Информационная сводка</h3>
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:15px;">
         <div class="info-block">
-            <h3 style="border-bottom:none; color:var(--accent);">| РАЗБАЛЛОВКА |</h3>
+            <h3 style="border-bottom:none; color:var(--accent);">Разбалловка</h3>
             <ul>
                 <li><b>фон с нуля</b> — от 20 до 30 баллов;</li>
                 <li><b>украшенный фон</b> — от 5 до 10 баллов;</li>
