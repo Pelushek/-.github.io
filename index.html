@@ -49,12 +49,23 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
 .info-block h3{margin:0 0 15px 0;font-size:16px;border-bottom:1px solid var(--line);padding-bottom:10px}
 .info-block ul{margin:0;padding-left:20px;font-size:13px;line-height:1.6}
 .info-block li{margin-bottom:6px}
+
+/* Стили для стартовой страницы (Мастерская чудес) */
+.bb-content { background: var(--paper); border: 1px solid var(--line); border-radius: 15px; padding: 25px; box-shadow: var(--shadow); max-width: 900px; margin: 0 auto; color: var(--ink); line-height: 1.6; }
+.bb-content h2 { font-size: 20px; margin: 20px 0 10px; border-bottom: 2px solid var(--line); padding-bottom: 5px; color: var(--accent); }
+.bb-content h3 { font-size: 15px; margin: 15px 0 10px; background: #f7f4ef; padding: 6px 12px; border-radius: 6px; display: inline-block; color: var(--green); }
+.bb-content p { margin: 0 0 10px; font-size: 13px; text-align: justify; }
+.bb-content ul { margin: 0 0 15px; padding-left: 20px; font-size: 13px; }
+.bb-content li { margin-bottom: 5px; }
+.bb-content table { border-collapse: collapse; width: 100%; margin-bottom: 20px; font-size: 13px; }
+.bb-content th, .bb-content td { padding: 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
+.bb-content th { background: #f7f4ef; font-weight: 700; color: var(--ink); }
+.bb-content img { max-width: 100%; border-radius: 8px; }
 </style></head>
 <body>
 <div id="loadingOverlay">Загрузка данных из Google Таблицы...</div>
 <div class="app">
 <aside class="sidebar">
- <!-- ИЗМЕНЕНО: Шапка теперь с ID для динамической смены текста -->
  <div class="brand">
    <div class="logo">✦</div>
    <div>
@@ -64,15 +75,12 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
  </div>
  
  <div style="width:100%"><div class="side-label">Рабочее место</div><nav class="nav">
-   <!-- Заглушки -->
    <button data-view="animators"><span class="nav-text">Аниматоры</span></button>
    <button data-view="writers"><span class="nav-text">Писатели</span></button>
    <button data-view="designers"><span class="nav-text">Оформители</span></button>
    
-   <!-- Основной раздел -->
    <button id="paintersMenuBtn" data-view="artists"><span class="nav-text">Живописцы</span></button>
    
-   <!-- Вложенные вкладки (появляются при клике на Живописцев) -->
    <div class="sub-nav" id="paintersSubNav">
      <button data-view="artists"><span class="ico">♙</span><span class="nav-text">Художники</span></button>
      <button data-view="board"><span class="ico">▦</span><span class="nav-text">Доска</span></button>
@@ -114,7 +122,9 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
    </div>
    <div class="section-head"><div><h2 id="listTitle">Список художников</h2><p id="listSub">Нажмите на карточку</p></div></div>
  </div>
- <div id="content"></div>
+ <div id="content">
+   <!-- Сюда рендерится контент (стартовая страница или доска) -->
+ </div>
 </main></div>
 
 <script>
@@ -132,6 +142,158 @@ let rewardCheckArtistId = '';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const slug=s=>String(s||'').toLowerCase().trim();
+
+// ===== HTML ДЛЯ СТАРТОВОЙ СТРАНИЦЫ =====
+// Мы удалили таблицу со ссылками (второй скрин) и переверстали текст в компактный, аккуратный вид
+const WELCOME_HTML = `
+<div class="bb-content">
+  <div style="text-align: center; margin-bottom: 30px;">
+    <img src="http://d.zaix.ru/bPsn.png" alt="Мастерская чудес" style="width: 100%; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+  </div>
+
+  <h2>Чем занимается Ведущий творец?</h2>
+  <p>Он является куратором всей системы, следит за всей творческой работой. Курирует создание мероприятий на разных этапах, ответственный за проведение национальных праздников [главный заказчик], обновляет блог по мере поступаемой информации, разбирает жалобы на глав.</p>
+
+  <h2>Чем занимается помощник?</h2>
+  <p>Ответственен за принятие заказов на мероприятие от соплеменников с дальнейшей передачей готовых документов ведущему творцу, коммуникациями с организаторами в период подготовки ивентов. Передаёт ВВ списки победителей при условии, что глава сферы творчества не участвовал как наблюдатель. Исполнитель заказов от ведущего творца внутри своей деятельности.</p>
+
+  <hr style="border:0; border-top:1px solid var(--line); margin: 30px 0;">
+
+  <h2 style="color: var(--accent); text-align: center; font-size: 24px;">АНИМАТОРЫ</h2>
+  <p style="text-align: center; color: var(--muted); font-size: 12px; margin-bottom: 15px;">Ответственный — <a href="#">[профиль]</a>. Помощник — <a href="#">[профиль]</a>.</p>
+  
+  <p><b>Аниматоры</b> — это предвестники приятных впечатлений, интересных историй и, что самое главное, увлекательных мероприятий! Деятельность отряда направлена на создание, реализацию и проведение различных племенных и межплеменных конкурсов, эстафет, квестов и масштабных племенных игр. Главная задача — стабилизировать проведение квестов внутри племени и улучшить работу над новыми проектами.</p>
+
+  <h3>Подразделяются на:</h3>
+  <ul>
+    <li><b>Подмастерье</b> — участник организации мероприятия. Он выполняет задания по детальной проработке мероприятия, занимается писательскими и оформительскими делами под руководством кудесника. Во время мероприятия может отыгрывать созданных для сюжета персонажей.</li>
+    <li><b>Кудесник</b> — игрок, ответственный за техническое создание мероприятия. Он пишет сюжет, задания, собирает организационный костяк будущего мероприятия, которым впоследствии управляет. При необходимости кудесники помогают подмастерью при организации Ворожбы Теней.</li>
+  </ul>
+
+  <h3>Обязанности ветви:</h3>
+  <ul>
+    <li>Создание ивентов;</li>
+    <li>Продумать сюжет и все его составляющие;</li>
+    <li>Прописывание диалогов, набор писателей;</li>
+    <li>Набор актёров на мероприятие;</li>
+    <li>Оформление ТЗ по костюмам, фонам, медалям [создание ляжет на живописцев].</li>
+  </ul>
+  <p><b>!! Вся работа сдаётся ВТ, а после одобрения уже начинаются следующие этапы создания.</b></p>
+
+  <h3>Порядок принятия в отряд:</h3>
+  <p>Подать заявку на вступление в отряд может любой игрок, имеющий запах Теней, кроме переходящих или людей, ранее замеченными за серьезными нарушениями конфиденциальности мероприятий.</p>
+  <ul>
+    <li><b>Подмастерью</b> необходимо сообщить ответственному за отряд или его помощнику о желании вступить в отряд. Вам будет выдано небольшое собеседование, которое поможет оценить ваши творческие способности и навыки, необходимые для работы над мероприятиями. Собеседование состоит из 5-ти вопросов, ограничений по сроку написания нет.</li>
+    <li><b>Кудеснику</b> нужно иметь опыт в организации не менее двух мероприятий и сообщить о желании занять должность кудесника. При необходимости ответственный задаст несколько вопросов, чтобы убедиться в ваших способностях. Ответственный имеет право отказать вам в повышении, даже если вы ответили на все вопросы.</li>
+  </ul>
+  <p><b>Вся работа по организации мероприятий происходит в ВКонтакте, поэтому для вступления нужно иметь там страницу. Запрашивая собеседование, пишите Клику Журавлей напрямую в <a href="https://vk.com/dojslodinoyaemtva" target="_blank">ВК</a>.</b></p>
+
+  <h3>Правила создания ивентов</h3>
+  <p><b>Заказчик</b> — кот от должности "оруженосец" с собственной идеей и программой для мероприятия. Может как подкинуть материал, так и полноценно участвовать в процессе его создания. Котята также могут предлагать варианты мероприятий и участвовать в разработке, при условии, что ранее находились в Сумраке с должностью выше оруженосца.</p>
+  <p>У заказчика обязательно должны быть:</p>
+  <ul>
+    <li><b>Идея</b> [общий замысел, история, краткое описание];</li>
+    <li><b>Этапы</b> [порядок прохождения квеста] и условия [если необходимы костюмы, предметы и их функции];</li>
+    <li><b>Роли</b> [если необходимо участие аниматоров].</li>
+  </ul>
+
+  <hr style="border:0; border-top:1px solid var(--line); margin: 30px 0;">
+
+  <h2 style="color: var(--accent); text-align: center; font-size: 24px;">ЖИВОПИСЦЫ</h2>
+  <p><b>Живописцы</b> — это объединение художников Сумрака, которым периодически поступают заказы на рисование предметов/медалей/украшение фонов и тд.</p>
+  
+  <h3>Обязанности ветви:</h3>
+  <ul>
+    <li>Отрисовка медалей;</li>
+    <li>Украшение фонов к мероприятиям/праздникам;</li>
+    <li>Отрисовка костюмов;</li>
+    <li>Отрисовка фонов;</li>
+    <li>Отрисовка призовых артов.</li>
+  </ul>
+
+  <h3>Порядок принятия в отряд:</h3>
+  <p>Написание Предвестнику Зла с примерами работ разнопланового творчества — костюмы, медали, предметы, фоны, арты. <br>
+  <i>[!] Клок Кометы не принимает заявки на вступление в отряд.</i> <br>
+  <i>[!] Обратите внимание, что отбор достаточно строгий. Вы можете в любой момент уточнить у Предвестника Зла, чего вам конкретно не хватает для принятия.</i></p>
+
+  <hr style="border:0; border-top:1px solid var(--line); margin: 30px 0;">
+
+  <h2 style="color: var(--accent); text-align: center; font-size: 24px;">ОФОРМИТЕЛИ</h2>
+  <p><b>Оформители</b> — это объединение теневых, умеющих работать с украшением текста и картинок. Им периодически поступают заказы на создание осебе на ивенты, гугл-таблиц, гугл-документов, блогов, уроков, баннеров.</p>
+  <h3>Порядок принятия:</h3>
+  <p>Написание ответственному или его помощнику с примерами оформительских работ.</p>
+
+  <hr style="border:0; border-top:1px solid var(--line); margin: 30px 0;">
+
+  <h2 style="color: var(--accent); text-align: center; font-size: 24px;">ПИСАТЕЛИ</h2>
+  <p><b>Писатели</b> — это объединение теневых, умеющих писать тексты и стихи. Их основной деятельность является написание сборников, приуроченных к мероприятиям, сезонам, лору племени. Кроме того, писателями периодически поступают заказы по написанию сопроводительных текстов для мероприятий, блогов и других проектов.</p>
+  
+  <h3>Обязанности ветви:</h3>
+  <ul>
+    <li><b>Работа с заказами:</b> текстовое наполнение блогов, постов; написание речей; формирование текстового сопровождения работы аниматоров.</li>
+    <li><b>Работа со сборниками:</b> издание племенных сборников рассказов; написание рассказов, мифов и сказок для их публикации в тематических сборниках.</li>
+  </ul>
+
+  <h3>Порядок принятия:</h3>
+  <p>Написание ответственному или его помощнику с примерами писательского творчества [проза, лирика, диалоги к мероприятиям и т. д.].</p>
+
+  <hr style="border:0; border-top:1px solid var(--line); margin: 30px 0;">
+
+  <h2 style="color: var(--accent); text-align: center; font-size: 24px;">НАГРАДЫ</h2>
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 100px; text-align: center;">Иконка</th>
+        <th>Название и описание</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td style="text-align: center;"><img src="/medal/500.png" alt="Медаль" style="width: 50px; border-radius: 0; box-shadow: none;"></td>
+        <td><b>За фантазию и организованность</b><br>Выдаётся за 40 баллов организации. Могут получить все аниматоры.</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;"><img src="/medal/223.png" alt="Медаль" style="width: 50px; border-radius: 0; box-shadow: none;"></td>
+        <td><b>За проявление творческой жилки</b><br>Могут получить художники из Живописцев, а также любой член племени.</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;"><img src="http://d.zaix.ru/GbFj.png" alt="Плашка" style="width: 120px;"></td>
+        <td><b>Плашка писателей</b><br>Выдаётся за 100 баллов писателей.</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;"><img src="https://i.ibb.co/FrxGcgY/image.png" alt="Плашка" style="width: 120px;"></td>
+        <td><b>Плашка оформителей</b><br>Выдаётся за 40 баллов оформителей.</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;"><img src="https://i.ibb.co/WNK9mFsv/image.png" alt="Плашка" style="width: 120px;"></td>
+        <td><b>Плашка живописцев</b><br>Выдаётся за 250 баллов живописцев.</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;"><img src="https://i.ibb.co/WNgYWPyF/3.png" alt="Костюм" style="width: 100px;"></td>
+        <td><b>Костюм писателей</b><br>Выдается писателям-активистам сезона [3 месяца] по двум категориям: игрок с наибольшим количеством баллов за работы; игрок с наибольшим количеством законченной работы.</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;"><img src="https://i.ibb.co/RGSbKRTy/1.png" alt="Костюм" style="width: 100px;"></td>
+        <td><b>Костюм оформителей</b><br>Выдается оформителям-активистам сезона [3 месяца] по двум категориям: игрок с наибольшим количеством баллов за работы; игрок с наибольшим количеством законченной работы.</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;"><img src="https://i.ibb.co/23Xm2FVL/1.png" alt="Костюм" style="width: 100px;"></td>
+        <td><b>Костюм живописцев</b><br>Выдается художникам-активистам сезона [3 месяца] по двум категориям: игрок с наибольшим количеством баллов за работы; игрок с наибольшим количеством законченной работы.</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;"><img src="https://d.zaix.ru/Edpa.png" alt="Ачивка" style="width: 80px;"></td>
+        <td><b>Ачивка живописцев</b><br>Выдаётся за 100 баллов живописцев.</td>
+      </tr>
+      <tr>
+        <td style="text-align: center;"><img src="http://d.zaix.ru/GbGk.png" alt="След" style="width: 100px;"></td>
+        <td><b>След живописцев</b><br>Возможность оставить след на фоне сроком на полгода. Выдаётся за 400 баллов живописцев.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+`;
+
+// ===== ОСТАЛЬНАЯ ЛОГИКА САЙТА =====
 
 function parseDate(dStr) {
     if (!dStr) return 0;
@@ -223,7 +385,12 @@ function updateStats(){ $('statArtists').textContent=artists.length;$('statWorks
  const old=$('artistFilter').value;$('artistFilter').innerHTML='<option value="">Все художники</option>'+artists.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('');$('artistFilter').value=old;}
 
 function render(){
- if (view === '' || ['animators','writers','designers'].includes(view)) {
+ if (view === '') {
+   $('workspace').style.display = 'none';
+   $('content').innerHTML = WELCOME_HTML;
+   return;
+ }
+ if (['animators','writers','designers'].includes(view)) {
    $('workspace').style.display = 'none';
    $('content').innerHTML = '';
    return;
@@ -498,25 +665,17 @@ function setView(v){
   view = v;
   const subNav = document.getElementById('paintersSubNav');
   const menuBtns = document.querySelectorAll('.nav > button');
-  const brandTitle = document.getElementById('brandTitle'); // Элемент заголовка
+  const brandTitle = document.getElementById('brandTitle');
   
-  // Очищаем активные классы у основного меню
   menuBtns.forEach(b => b.classList.remove('active'));
-  // Очищаем активные классы у вложенного меню
   subNav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
 
-  // Если выбрана одна из вкладок живописцев
   if (['artists', 'board', 'works', 'rewards'].includes(v)) {
-    subNav.classList.add('open'); // Открываем вкладки
+    subNav.classList.add('open');
     document.getElementById('paintersMenuBtn').classList.add('active');
-    
-    // Подсвечиваем конкретную вкладку в подменю
     subNav.querySelector(`[data-view="${v}"]`).classList.add('active');
-    
-    // Меняем заголовок в сайдбаре
     brandTitle.textContent = 'Живописцы';
 
-    // Рендерим контент живописцев
     $('workspace').style.display = 'block';
     $('pageTitle').textContent=({board:'Доска художников',artists:'Все художники',works:'Все работы',rewards:'Награды и разбалловка'})[v];
     $('listTitle').textContent=({board:'Рабочее пространство',artists:'Список художников',works:'Реестр работ',rewards:'Награды'})[v];
@@ -557,11 +716,9 @@ function setView(v){
     return;
   }
 
-  // Обработка заглушек (Аниматоры, Писатели, Оформители)
-  subNav.classList.remove('open'); // Скрываем вкладки живописцев
+  subNav.classList.remove('open');
   document.querySelector(`.nav > button[data-view="${v}"]`).classList.add('active');
   
-  // Меняем заголовок в сайдбаре на название выбранного раздела
   if (v === 'animators') brandTitle.textContent = 'Аниматоры';
   else if (v === 'writers') brandTitle.textContent = 'Писатели';
   else if (v === 'designers') brandTitle.textContent = 'Оформители';
@@ -570,7 +727,6 @@ function setView(v){
   $('content').innerHTML = '';
 }
 
-// Вешаем события на все кнопки (и основные, и вложенные)
 document.querySelectorAll('button[data-view]').forEach(b=>{
   b.onclick = () => setView(b.dataset.view);
 });
@@ -682,10 +838,9 @@ $('artistFilter').onchange=render;
 $('sort').onchange=render;
 $('specFilter').onchange=render;
 
-// При первом открытии правая часть пуста, раздел не выбран, заголовок по умолчанию
+// При первом открытии правая часть показывает WELCOME_HTML
 view = '';
 $('workspace').style.display = 'none';
-$('content').innerHTML = '';
 document.getElementById('brandTitle').textContent = 'Мастерская чудес';
 document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
 
