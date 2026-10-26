@@ -2,12 +2,30 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Живописцы — рабочее пространство</title>
+<title>Мастерская чудес — рабочее пространство</title>
 <style>
 :root{--bg:#f5f2ee;--paper:#fffdfa;--ink:#292723;--muted:#8c877f;--line:#e6e0d8;--accent:#c86f52;--green:#647b62;--shadow:0 8px 28px #31261b0b}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,ui-sans-serif,system-ui,sans-serif}
 button,input,select{font:inherit}button{cursor:pointer}.app{min-height:100vh;display:grid;grid-template-columns:248px 1fr}
-.sidebar{background:#292824;color:#f8f4ee;padding:25px 17px;display:flex;flex-direction:column;gap:24px;min-height:100vh}.brand{display:flex;align-items:center;gap:12px;padding:0 7px}.logo{width:39px;height:39px;border-radius:13px;background:#d48a6f;color:#292824;display:grid;place-items:center;font-size:21px;font-weight:800}.brand strong{font-size:16px}.brand small{display:block;color:#aaa49b;font-size:11px;margin-top:2px}.side-label{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:#8e8981;padding:0 10px;margin-bottom:7px}.nav{display:grid;gap:5px}.nav button{border:0;color:#d7d0c7;background:transparent;text-align:left;padding:11px 12px;border-radius:10px;display:flex;align-items:center;gap:11px}.nav button.active,.nav button:hover{background:#414039;color:#fff}.nav .ico{width:19px;text-align:center;font-size:16px}.side-note{margin-top:auto;border:1px solid #48463f;background:#33322d;border-radius:13px;padding:13px;color:#bcb6ad;font-size:12px}.side-note b{color:#f8f4ee;display:block;margin-bottom:5px}
+.sidebar{background:#292824;color:#f8f4ee;padding:25px 17px;display:flex;flex-direction:column;gap:24px;min-height:100vh}
+.brand{display:flex;align-items:center;gap:12px;padding:0 7px}
+.logo{width:39px;height:39px;border-radius:13px;background:#d48a6f;color:#292824;display:grid;place-items:center;font-size:21px;font-weight:800}
+.brand strong{font-size:16px; transition: 0.2s;}
+.brand small{display:block;color:#aaa49b;font-size:11px;margin-top:2px}
+.side-label{font-size:10px;text-transform:uppercase;letter-spacing:.16em;color:#8e8981;padding:0 10px;margin-bottom:7px}
+.nav{display:grid;gap:5px}
+.nav button{border:0;color:#d7d0c7;background:transparent;text-align:left;padding:11px 12px;border-radius:10px;display:flex;align-items:center;gap:11px;width:100%}
+.nav button.active,.nav button:hover{background:#414039;color:#fff}
+.nav .ico{width:19px;text-align:center;font-size:16px}
+
+/* Стили для вложенных вкладок живописцев */
+.sub-nav {display: none;flex-direction: column;gap: 4px;margin-top: 4px;padding-left: 12px;border-left: 2px solid #414039;margin-left: 12px;}
+.sub-nav.open {display: flex;}
+.sub-nav button {padding: 8px 12px;font-size: 13px;color: #b0a99f;}
+.sub-nav button.active, .sub-nav button:hover {background: transparent;color: #fff;}
+.sub-nav .ico {font-size: 14px;}
+
+.side-note{margin-top:auto;border:1px solid #48463f;background:#33322d;border-radius:13px;padding:13px;color:#bcb6ad;font-size:12px}.side-note b{color:#f8f4ee;display:block;margin-bottom:5px}
 main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:25px}.eyebrow{font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.14em;font-weight:750}.topbar h1{font-size:27px;margin:5px 0 0;letter-spacing:-.04em}.btn{border:1px solid var(--line);background:var(--paper);padding:10px 13px;border-radius:10px;color:var(--ink);font-weight:650}.btn:hover{filter:brightness(.97)}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}.stat{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px 17px;box-shadow:var(--shadow)}.stat span{color:var(--muted);font-size:12px}.stat strong{display:block;font-size:25px;margin-top:6px}.stat small{color:var(--green);font-size:11px}
 .toolbar{display:flex;gap:10px;margin-bottom:17px;flex-wrap:wrap}.search{position:relative;flex:1;min-width:190px}.search input{width:100%;border:1px solid var(--line);background:var(--paper);border-radius:11px;padding:12px 14px 12px 38px;outline:none}.search:before{content:"⌕";position:absolute;left:14px;top:7px;font-size:23px;color:var(--muted)}select{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:11px;color:var(--ink);max-width:200px}.section-head{display:flex;justify-content:space-between;margin:24px 0 12px}.section-head h2{font-size:15px;margin:0}.section-head p{color:var(--muted);font-size:12px;margin:3px 0 0}.board{display:grid;grid-template-columns:260px 1fr;gap:14px}.artist-panel,.work-area{background:var(--paper);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow)}.artist-panel{padding:17px;display:flex;flex-direction:column;gap:14px}.artist-hero{display:flex;align-items:center;gap:13px}.avatar{width:76px;height:76px;border-radius:12px;background:#e9ded4;display:grid;place-items:center;overflow:hidden;color:#a27b69;font-size:28px;font-weight:750}.avatar img{width:100%;height:100%;object-fit:cover}.artist-name{font-size:17px;font-weight:800;line-height:1.25}.artist-sub{color:var(--muted);font-size:12px}.links{display:flex;gap:7px;flex-wrap:wrap}.links a{font-size:11px;color:#a85840;text-decoration:none;border-bottom:1px solid #e5c1b4}.links a:hover{color:#703724}.divider{height:1px;background:var(--line)}.field-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:750;margin-bottom:5px}.bio{font-size:13px;white-space:pre-wrap}.chips{display:flex;flex-wrap:wrap;gap:5px}.chip{border-radius:6px;padding:4px 7px;background:#f2e9e1;color:#765d4e;font-size:11px}
 .mini-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mini-stat{background:#f7f3ee;border-radius:10px;padding:10px}.mini-stat span{display:block;color:var(--muted);font-size:11px;line-height:1.2;margin-bottom:2px;}.mini-stat b{display:block;font-size:18px;line-height:1.2;}.mini-stat.full-width {grid-column: 1 / -1; text-align: center; background: #f2e9e1;}.mini-stat.full-width b {color: var(--accent); font-size: 22px;}
@@ -36,44 +54,66 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
 <div id="loadingOverlay">Загрузка данных из Google Таблицы...</div>
 <div class="app">
 <aside class="sidebar">
- <div class="brand"><div class="logo">Ж</div><div><strong>Живописцы</strong><small>рабочее пространство</small></div></div>
+ <!-- ИЗМЕНЕНО: Шапка теперь с ID для динамической смены текста -->
+ <div class="brand">
+   <div class="logo">✦</div>
+   <div>
+     <strong id="brandTitle">Мастерская чудес</strong>
+     <small>рабочее пространство</small>
+   </div>
+ </div>
+ 
  <div style="width:100%"><div class="side-label">Рабочее место</div><nav class="nav">
- <button class="active" data-view="artists"><span class="ico">♙</span><span class="nav-text">Художники</span></button>
- <button data-view="board"><span class="ico">▦</span><span class="nav-text">Доска</span></button>
- <button data-view="works"><span class="ico">✎</span><span class="nav-text">Все работы</span></button>
- <button data-view="rewards"><span class="ico">★</span><span class="nav-text">Награды</span></button>
+   <!-- Заглушки -->
+   <button data-view="animators"><span class="nav-text">Аниматоры</span></button>
+   <button data-view="writers"><span class="nav-text">Писатели</span></button>
+   <button data-view="designers"><span class="nav-text">Оформители</span></button>
+   
+   <!-- Основной раздел -->
+   <button id="paintersMenuBtn" data-view="artists"><span class="nav-text">Живописцы</span></button>
+   
+   <!-- Вложенные вкладки (появляются при клике на Живописцев) -->
+   <div class="sub-nav" id="paintersSubNav">
+     <button data-view="artists"><span class="ico">♙</span><span class="nav-text">Художники</span></button>
+     <button data-view="board"><span class="ico">▦</span><span class="nav-text">Доска</span></button>
+     <button data-view="works"><span class="ico">✎</span><span class="nav-text">Все работы</span></button>
+     <button data-view="rewards"><span class="ico">★</span><span class="nav-text">Награды</span></button>
+   </div>
  </nav></div>
+ 
  <div class="side-note"><b>Только просмотр</b>Данные берутся из Google Таблицы. Для изменения данных отредактируйте таблицу.</div>
 </aside>
 <main>
- <div class="topbar"><div><div class="eyebrow">Панель координатора</div><h1 id="pageTitle">Все художники</h1></div><div class="actions"><button class="btn" onclick="location.reload()">↻ Обновить</button></div></div>
- <section class="stats" style="display:none;">
- <div class="stat"><span>Художников</span><strong id="statArtists">0</strong></div>
- <div class="stat"><span>Работ учтено</span><strong id="statWorks">0</strong></div>
- <div class="stat"><span>Начислено баллов</span><strong id="statPoints">0</strong></div>
- <div class="stat"><span>Без работ</span><strong id="statEmpty">0</strong></div>
- </section>
- <div class="toolbar">
-   <div class="search"><input id="search" placeholder="Поиск по имени или VK..."></div>
-   <select id="specFilter" style="display:none;">
-     <option value="">Все специальности</option>
-     <option value="фон">Фоны</option>
-     <option value="костюм">Костюмы</option>
-     <option value="предмет">Предметы</option>
-     <option value="медал">Медали</option>
-     <option value="шапк">Шапки</option>
-     <option value="плашк">Плашки</option>
-     <option value="ачивк">Ачивки</option>
-   </select>
-   <select id="artistFilter"><option value="">Все художники</option></select>
-   <select id="sort">
-     <option value="name">По имени</option>
-     <option value="points">По баллам ↓</option>
-     <option value="date_desc">По дате (сначала новые)</option>
-     <option value="date_asc">По дате (сначала старые)</option>
-   </select>
+ <div id="workspace" style="display:none;">
+   <div class="topbar"><div><div class="eyebrow">Панель координатора</div><h1 id="pageTitle">Все художники</h1></div><div class="actions"><button class="btn" onclick="location.reload()">↻ Обновить</button></div></div>
+   <section class="stats" style="display:none;">
+    <div class="stat"><span>Художников</span><strong id="statArtists">0</strong></div>
+    <div class="stat"><span>Работ учтено</span><strong id="statWorks">0</strong></div>
+    <div class="stat"><span>Начислено баллов</span><strong id="statPoints">0</strong></div>
+    <div class="stat"><span>Без работ</span><strong id="statEmpty">0</strong></div>
+   </section>
+   <div class="toolbar">
+     <div class="search"><input id="search" placeholder="Поиск по имени или VK..."></div>
+     <select id="specFilter" style="display:none;">
+       <option value="">Все специальности</option>
+       <option value="фон">Фоны</option>
+       <option value="костюм">Костюмы</option>
+       <option value="предмет">Предметы</option>
+       <option value="медал">Медали</option>
+       <option value="шапк">Шапки</option>
+       <option value="плашк">Плашки</option>
+       <option value="ачивк">Ачивки</option>
+     </select>
+     <select id="artistFilter"><option value="">Все художники</option></select>
+     <select id="sort">
+       <option value="name">По имени</option>
+       <option value="points">По баллам ↓</option>
+       <option value="date_desc">По дате (сначала новые)</option>
+       <option value="date_asc">По дате (сначала старые)</option>
+     </select>
+   </div>
+   <div class="section-head"><div><h2 id="listTitle">Список художников</h2><p id="listSub">Нажмите на карточку</p></div></div>
  </div>
- <div class="section-head"><div><h2 id="listTitle">Список художников</h2><p id="listSub">Нажмите на карточку</p></div></div>
  <div id="content"></div>
 </main></div>
 
@@ -85,7 +125,7 @@ const CSV_URL = 'https://docs.google.com/spreadsheets/d/1hjiRKo9s39_sUv9JCfZ70GA
 const PURCHASES_URL = 'https://docs.google.com/spreadsheets/d/1hjiRKo9s39_sUv9JCfZ70GAffxHH5K306Lyv-Yfu7os/export?format=csv&gid=1168996610';
 
 const CATS=['Фон с нуля','Украш. фон','Костюм фулл & боты','Костюм','Предметы','Медаль','Шапка','Иное'];
-let artists=[], works=[], purchases=[], currentArtist=null, view='board';
+let artists=[], works=[], purchases=[], currentArtist=null, view='';
 let expandedCats = {}; 
 let rewardCheckArtistId = ''; 
 
@@ -137,7 +177,7 @@ const ALL_REWARDS = [
   { name: 'Отрядное оформление сокровищницы', price: 400, isNb: false },
   { name: 'Костюм живописцев', price: 0, isNb: false }, 
   { name: 'Обмен на жетоны', price: 1, isNb: true },
-  { name: 'Медаль мероприятия', price: 0, isNb: true }, // Особый случай
+  { name: 'Медаль мероприятия', price: 0, isNb: true },
   { name: 'След на фоне (1 сезон)', price: 15, isNb: true },
   { name: 'Личный костюм (1 неделя)', price: 30, isNb: true },
   { name: 'Личный костюм (2 недели)', price: 50, isNb: true },
@@ -183,6 +223,12 @@ function updateStats(){ $('statArtists').textContent=artists.length;$('statWorks
  const old=$('artistFilter').value;$('artistFilter').innerHTML='<option value="">Все художники</option>'+artists.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('');$('artistFilter').value=old;}
 
 function render(){
+ if (view === '' || ['animators','writers','designers'].includes(view)) {
+   $('workspace').style.display = 'none';
+   $('content').innerHTML = '';
+   return;
+ }
+ $('workspace').style.display = 'block';
  updateStats();
  let q = slug($('search').value);
  let filter = $('artistFilter').value;
@@ -336,7 +382,6 @@ function renderRewards() {
       let typeName = isNb ? 'НБ' : 'баллов';
       let isBought = false;
       
-      // Список особых наград, которые не покупаются, а выдаются вручную
       let isSpecial = (title === 'Костюм живописцев' || title === 'Медаль мероприятия');
 
       if (checkedArtist) {
@@ -362,7 +407,6 @@ function renderRewards() {
       if (avail) cardClass += ' available';
       if (isBought) cardClass += ' bought';
 
-      // Форматируем вывод цены
       let priceDisplay = '';
       if (isSpecial) {
           priceDisplay = `<span style="font-weight:400; font-size:11px; color:var(--muted);">Особое условие</span>`;
@@ -451,45 +495,85 @@ function renderRewards() {
 }
 
 function setView(v){
- view=v;document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===v));
- $('pageTitle').textContent=({board:'Доска художников',artists:'Все художники',works:'Все работы',rewards:'Награды и разбалловка'})[v];
- $('listTitle').textContent=({board:'Рабочее пространство',artists:'Список художников',works:'Реестр работ',rewards:'Награды'})[v];
- $('listSub').textContent=({board:'Выберите художника',artists:'Нажмите на карточку',works:'Все начисления в одном списке',rewards:'Информация о наградах и баллах'})[v];
- 
- if (v === 'rewards') {
-     document.querySelector('.toolbar').style.display = 'none';
- } else {
-     document.querySelector('.toolbar').style.display = 'flex';
- }
+  view = v;
+  const subNav = document.getElementById('paintersSubNav');
+  const menuBtns = document.querySelectorAll('.nav > button');
+  const brandTitle = document.getElementById('brandTitle'); // Элемент заголовка
+  
+  // Очищаем активные классы у основного меню
+  menuBtns.forEach(b => b.classList.remove('active'));
+  // Очищаем активные классы у вложенного меню
+  subNav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
 
- if (v === 'board') {
-     document.getElementById('specFilter').style.display = 'none';
-     document.getElementById('sort').style.display = 'none';
-     document.getElementById('artistFilter').style.display = 'block';
- } else if (v === 'artists') {
-     document.getElementById('specFilter').style.display = 'block';
-     document.getElementById('sort').style.display = 'block';
-     document.getElementById('artistFilter').style.display = 'none';
-     let sortSelect = document.getElementById('sort');
-     sortSelect.innerHTML = `<option value="name">По имени</option><option value="points">По баллам ↓</option>`;
- } else if (v === 'works') {
-     document.getElementById('specFilter').style.display = 'none';
-     document.getElementById('sort').style.display = 'block';
-     document.getElementById('artistFilter').style.display = 'block';
-     let sortSelect = document.getElementById('sort');
-     sortSelect.innerHTML = `<option value="name">По имени</option><option value="points">По баллам ↓</option><option value="date_desc">По дате (сначала новые)</option><option value="date_asc">По дате (сначала старые)</option>`;
- }
+  // Если выбрана одна из вкладок живописцев
+  if (['artists', 'board', 'works', 'rewards'].includes(v)) {
+    subNav.classList.add('open'); // Открываем вкладки
+    document.getElementById('paintersMenuBtn').classList.add('active');
+    
+    // Подсвечиваем конкретную вкладку в подменю
+    subNav.querySelector(`[data-view="${v}"]`).classList.add('active');
+    
+    // Меняем заголовок в сайдбаре
+    brandTitle.textContent = 'Живописцы';
 
- const statsBlock = document.querySelector('.stats');
- if (v === 'board' || v === 'works' || v === 'rewards') {
-     statsBlock.style.display = 'none';
- } else {
-     statsBlock.style.display = 'grid';
- }
+    // Рендерим контент живописцев
+    $('workspace').style.display = 'block';
+    $('pageTitle').textContent=({board:'Доска художников',artists:'Все художники',works:'Все работы',rewards:'Награды и разбалловка'})[v];
+    $('listTitle').textContent=({board:'Рабочее пространство',artists:'Список художников',works:'Реестр работ',rewards:'Награды'})[v];
+    $('listSub').textContent=({board:'Выберите художника',artists:'Нажмите на карточку',works:'Все начисления в одном списке',rewards:'Информация о наградах и баллах'})[v];
+    
+    if (v === 'rewards') {
+        document.querySelector('.toolbar').style.display = 'none';
+    } else {
+        document.querySelector('.toolbar').style.display = 'flex';
+    }
 
- render();
+    if (v === 'board') {
+        document.getElementById('specFilter').style.display = 'none';
+        document.getElementById('sort').style.display = 'none';
+        document.getElementById('artistFilter').style.display = 'block';
+    } else if (v === 'artists') {
+        document.getElementById('specFilter').style.display = 'block';
+        document.getElementById('sort').style.display = 'block';
+        document.getElementById('artistFilter').style.display = 'none';
+        let sortSelect = document.getElementById('sort');
+        sortSelect.innerHTML = `<option value="name">По имени</option><option value="points">По баллам ↓</option>`;
+    } else if (v === 'works') {
+        document.getElementById('specFilter').style.display = 'none';
+        document.getElementById('sort').style.display = 'block';
+        document.getElementById('artistFilter').style.display = 'block';
+        let sortSelect = document.getElementById('sort');
+        sortSelect.innerHTML = `<option value="name">По имени</option><option value="points">По баллам ↓</option><option value="date_desc">По дате (сначала новые)</option><option value="date_asc">По дате (сначала старые)</option>`;
+    }
+
+    const statsBlock = document.querySelector('.stats');
+    if (v === 'board' || v === 'works' || v === 'rewards') {
+        statsBlock.style.display = 'none';
+    } else {
+        statsBlock.style.display = 'grid';
+    }
+
+    render();
+    return;
+  }
+
+  // Обработка заглушек (Аниматоры, Писатели, Оформители)
+  subNav.classList.remove('open'); // Скрываем вкладки живописцев
+  document.querySelector(`.nav > button[data-view="${v}"]`).classList.add('active');
+  
+  // Меняем заголовок в сайдбаре на название выбранного раздела
+  if (v === 'animators') brandTitle.textContent = 'Аниматоры';
+  else if (v === 'writers') brandTitle.textContent = 'Писатели';
+  else if (v === 'designers') brandTitle.textContent = 'Оформители';
+  
+  $('workspace').style.display = 'none';
+  $('content').innerHTML = '';
 }
-document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>setView(b.dataset.view));
+
+// Вешаем события на все кнопки (и основные, и вложенные)
+document.querySelectorAll('button[data-view]').forEach(b=>{
+  b.onclick = () => setView(b.dataset.view);
+});
 
 function parseCSV(text){
     let first=text.split(/\r?\n/)[0]||'';
@@ -598,8 +682,12 @@ $('artistFilter').onchange=render;
 $('sort').onchange=render;
 $('specFilter').onchange=render;
 
-// Инициализация: сразу применяем вид "Все художники"
-setView('artists');
+// При первом открытии правая часть пуста, раздел не выбран, заголовок по умолчанию
+view = '';
+$('workspace').style.display = 'none';
+$('content').innerHTML = '';
+document.getElementById('brandTitle').textContent = 'Мастерская чудес';
+document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
 
 fetchData();
 </script></body></html>
