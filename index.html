@@ -633,6 +633,7 @@ function initials(a){return (a.name||'?').trim().split(/\s+/).slice(0,2).map(x=>
 function updateStats(){ 
   if(view.startsWith('animators')) {
     $('statLabel1').textContent = "Аниматоров";
+    $('statLabel2').textContent = "Мероприятий";
     $('statLabel3').textContent = "Начислено баллов";
     $('statLabel4').textContent = "Без мероприятий";
     
@@ -684,12 +685,12 @@ function render(){
 
     const statsBlock = document.querySelector('.stats');
     // Исправление 3: скрываем статистику на вкладке "Доска" и "Награды"
-    if (view.startsWith('animators')) {
-        statsBlock.style.display = 'none'; // скрываем для всех вкладок аниматоров
+    if (view === 'animators_board' || view === 'animators_rewards') {
+        statsBlock.style.display = 'none';
     } else {
-        statsBlock.style.display = 'grid'; // показываем для художников
+        statsBlock.style.display = 'grid';
     }
-  
+
     if (view === 'animators_stats') {
         $('listTitle').textContent = 'Список аниматоров';
         $('listSub').textContent = 'Нажмите на карточку';
