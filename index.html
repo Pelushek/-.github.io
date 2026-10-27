@@ -507,8 +507,8 @@ const WELCOME_HTML = `
     </thead>
     <tbody>
       <tr>
-        <td style="text-align: center;"><img src="https://catwar.net/medal/500.png" alt="Медаль" style="width: 50px; border-radius: 0; box-shadow: none;"></td>
-        <td><b>За фантазию и организованность</b><br>Выдаётся за 40 баллов организации. Могут получить все аниматоры.</td>
+        <td style="text-align: center;"><img src="https://i.ibb.co/MxxJ86PF/500.png" alt="Медаль" style="width: 50px; border-radius: 0; box-shadow: none;"></td>
+        <td><b>За фантазию и организованность</b><br>Могут получить все аниматоры.</td>
       </tr>
       <tr>
         <td style="text-align: center;"><img src="https://catwar.net/medal/223.png" alt="Медаль" style="width: 50px; border-radius: 0; box-shadow: none;"></td>
@@ -666,10 +666,13 @@ function makeRewardCard(ctx) {
     let typeName = isNb ? 'НБ' : 'баллов';
     let isBought = false;
     const isSpecial = SPECIAL_REWARDS.includes(title);
+    const isTbd = price == null;
 
     if (ctx.checked) isBought = ctx.isBoughtFn(title);
 
-    if (isSpecial) {
+    if (isTbd) {
+      statusHtml = `<div class="reward-status status-no" style="background:#f0f0f0; color:#666; border-color:#ddd;">Цена уточняется</div>`;
+    } else if (isSpecial) {
       if (isBought) {
         statusHtml = `<div class="reward-status status-avail" style="display:block; background:#e8f5e9; color:#2e7d32; padding:5px; border-radius:6px; margin-top:8px;">Выдан (внесен в таблицу)</div>`;
       } else {
@@ -687,7 +690,9 @@ function makeRewardCard(ctx) {
     if (avail && !isBought) cardClass += ' available';
     if (isBought) cardClass += ' bought';
 
-    let priceDisplay = isSpecial
+    let priceDisplay = isTbd
+      ? `<span style="font-weight:400; font-size:11px; color:var(--muted);">Цена: уточняется</span>`
+      : isSpecial
       ? `<span style="font-weight:400; font-size:11px; color:var(--muted);">Особое условие</span>`
       : `${isNb ? 'НБ: ' : 'Баллов: '}${price} ${isLifetime ? '<span style="font-size:10px;font-weight:400;color:var(--muted)">(за всю жизнь)</span>' : ''}`;
 
@@ -872,7 +877,7 @@ function renderAnimatorsArtists(list){
         </div>
         <div class="mini-stats">
           <div class="mini-stat"><span>Баллы</span><b>${animatorPoints(a)}</b></div>
-          <div class="mini-stat"><span>Мероприятий</span><b>${aEvents(a).length}</b></div>
+          <div class="mini-stat"><span>Ивенты</span><b>${aEvents(a).length}</b></div>
         </div>
       </div>
     `).join('')}
@@ -961,15 +966,27 @@ function renderAnimatorRewards() {
 
     <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--accent); padding-bottom:5px; color:var(--accent);">Награды за баллы</h3>
     <div class="rewards-grid" style="margin-top:15px;">
-      ${card('За фантазию и организованность', 'Выдаётся за 40 баллов организации. Могут получить все аниматоры.', 40, false, 'https://i.ibb.co/CsV1YFWZ/223.png')}
-      ${card('Костюм аниматора', 'Выдается активистам сезона.', 100, false, null)}
+      ${card('За фантазию и организованность', 'Выдаётся за 40 баллов организации. Могут получить все аниматоры.', 40, false, 'https://i.ibb.co/MxxJ86PF/500.png')}
+      ${card('Ачивка аниматоров', '', null, false, null)}
+      ${card('Отрядное оформление сокровищницы', '', null, false, null)}
     </div>
 
     <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--line); padding-bottom:5px;">Информационная сводка</h3>
-    <div style="display:grid; grid-template-columns:1fr; gap:20px; margin-top:15px;">
+    <div class="two-col" style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-top:15px;">
         <div class="info-block">
-            <h3 style="border-bottom:none; color:var(--accent);">Разбалловка (в разработке)</h3>
-            <p style="font-size:12px; color:var(--muted); margin-top:10px;">Здесь будет информация по начислению баллов за мероприятия.</p>
+            <h3 style="border-bottom:none; color:var(--accent);">Мероприятия</h3>
+            <ul>
+                <li><b>Кудесник</b> за организацию получает 20 баллов;</li>
+                <li><b>Подмастерье</b> за участие в организации получает от 5 баллов на усмотрение главного организатора или Ведущего творца;</li>
+                <li><b>Главный помощник</b> за свою работу получает 20 баллов.</li>
+            </ul>
+        </div>
+        <div class="info-block">
+            <h3 style="border-bottom:none; color:var(--accent);">Ворожба</h3>
+            <ul>
+                <li><b>Главный организатор</b> получает 15 баллов;</li>
+                <li><b>Каждый помощник</b> получает от 5 до 10 баллов (на усмотрение главного организатора).</li>
+            </ul>
         </div>
     </div>
   `;
@@ -1198,6 +1215,7 @@ function setView(v){
     document.getElementById('animSpecFilter').style.display = v === 'animators_stats' ? 'block' : 'none';
     $('artistFilter').style.display = v === 'animators_stats' ? 'none' : 'block';
     $('sort').innerHTML = v === 'animators_stats' ? SORT_NP : SORT_ALL;
+    $('sort').style.display = v === 'animators_board' ? 'none' : 'block';
     $('sort').value = 'name';
     document.getElementById('specFilter').style.display = 'none';
 
