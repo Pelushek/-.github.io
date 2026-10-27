@@ -359,7 +359,7 @@ const WELCOME_HTML = `
     </p>
   </div>
   
-  <p><b>Живописцы</b> — это объединение художников Сумрака, которым периодически поступают заказы на рисование предметов/медалей/украшение фонов и тд.</p>
+  <p><b>Живописцы</b> — это объединение художников Сумрака, которым периодически поступают заказы на рисование предметов/медалей/украшение фонов и тд. Они находятся под ответственностью предводителя и курируются закрепленным за сферой игроком.</p>
   
   <h3>Обязанности ветви:</h3>
   <ul>
@@ -388,10 +388,31 @@ const WELCOME_HTML = `
   <hr style="border:0; border-top:1px solid var(--line); margin: 30px 0 0 0;">
 
   <!-- ОФОРМИТЕЛИ -->
-  <h2 style="color: var(--accent); text-align: center; font-size: 24px; margin: 10px 0 20px 0; display: block; width: 100%;">ОФОРМИТЕЛИ</h2>
+  <a href="#" onclick="setView('designers'); return false;" style="text-decoration: none; display: block; text-align: center; margin-bottom: 10px;">
+    <h2 style="color: var(--accent); font-size: 24px; margin: 10px 0 0 0; border-bottom: none; display: inline-block; transition: 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+      ОФОРМИТЕЛИ
+    </h2>
+  </a>
+  
+  <!-- Блок с ответственными -->
+  <div style="background: #fdf6f3; border-top: 2px solid var(--accent); border-bottom: 2px solid var(--accent); padding: 10px 15px; margin-bottom: 20px; border-radius: 6px; text-align: center; width: fit-content; margin-left: auto; margin-right: auto;">
+    <p style="margin: 0; font-size: 14px; color: var(--ink);">
+      <b>Ответственный</b> — <a href="https://catwar.net/cat1692501" target="_blank" style="color: var(--accent); text-decoration: underline;">Клик Журавлей</a> &nbsp;|&nbsp; 
+      <b>Помощник</b> — отсутствует
+    </p>
+  </div>
+
   <p><b>Оформители</b> — это объединение теневых, умеющих работать с украшением текста и картинок. Им периодически поступают заказы на создание осебе на ивенты, гугл-таблиц, гугл-документов, блогов, уроков, баннеров.</p>
+  
   <h3>Порядок принятия:</h3>
   <p>Написание ответственному или его помощнику с примерами оформительских работ.</p>
+
+  <!-- Кнопка портфолио -->
+  <div style="text-align: center; margin: 25px 0 35px 0;">
+    <a href="https://catwar.net/cat1692501" target="_blank" style="display: inline-block; background: var(--accent); color: #fff; font-weight: 800; font-size: 14px; padding: 12px 24px; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 12px rgba(200,111,82,0.3); transition: 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(200,111,82,0.4)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 12px rgba(200,111,82,0.3)'">
+      ПРИСЛАТЬ ПОРТФОЛИО
+    </a>
+  </div>
 
   <hr style="border:0; border-top:1px solid var(--line); margin: 30px 0 0 0;">
 
