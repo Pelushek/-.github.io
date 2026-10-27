@@ -82,6 +82,9 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
   .bb-content table{display:block;overflow-x:auto}
 }
 
+.stats.three{grid-template-columns:repeat(3,1fr)}.stats.three .stat:nth-child(2){display:none}
+@media (max-width: 900px){.stats.three{grid-template-columns:repeat(2,1fr)}}
+
 /* Убираем лишний пробел в самом верху страницы */
 #content { margin-top: 0; padding-top: 0; }
 </style></head>
@@ -702,7 +705,7 @@ function makeRewardCard(ctx) {
 
 function initials(a){return (a.name||'?').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()}
 
-function updateStats(){ 
+function updateStats(){ document.querySelector('.stats').classList.toggle('three', view === 'animators_stats'); 
   if(view.startsWith('animators')) {
     $('statLabel1').textContent = "Аниматоров";
     $('statLabel2').textContent = "Мероприятий";
@@ -898,7 +901,7 @@ function animatorBoardHTML(a) {
         ${linkHtml}
         <div style="font-weight:800; font-size:14px; margin-bottom:6px; color:var(--ink);">${esc(e.title || 'Без названия')}</div>
         <div class="meta" style="margin-top:0;">
-            <span style="font-size:11px;">📅 ${esc(e.date || 'Дата не указана')}</span>
+            <span style="font-size:11px;">${esc(e.date || 'Дата не указана')}</span>
             <span class="points" style="font-size:13px;">+${+e.points || 0} баллов</span>
         </div>
      </div>`;
@@ -1193,6 +1196,7 @@ function setView(v){
     // Управление фильтрами
     document.querySelector('.toolbar').style.display = v === 'animators_rewards' ? 'none' : 'flex';
     document.getElementById('animSpecFilter').style.display = v === 'animators_stats' ? 'block' : 'none';
+    $('artistFilter').style.display = v === 'animators_stats' ? 'none' : 'block';
     $('sort').innerHTML = v === 'animators_stats' ? SORT_NP : SORT_ALL;
     $('sort').value = 'name';
     document.getElementById('specFilter').style.display = 'none';
