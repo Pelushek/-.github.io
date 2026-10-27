@@ -24,14 +24,13 @@ button,input,select{font:inherit}button{cursor:pointer}
 .nav button.active,.nav button:hover{background:#414039;color:#fff}
 .nav .ico{width:19px;text-align:center;font-size:16px}
 
-/* Стили для вложенных вкладок живописцев */
+/* Стили для вложенных вкладок */
 .sub-nav {display: none;flex-direction: column;gap: 4px;margin-top: 4px;padding-left: 12px;border-left: 2px solid #414039;margin-left: 12px;}
 .sub-nav.open {display: flex;}
 .sub-nav button {padding: 8px 12px;font-size: 13px;color: #b0a99f;}
 .sub-nav button.active, .sub-nav button:hover {background: transparent;color: #fff;}
 .sub-nav .ico {font-size: 14px;}
 
-.side-note{margin-top:auto;border:1px solid #48463f;background:#33322d;border-radius:13px;padding:13px;color:#bcb6ad;font-size:12px}.side-note b{color:#f8f4ee;display:block;margin-bottom:5px}
 main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:25px}.eyebrow{font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.14em;font-weight:750}.topbar h1{font-size:27px;margin:5px 0 0;letter-spacing:-.04em}.btn{border:1px solid var(--line);background:var(--paper);padding:10px 13px;border-radius:10px;color:var(--ink);font-weight:650}.btn:hover{filter:brightness(.97)}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}.stat{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px 17px;box-shadow:var(--shadow)}.stat span{color:var(--muted);font-size:12px}.stat strong{display:block;font-size:25px;margin-top:6px}.stat small{color:var(--green);font-size:11px}
 .toolbar{display:flex;gap:10px;margin-bottom:17px;flex-wrap:wrap}.search{position:relative;flex:1;min-width:190px}.search input{width:100%;border:1px solid var(--line);background:var(--paper);border-radius:11px;padding:12px 14px 12px 38px;outline:none}.search:before{content:"⌕";position:absolute;left:14px;top:7px;font-size:23px;color:var(--muted)}select{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:11px;color:var(--ink);max-width:200px}.section-head{display:flex;justify-content:space-between;margin:24px 0 12px}.section-head h2{font-size:15px;margin:0}.section-head p{color:var(--muted);font-size:12px;margin:3px 0 0}.board{display:grid;grid-template-columns:260px 1fr;gap:14px}.artist-panel,.work-area{background:var(--paper);border:1px solid var(--line);border-radius:15px;box-shadow:var(--shadow)}.artist-panel{padding:17px;display:flex;flex-direction:column;gap:14px}.artist-hero{display:flex;align-items:center;gap:13px}.avatar{width:76px;height:76px;border-radius:12px;background:#e9ded4;display:grid;place-items:center;overflow:hidden;color:#a27b69;font-size:28px;font-weight:750}.avatar img{width:100%;height:100%;object-fit:cover}.artist-name{font-size:17px;font-weight:800;line-height:1.25}.artist-sub{color:var(--muted);font-size:12px}.links{display:flex;gap:7px;flex-wrap:wrap}.links a{font-size:11px;color:#a85840;text-decoration:none;border-bottom:1px solid #e5c1b4}.links a:hover{color:#703724}.divider{height:1px;background:var(--line)}.field-label{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:750;margin-bottom:5px}.bio{font-size:13px;white-space:pre-wrap}.chips{display:flex;flex-wrap:wrap;gap:5px}.chip{border-radius:6px;padding:4px 7px;background:#f2e9e1;color:#765d4e;font-size:11px}
 .mini-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}.mini-stat{background:#f7f3ee;border-radius:10px;padding:10px}.mini-stat span{display:block;color:var(--muted);font-size:11px;line-height:1.2;margin-bottom:2px;}.mini-stat b{display:block;font-size:18px;line-height:1.2;}.mini-stat.full-width {grid-column: 1 / -1; text-align: center; background: #f2e9e1;}.mini-stat.full-width b {color: var(--accent); font-size: 22px;}
@@ -89,9 +88,15 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
    <!-- Новая главная вкладка -->
    <button data-view=""><span class="nav-text">Мастерская чудес</span></button>
 
-   <button data-view="animators"><span class="nav-text">Аниматоры</span></button>
+   <!-- Аниматоры -->
+   <button id="animatorsMenuBtn" data-view="animators_stats"><span class="nav-text">Аниматоры</span></button>
+   <div class="sub-nav" id="animatorsSubNav">
+     <button data-view="animators_stats"><span class="ico">♙</span><span class="nav-text">Аниматоры</span></button>
+     <button data-view="animators_board"><span class="ico">▦</span><span class="nav-text">Доска</span></button>
+     <button data-view="animators_rewards"><span class="ico">★</span><span class="nav-text">Награды</span></button>
+   </div>
    
-   <!-- Живописцы теперь идут после Аниматоров -->
+   <!-- Живописцы -->
    <button id="paintersMenuBtn" data-view="artists"><span class="nav-text">Живописцы</span></button>
    <div class="sub-nav" id="paintersSubNav">
      <button data-view="artists"><span class="ico">♙</span><span class="nav-text">Художники</span></button>
@@ -110,24 +115,14 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
  <div id="workspace" style="display:none;">
    <div class="topbar"><div><div class="eyebrow">Панель координатора</div><h1 id="pageTitle">Все художники</h1></div><div class="actions"><button class="btn" onclick="location.reload()">↻ Обновить</button></div></div>
    <section class="stats" style="display:none;">
-    <div class="stat"><span>Художников</span><strong id="statArtists">0</strong></div>
-    <div class="stat"><span>Работ учтено</span><strong id="statWorks">0</strong></div>
-    <div class="stat"><span>Начислено баллов</span><strong id="statPoints">0</strong></div>
-    <div class="stat"><span>Без работ</span><strong id="statEmpty">0</strong></div>
+    <div class="stat"><span id="statLabel1">Художников</span><strong id="statArtists">0</strong></div>
+    <div class="stat"><span id="statLabel2">Работ учтено</span><strong id="statWorks">0</strong></div>
+    <div class="stat"><span id="statLabel3">Начислено баллов</span><strong id="statPoints">0</strong></div>
+    <div class="stat"><span id="statLabel4">Без работ</span><strong id="statEmpty">0</strong></div>
    </section>
    <div class="toolbar">
-     <div class="search"><input id="search" placeholder="Поиск по имени или VK..."></div>
-     <select id="specFilter" style="display:none;">
-       <option value="">Все специальности</option>
-       <option value="фон">Фоны</option>
-       <option value="костюм">Костюмы</option>
-       <option value="предмет">Предметы</option>
-       <option value="медал">Медали</option>
-       <option value="шапк">Шапки</option>
-       <option value="плашк">Плашки</option>
-       <option value="ачивк">Ачивки</option>
-     </select>
-     <select id="artistFilter"><option value="">Все художники</option></select>
+     <div class="search"><input id="search" placeholder="Поиск по имени..."></div>
+     <select id="artistFilter"><option value="">Все</option></select>
      <select id="sort">
        <option value="name">По имени</option>
        <option value="points">По баллам ↓</option>
@@ -135,7 +130,7 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
        <option value="date_asc">По дате (сначала старые)</option>
      </select>
    </div>
-   <div class="section-head"><div><h2 id="listTitle">Список художников</h2><p id="listSub">Нажмите на карточку</p></div></div>
+   <div class="section-head"><div><h2 id="listTitle">Список</h2><p id="listSub">Нажмите на карточку</p></div></div>
  </div>
  <div id="content">
    <!-- Сюда рендерится контент (стартовая страница или доска) -->
@@ -143,16 +138,23 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
 </main></div>
 
 <script>
-// ⚠️ ССЫЛКА НА ВАШУ ТАБЛИЦУ (Работы)
+// ⚠️ ССЫЛКА НА ВАШУ ТАБЛИЦУ (Работы живописцев)
 const CSV_URL = 'https://docs.google.com/spreadsheets/d/1hjiRKo9s39_sUv9JCfZ70GAffxHH5K306Lyv-Yfu7os/export?format=csv&gid=0'; 
 
-// ⚠️ ССЫЛКА НА ВАШУ ТАБЛИЦУ (Покупки)
+// ⚠️ ССЫЛКА НА ВАШУ ТАБЛИЦУ (Покупки живописцев)
 const PURCHASES_URL = 'https://docs.google.com/spreadsheets/d/1hjiRKo9s39_sUv9JCfZ70GAffxHH5K306Lyv-Yfu7os/export?format=csv&gid=1168996610';
+
+// ⚠️ ССЫЛКА НА ВАШУ ТАБЛИЦУ (Аниматоры - новый лист!)
+// ВСТАВЬТЕ СЮДА ССЫЛКУ НА НОВЫЙ ЛИСТ С МЕРОПРИЯТИЯМИ АНИМАТОРОВ
+const ANIMATORS_URL = 'https://docs.google.com/spreadsheets/d/1hjiRKo9s39_sUv9JCfZ70GAffxHH5K306Lyv-Yfu7os/export?format=csv&gid=1376028487'; 
 
 const CATS=['Фон с нуля','Украш. фон','Костюм фулл & боты','Костюм','Предметы','Медаль','Шапка','Иное'];
 let artists=[], works=[], purchases=[], currentArtist=null, view='';
+let animators=[], animatorEvents=[], currentAnimator=null;
+
 let expandedCats = {}; 
 let rewardCheckArtistId = ''; 
+let rewardCheckAnimatorId = '';
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -184,13 +186,12 @@ const WELCOME_HTML = `
   <hr style="border:0; border-top:1px solid var(--line); margin: 30px 0 0 0;">
 
   <!-- КЛИКАБЕЛЬНЫЙ ЗАГОЛОВОК АНИМАТОРОВ -->
-  <a href="#" onclick="setView('animators'); return false;" style="text-decoration: none; display: block; text-align: center; margin-bottom: 10px;">
+  <a href="#" onclick="setView('animators_stats'); return false;" style="text-decoration: none; display: block; text-align: center; margin-bottom: 10px;">
     <h2 style="color: var(--accent); font-size: 24px; margin: 10px 0 0 0; border-bottom: none; display: inline-block; transition: 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
       АНИМАТОРЫ
     </h2>
   </a>
   
-  <!-- Ссылки на ответственных за аниматоров (по центру) -->
   <div style="background: #fdf6f3; border-top: 2px solid var(--accent); border-bottom: 2px solid var(--accent); padding: 10px 15px; margin-bottom: 20px; border-radius: 6px; text-align: center; width: fit-content; margin-left: auto; margin-right: auto;">
     <p style="margin: 0; font-size: 14px; color: var(--ink);">
       <b>Ответственный</b> — <a href="https://catwar.net/cat1692501" target="_blank" style="color: var(--accent); text-decoration: underline;">Клик Журавлей</a> &nbsp;|&nbsp; 
@@ -225,7 +226,6 @@ const WELCOME_HTML = `
   
   <p>Вся работа по организации мероприятий происходит в ВКонтакте, поэтому для вступления нужно иметь там страницу.</p>
 
-  <!-- Кнопка запроса собеседования -->
   <div style="text-align: center; margin: 25px 0 35px 0;">
     <a href="https://vk.com/dojslodinoyaemtva" target="_blank" style="display: inline-block; background: var(--accent); color: #fff; font-weight: 800; font-size: 14px; padding: 12px 24px; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 12px rgba(200,111,82,0.3); transition: 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(200,111,82,0.4)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 12px rgba(200,111,82,0.3)'">
       ЗАПРОСИТЬ СОБЕСЕДОВАНИЕ
@@ -350,7 +350,6 @@ const WELCOME_HTML = `
     </h2>
   </a>
   
-  <!-- Блок с ответственными за живописцев (с добавленной ролью) -->
   <div style="background: #fdf6f3; border-top: 2px solid var(--accent); border-bottom: 2px solid var(--accent); padding: 10px 15px; margin-bottom: 20px; border-radius: 6px; text-align: center; width: fit-content; margin-left: auto; margin-right: auto;">
     <p style="margin: 0; font-size: 14px; color: var(--ink);">
       <b>Ответственный</b> — <a href="https://catwar.net/cat1692501" target="_blank" style="color: var(--accent); text-decoration: underline;">Клок Кометы</a> &nbsp;|&nbsp; 
@@ -370,7 +369,6 @@ const WELCOME_HTML = `
     <li>Отрисовка призовых артов.</li>
   </ul>
 
-  <!-- ОБНОВЛЕННЫЙ БЛОК "ПОРЯДОК ПРИНЯТИЯ" С КНОПКОЙ -->
   <h3>Порядок принятия в отряд:</h3>
   
   <div style="background: #f9f7f4; border-left: 4px solid var(--accent); padding: 15px 20px; margin-bottom: 20px; border-radius: 0 8px 8px 0; color: #444; font-size: 13px; line-height: 1.5;">
@@ -394,7 +392,6 @@ const WELCOME_HTML = `
     </h2>
   </a>
   
-  <!-- Блок с ответственными -->
   <div style="background: #fdf6f3; border-top: 2px solid var(--accent); border-bottom: 2px solid var(--accent); padding: 10px 15px; margin-bottom: 20px; border-radius: 6px; text-align: center; width: fit-content; margin-left: auto; margin-right: auto;">
     <p style="margin: 0; font-size: 14px; color: var(--ink);">
       <b>Ответственный</b> — <a href="https://catwar.net/cat1692501" target="_blank" style="color: var(--accent); text-decoration: underline;">Клик Журавлей</a> &nbsp;|&nbsp; 
@@ -415,7 +412,6 @@ const WELCOME_HTML = `
   <h3>Порядок принятия в отряд:</h3>
   <p>Написание ответственному или его помощнику с примерами оформительских работ.</p>
 
-  <!-- Кнопка портфолио -->
   <div style="text-align: center; margin: 25px 0 35px 0;">
     <a href="https://vk.ru/dojslodinoyaemtva" target="_blank" style="display: inline-block; background: var(--accent); color: #fff; font-weight: 800; font-size: 14px; padding: 12px 24px; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 12px rgba(200,111,82,0.3); transition: 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(200,111,82,0.4)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 12px rgba(200,111,82,0.3)'">
       ПРИСЛАТЬ ПОРТФОЛИО
@@ -431,7 +427,6 @@ const WELCOME_HTML = `
     </h2>
   </a>
   
-  <!-- Блок с ответственными -->
   <div style="background: #fdf6f3; border-top: 2px solid var(--accent); border-bottom: 2px solid var(--accent); padding: 10px 15px; margin-bottom: 20px; border-radius: 6px; text-align: center; width: fit-content; margin-left: auto; margin-right: auto;">
     <p style="margin: 0; font-size: 14px; color: var(--ink);">
       <b>Ответственный</b> — <a href="https://catwar.net/cat1692501" target="_blank" style="color: var(--accent); text-decoration: underline;">Клик Журавлей</a> &nbsp;|&nbsp; 
@@ -450,7 +445,6 @@ const WELCOME_HTML = `
   <h3>Порядок принятия в отряд:</h3>
   <p>Написание ответственному или его помощнику с примерами писательского творчества [проза, лирика, диалоги к мероприятиям и т. д.].</p>
 
-  <!-- Кнопка портфолио -->
   <div style="text-align: center; margin: 25px 0 35px 0;">
     <a href="https://vk.ru/dojslodinoyaemtva" target="_blank" style="display: inline-block; background: var(--accent); color: #fff; font-weight: 800; font-size: 14px; padding: 12px 24px; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 12px rgba(200,111,82,0.3); transition: 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(200,111,82,0.4)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 12px rgba(200,111,82,0.3)'">
       ПРИСЛАТЬ ПОРТФОЛИО
@@ -514,63 +508,7 @@ const WELCOME_HTML = `
 </div>
 `;
 
-// ===== ОСТАЛЬНАЯ ЛОГИКА САЙТА =====
-
-function parseDate(dStr) {
-    if (!dStr) return 0;
-    let parts = dStr.match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})/);
-    if (parts) {
-        let day = parseInt(parts[1], 10);
-        let month = parseInt(parts[2], 10) - 1;
-        let year = parseInt(parts[3], 10);
-        if (year < 100) year += 2000; 
-        return new Date(year, month, day).getTime();
-    }
-    parts = dStr.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
-    if (parts) return new Date(parts[1], parts[2]-1, parts[3]).getTime();
-    let t = Date.parse(dStr);
-    return isNaN(t) ? 0 : t;
-}
-
-async function fetchData() {
-  try {
-    $('loadingOverlay').style.display = 'flex';
-    const resWorks = await fetch(CSV_URL);
-    if (resWorks.ok) {
-        const textWorks = await resWorks.text();
-        importRows(parseCSV(textWorks));
-    }
-    const resPurchases = await fetch(PURCHASES_URL);
-    if (resPurchases.ok) {
-        const textPurch = await resPurchases.text();
-        importPurchases(parseCSV(textPurch));
-    }
-  } catch (e) {
-    alert('Ошибка загрузки. Проверьте ссылки на CSV.');
-  } finally {
-    $('loadingOverlay').style.display = 'none';
-    render();
-  }
-}
-
-const ALL_REWARDS = [
-  { name: 'За проявление творческой жилки', price: 100, isNb: false },
-  { name: 'Ачивка живописцев', price: 100, isNb: false },
-  { name: 'Плашки живописцев', price: 250, isNb: false },
-  { name: 'Отрядное оформление сокровищницы', price: 400, isNb: false },
-  { name: 'Костюм живописцев', price: 0, isNb: false }, 
-  { name: 'Обмен на жетоны', price: 1, isNb: true },
-  { name: 'Медаль мероприятия', price: 0, isNb: true },
-  { name: 'След на фоне (1 сезон)', price: 15, isNb: true },
-  { name: 'Личный костюм (1 неделя)', price: 30, isNb: true },
-  { name: 'Личный костюм (2 недели)', price: 50, isNb: true },
-  { name: 'Оформление плашки (Одаз/Манназ)', price: 70, isNb: true },
-  { name: 'Оформление сокровищницы', price: 100, isNb: true },
-  { name: 'Личная ачивка', price: 50, isNb: true },
-  { name: 'След на фоне (НАВСЕГДА)', price: 100, isNb: true },
-  { name: 'Упоминание в блоге', price: 150, isNb: true }
-];
-
+// ===== ЛОГИКА ДЛЯ ЖИВОПИСЦЕВ =====
 function aWorks(a){return works.filter(w=>w.artistId===a.id)}
 function rawPoints(a){return aWorks(a).reduce((s,w)=>s+(Number(w.points)||0),0)}
 function spentPoints(a){return 0;} 
@@ -601,9 +539,103 @@ function currentBonusPoints(a) {
     return Math.max(0, Math.round((rawBonusPoints(a) - spentNb(a)) * 10) / 10);
 }
 
+// ===== ЛОГИКА ДЛЯ АНИМАТОРОВ =====
+function aEvents(a){return animatorEvents.filter(e=>e.animatorId===a.id)}
+function animatorPoints(a){return aEvents(a).reduce((s,e)=>s+(Number(e.points)||0),0)}
+
+function parseDate(dStr) {
+    if (!dStr) return 0;
+    let parts = dStr.match(/(\d{1,2})\.(\d{1,2})\.(\d{2,4})/);
+    if (parts) {
+        let day = parseInt(parts[1], 10);
+        let month = parseInt(parts[2], 10) - 1;
+        let year = parseInt(parts[3], 10);
+        if (year < 100) year += 2000; 
+        return new Date(year, month, day).getTime();
+    }
+    parts = dStr.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (parts) return new Date(parts[1], parts[2]-1, parts[3]).getTime();
+    let t = Date.parse(dStr);
+    return isNaN(t) ? 0 : t;
+}
+
+async function fetchData() {
+  try {
+    $('loadingOverlay').style.display = 'flex';
+    const resWorks = await fetch(CSV_URL);
+    if (resWorks.ok) {
+        const textWorks = await resWorks.text();
+        importRows(parseCSV(textWorks));
+    }
+    const resPurchases = await fetch(PURCHASES_URL);
+    if (resPurchases.ok) {
+        const textPurch = await resPurchases.text();
+        importPurchases(parseCSV(textPurch));
+    }
+    if (ANIMATORS_URL && !ANIMATORS_URL.includes('ВАШ_НОВЫЙ_GID')) {
+        const resAnims = await fetch(ANIMATORS_URL);
+        if (resAnims.ok) {
+            const textAnims = await resAnims.text();
+            importAnimators(parseCSV(textAnims));
+        }
+    }
+  } catch (e) {
+    alert('Ошибка загрузки. Проверьте ссылки на CSV.');
+  } finally {
+    $('loadingOverlay').style.display = 'none';
+    render();
+  }
+}
+
+const ALL_REWARDS = [
+  { name: 'За проявление творческой жилки', price: 100, isNb: false },
+  { name: 'Ачивка живописцев', price: 100, isNb: false },
+  { name: 'Плашки живописцев', price: 250, isNb: false },
+  { name: 'Отрядное оформление сокровищницы', price: 400, isNb: false },
+  { name: 'Костюм живописцев', price: 0, isNb: false }, 
+  { name: 'Обмен на жетоны', price: 1, isNb: true },
+  { name: 'Медаль мероприятия', price: 0, isNb: true },
+  { name: 'След на фоне (1 сезон)', price: 15, isNb: true },
+  { name: 'Личный костюм (1 неделя)', price: 30, isNb: true },
+  { name: 'Личный костюм (2 недели)', price: 50, isNb: true },
+  { name: 'Оформление плашки (Одаз/Манназ)', price: 70, isNb: true },
+  { name: 'Оформление сокровищницы', price: 100, isNb: true },
+  { name: 'Личная ачивка', price: 50, isNb: true },
+  { name: 'След на фоне (НАВСЕГДА)', price: 100, isNb: true },
+  { name: 'Упоминание в блоге', price: 150, isNb: true }
+];
+
 function initials(a){return (a.name||'?').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()}
-function updateStats(){ $('statArtists').textContent=artists.length;$('statWorks').textContent=works.length;$('statPoints').textContent=works.reduce((s,w)=>s+(+w.points||0),0);$('statEmpty').textContent=artists.filter(a=>!aWorks(a).length).length;
- const old=$('artistFilter').value;$('artistFilter').innerHTML='<option value="">Все художники</option>'+artists.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('');$('artistFilter').value=old;}
+
+function updateStats(){ 
+  if(view.startsWith('animators')) {
+    $('statLabel1').textContent = "Аниматоров";
+    $('statLabel2').textContent = "Мероприятий";
+    $('statLabel3').textContent = "Начислено баллов";
+    $('statLabel4').textContent = "Без мероприятий";
+    
+    $('statArtists').textContent = animators.length;
+    $('statWorks').textContent = animatorEvents.length;
+    $('statPoints').textContent = animatorEvents.reduce((s,e)=>s+(+e.points||0),0);
+    $('statEmpty').textContent = animators.filter(a=>!aEvents(a).length).length;
+
+    const old = $('artistFilter').value;
+    $('artistFilter').innerHTML = '<option value="">Все аниматоры</option>' + animators.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('');
+    $('artistFilter').value = old;
+  } else {
+    $('statLabel1').textContent = "Художников";
+    $('statLabel2').textContent = "Работ учтено";
+    $('statLabel3').textContent = "Начислено баллов";
+    $('statLabel4').textContent = "Без работ";
+
+    $('statArtists').textContent = artists.length;
+    $('statWorks').textContent = works.length;
+    $('statPoints').textContent = works.reduce((s,w)=>s+(+w.points||0),0);
+    $('statEmpty').textContent = artists.filter(a=>!aWorks(a).length).length;
+
+    const old=$('artistFilter').value;$('artistFilter').innerHTML='<option value="">Все художники</option>'+artists.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('');$('artistFilter').value=old;
+  }
+}
 
 function render(){
  if (view === '') {
@@ -611,22 +643,82 @@ function render(){
    $('content').innerHTML = WELCOME_HTML;
    return;
  }
- if (['animators','writers','designers'].includes(view)) {
+ if (['writers','designers'].includes(view)) {
    $('workspace').style.display = 'none';
    $('content').innerHTML = '';
    return;
  }
+
+ // Блок рендера аниматоров
+ if (view.startsWith('animators')) {
+    $('workspace').style.display = 'block';
+    updateStats();
+    
+    // Скрываем поиск для наград
+    if (view === 'animators_rewards') {
+        document.querySelector('.toolbar').style.display = 'none';
+    } else {
+        document.querySelector('.toolbar').style.display = 'flex';
+    }
+
+    const statsBlock = document.querySelector('.stats');
+    if (view === 'animators_rewards') {
+        statsBlock.style.display = 'none';
+    } else {
+        statsBlock.style.display = 'grid';
+    }
+
+    if (view === 'animators_stats') {
+        $('listTitle').textContent = 'Список аниматоров';
+        $('listSub').textContent = 'Нажмите на карточку';
+        let list = animators.filter(a => {
+           let filter = $('artistFilter').value;
+           if (filter && a.id !== filter) return false;
+           let q = slug($('search').value);
+           if (q && !slug(a.name).includes(q)) return false;
+           return true;
+        });
+        renderAnimatorsArtists(list);
+        return;
+    }
+    if (view === 'animators_board') {
+        $('listTitle').textContent = 'Доска мероприятий';
+        $('listSub').textContent = 'Выберите аниматора';
+        let list = animators.filter(a => {
+           let filter = $('artistFilter').value;
+           if (filter && a.id !== filter) return false;
+           let q = slug($('search').value);
+           if (q && !slug(a.name).includes(q)) return false;
+           return true;
+        });
+        if(!currentAnimator || !animators.some(a=>a.id===currentAnimator)) currentAnimator = (list[0]||{}).id;
+        if(!list.some(a=>a.id===currentAnimator)) currentAnimator = (list[0]||{}).id;
+        let a = animators.find(x => x.id === currentAnimator);
+        if(a) {
+            $('content').innerHTML = animatorBoardHTML(a);
+        } else {
+            $('content').innerHTML = '<div class="empty-state"><b>Аниматоры не найдены</b></div>';
+        }
+        return;
+    }
+    if (view === 'animators_rewards') {
+        $('listTitle').textContent = 'Награды аниматоров';
+        $('listSub').textContent = 'Информация о наградах и баллах';
+        renderAnimatorRewards();
+        return;
+    }
+ }
+
+ // Блок рендера живописцев
  $('workspace').style.display = 'block';
  updateStats();
  let q = slug($('search').value);
  let filter = $('artistFilter').value;
- let spec = $('specFilter').value; 
  let sort = $('sort').value;
  
  let list=artists.filter(a=>{
    if (filter && a.id !== filter) return false;
    if (q && !slug([a.name,a.catwar,a.vk,a.profile].join(' ')).includes(q)) return false;
-   if (spec && !slug(a.profile).includes(spec)) return false;
    return true;
  });
  
@@ -656,6 +748,166 @@ function render(){
  const a=artists.find(a=>a.id===currentArtist);$('content').innerHTML=boardHTML(a);
  bindBoardEvents();
 }
+
+// ===== ОТРИСОВКА АНИМАТОРОВ =====
+function renderAnimatorsArtists(list){
+  $('content').innerHTML = list.length ? 
+  `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px">
+    ${list.map(a => `
+      <div class="artist-panel" style="cursor:pointer" data-open="${a.id}">
+        <div class="artist-hero">
+          <div class="avatar" style="width:55px;height:55px">${esc(initials(a))}</div>
+          <div><div class="artist-name">${esc(a.name)}</div></div>
+        </div>
+        <div class="mini-stats">
+          <div class="mini-stat"><span>Баллы</span><b>${animatorPoints(a)}</b></div>
+          <div class="mini-stat"><span>Ивенты</span><b>${aEvents(a).length}</b></div>
+        </div>
+      </div>
+    `).join('')}
+  </div>` : '<div class="empty-state"><b>Ничего не найдено</b></div>';
+  
+  document.querySelectorAll('[data-open]').forEach(el => el.onclick = () => {
+    currentAnimator = el.dataset.open;
+    setView('animators_board');
+  });
+}
+
+function animatorBoardHTML(a) {
+  let evs = aEvents(a);
+  let sortMode = $('sort').value;
+  if (sortMode === 'date_desc') evs.sort((x,y)=>parseDate(y.date)-parseDate(x.date));
+  else if (sortMode === 'date_asc') evs.sort((x,y)=>parseDate(x.date)-parseDate(y.date));
+
+  let htmlEvents = evs.map(e => {
+     const hasUrl = e.url && /^https?:\/\//i.test(e.url);
+     const linkHtml = hasUrl 
+        ? `<a href="${esc(e.url)}" target="_blank" style="display:inline-flex; align-items:center; gap:6px; background:#f2e9e1; padding:6px 10px; border-radius:6px; color:var(--accent); font-weight:700; font-size:12px; text-decoration:none; margin-bottom:8px; transition:0.2s;" onmouseover="this.style.background='#e8ded5'" onmouseout="this.style.background='#f2e9e1'">↗ Ссылка на блог/пост</a>`
+        : `<span style="display:inline-block; color:var(--muted); font-size:11px; margin-bottom:8px;">Нет ссылки</span>`;
+     
+     return `<div class="work-card" style="padding:12px; font-size:13px; margin-bottom:10px;">
+        ${linkHtml}
+        <div style="font-weight:800; font-size:14px; margin-bottom:6px; color:var(--ink);">${esc(e.title || 'Без названия')}</div>
+        <div class="meta" style="margin-top:0;">
+            <span style="font-size:11px;">📅 ${esc(e.date || 'Дата не указана')}</span>
+            <span class="points" style="font-size:13px;">+${+e.points || 0} баллов</span>
+        </div>
+     </div>`;
+  }).join('');
+
+  return `<div class="board">
+    <section class="artist-panel">
+      <div class="artist-hero">
+        <div class="avatar">${esc(initials(a))}</div>
+        <div><div class="artist-name">${esc(a.name)}</div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="mini-stats">
+        <div class="mini-stat"><span>Всего баллов</span><b>${animatorPoints(a)}</b></div>
+        <div class="mini-stat"><span>Мероприятий</span><b>${evs.length}</b></div>
+      </div>
+    </section>
+    <section class="work-area">
+      <div class="work-head"><h3>Проведенные мероприятия</h3><span>${evs.length} шт.</span></div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        ${evs.length ? htmlEvents : '<div class="empty">У этого аниматора пока нет мероприятий</div>'}
+      </div>
+    </section>
+  </div>`;
+}
+
+function renderAnimatorRewards() {
+  // Копируем рендер наград, меняя только ID
+  let options = '<option value="">Выбрать аниматора</option>';
+  animators.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).forEach(a => {
+      options += `<option value="${a.id}" ${rewardCheckAnimatorId === a.id ? 'selected' : ''}>${esc(a.name)}</option>`;
+  });
+
+  let checkedArtist = animators.find(a => a.id === rewardCheckAnimatorId);
+  let aPts = checkedArtist ? animatorPoints(checkedArtist) : 0;
+  let aNb = 0; // Пока без НБ для аниматоров
+  let aRawNb = 0;
+
+  const card = (title, desc, price, isNb, imgUrl, isLifetime = false) => {
+      let avail = false;
+      let statusHtml = '';
+      let currentValue = isNb ? (isLifetime ? aRawNb : aNb) : aPts;
+      let typeName = isNb ? 'НБ' : 'баллов';
+      let isBought = false;
+      
+      let isSpecial = (title === 'Костюм живописцев' || title === 'Медаль мероприятия');
+
+      if (checkedArtist) {
+          // Заглушка для покупок, пока не подключим
+          isBought = false; 
+      }
+      
+      if (isSpecial) {
+          if (isBought) {
+              avail = true;
+              statusHtml = `<div class="reward-status status-avail" style="display:block; background:#e8f5e9; color:#2e7d32; padding:5px; border-radius:6px; margin-top:8px;">Выдан (внесен в таблицу)</div>`;
+          } else {
+              statusHtml = `<div class="reward-status status-no" style="background:#f0f0f0; color:#666; border-color:#ddd;">Выдается вручную</div>`;
+          }
+      } else if (checkedArtist && !isBought) {
+          avail = currentValue >= price;
+          statusHtml = avail ? `` : `<div class="reward-status status-no">До награды: не хватает ${Math.round((price - currentValue) * 10) / 10} ${typeName}</div>`;
+      }
+
+      let imgHtml = imgUrl ? `<img src="${esc(imgUrl)}" class="reward-img" alt="">` : `<div class="reward-img">Нет фото</div>`;
+      let descHtml = desc ? `<div class="reward-desc">${desc}</div>` : '';
+
+      let cardClass = 'reward-card';
+      if (avail) cardClass += ' available';
+      if (isBought) cardClass += ' bought';
+
+      let priceDisplay = '';
+      if (isSpecial) {
+          priceDisplay = `<span style="font-weight:400; font-size:11px; color:var(--muted);">Особое условие</span>`;
+      } else {
+          priceDisplay = `${isNb ? 'НБ: ' : 'Баллов: '}${price} ${isLifetime ? '<span style="font-size:10px;font-weight:400;color:var(--muted)">(за всю жизнь)</span>' : ''}`;
+      }
+
+      return `<div class="${cardClass}">
+          ${imgHtml}
+          <div class="reward-info">
+              <div class="reward-title">${esc(title)}</div>
+              ${descHtml}
+              <div class="reward-price">${priceDisplay}</div>
+              ${statusHtml}
+          </div>
+      </div>`;
+  };
+
+  let html = `
+    <div class="info-block" style="padding:15px; margin-bottom:20px; display:flex; align-items:center; gap:15px;">
+      <strong style="font-size:14px;">Проверить доступность наград для:</strong>
+      <select id="rewardArtistSelect" style="flex:1; max-width:300px; padding:8px;">${options}</select>
+    </div>
+
+    <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--accent); padding-bottom:5px; color:var(--accent);">Награды за баллы</h3>
+    <div class="rewards-grid" style="margin-top:15px;">
+      ${card('За фантазию и организованность', 'Выдаётся за 40 баллов организации. Могут получить все аниматоры.', 40, false, 'https://i.ibb.co/CsV1YFWZ/223.png')}
+      ${card('Костюм аниматора', 'Выдается активистам сезона.', 100, false, null)}
+    </div>
+
+    <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--line); padding-bottom:5px;">Информационная сводка</h3>
+    <div style="display:grid; grid-template-columns:1fr; gap:20px; margin-top:15px;">
+        <div class="info-block">
+            <h3 style="border-bottom:none; color:var(--accent);">Разбалловка (в разработке)</h3>
+            <p style="font-size:12px; color:var(--muted); margin-top:10px;">Здесь будет информация по начислению баллов за мероприятия.</p>
+        </div>
+    </div>
+  `;
+
+  $('content').innerHTML = html;
+
+  $('rewardArtistSelect').onchange = (e) => {
+      rewardCheckAnimatorId = e.target.value;
+      renderAnimatorRewards(); 
+  };
+}
+
 
 function boardHTML(a){
  let aw=aWorks(a);
@@ -884,17 +1136,38 @@ function renderRewards() {
 
 function setView(v){
   view = v;
-  const subNav = document.getElementById('paintersSubNav');
+  const animNav = document.getElementById('animatorsSubNav');
+  const paintNav = document.getElementById('paintersSubNav');
   const menuBtns = document.querySelectorAll('.nav > button');
   const brandTitle = document.getElementById('brandTitle');
   
   menuBtns.forEach(b => b.classList.remove('active'));
-  subNav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  animNav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  paintNav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
 
+  // Аниматоры
+  if (v.startsWith('animators')) {
+    animNav.classList.add('open');
+    document.getElementById('animatorsMenuBtn').classList.add('active');
+    animNav.querySelector(`[data-view="${v}"]`).classList.add('active');
+    brandTitle.textContent = 'Аниматоры';
+
+    $('workspace').style.display = 'block';
+    $('pageTitle').textContent = ({
+        animators_stats: 'Все аниматоры',
+        animators_board: 'Доска мероприятий',
+        animators_rewards: 'Награды и разбалловка'
+    })[v] || 'Аниматоры';
+    
+    render();
+    return;
+  }
+  
+  // Живописцы
   if (['artists', 'board', 'works', 'rewards'].includes(v)) {
-    subNav.classList.add('open');
+    paintNav.classList.add('open');
     document.getElementById('paintersMenuBtn').classList.add('active');
-    subNav.querySelector(`[data-view="${v}"]`).classList.add('active');
+    paintNav.querySelector(`[data-view="${v}"]`).classList.add('active');
     brandTitle.textContent = 'Живописцы';
 
     $('workspace').style.display = 'block';
@@ -909,17 +1182,14 @@ function setView(v){
     }
 
     if (v === 'board') {
-        document.getElementById('specFilter').style.display = 'none';
         document.getElementById('sort').style.display = 'none';
         document.getElementById('artistFilter').style.display = 'block';
     } else if (v === 'artists') {
-        document.getElementById('specFilter').style.display = 'block';
         document.getElementById('sort').style.display = 'block';
         document.getElementById('artistFilter').style.display = 'none';
         let sortSelect = document.getElementById('sort');
         sortSelect.innerHTML = `<option value="name">По имени</option><option value="points">По баллам ↓</option>`;
     } else if (v === 'works') {
-        document.getElementById('specFilter').style.display = 'none';
         document.getElementById('sort').style.display = 'block';
         document.getElementById('artistFilter').style.display = 'block';
         let sortSelect = document.getElementById('sort');
@@ -937,7 +1207,8 @@ function setView(v){
     return;
   }
 
-  subNav.classList.remove('open');
+  animNav.classList.remove('open');
+  paintNav.classList.remove('open');
   document.querySelector(`.nav > button[data-view="${v}"]`)?.classList.add('active');
   
   if (v === '') {
@@ -947,8 +1218,7 @@ function setView(v){
     return;
   }
 
-  if (v === 'animators') brandTitle.textContent = 'Аниматоры';
-  else if (v === 'writers') brandTitle.textContent = 'Писатели';
+  if (v === 'writers') brandTitle.textContent = 'Писатели';
   else if (v === 'designers') brandTitle.textContent = 'Оформители';
   
   $('workspace').style.display = 'none';
@@ -1038,6 +1308,40 @@ function importRows(rows){
  });
 }
 
+function importAnimators(rows){
+ if(!rows.length)return;
+ animators=[]; animatorEvents=[];
+ let headers=rows[0].map(norm),idx=(...names)=>headers.findIndex(h=>names.some(n=>h.includes(norm(n))));
+ 
+ let ni=idx('имя', 'аниматор');
+ let ti=idx('мероприятие', 'ивент', 'название');
+ let di=idx('дата');
+ let pti=idx('баллы', 'очки');
+ let ui=idx('ссылка', 'url', 'блог', 'пост');
+
+ rows.slice(1).forEach(r=>{
+  let name=(r[ni]||'').trim();if(!name)return;
+  
+  let a=animators.find(a=>slug(a.name)===slug(name));
+  
+  if(!a){
+    a={ id:'an'+animators.length, name };
+    animators.push(a);
+  }
+  
+  if(ti>=0 && (r[ti]||'').trim()){
+   animatorEvents.push({
+       id:'anw'+animatorEvents.length,
+       animatorId:a.id,
+       title:r[ti].trim(),
+       url:ui>=0?r[ui]||'':'',
+       date:di>=0?r[di]||'':'',
+       points:pti>=0?Number(String(r[pti]||'0').replace(',','.'))||0:0
+   });
+  }
+ });
+}
+
 function importPurchases(rows) {
   if(!rows.length)return;
   purchases = [];
@@ -1064,14 +1368,12 @@ function importPurchases(rows) {
 $('search').oninput=render;
 $('artistFilter').onchange=render;
 $('sort').onchange=render;
-$('specFilter').onchange=render;
 
-// При первом открытии правая часть показывает WELCOME_HTML
+// При первом открытии
 view = '';
 $('workspace').style.display = 'none';
 document.getElementById('brandTitle').textContent = 'Мастерская чудес';
 document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
-// Автоматически выделяем вкладку "Мастерская чудес" при загрузке
 document.querySelector(`.nav > button[data-view=""]`).classList.add('active');
 
 fetchData();
