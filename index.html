@@ -59,7 +59,7 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
 .bb-content { background: var(--paper); border: 1px solid var(--line); border-radius: 15px; padding: 25px; box-shadow: var(--shadow); max-width: 900px; margin: 0 auto; color: var(--ink); line-height: 1.6; }
 .bb-content h2 { font-size: 20px; margin: 20px 0 10px; border-bottom: 2px solid var(--line); padding-bottom: 5px; color: var(--accent); }
 .bb-content h3 { font-size: 15px; margin: 15px 0 10px; background: #f7f4ef; padding: 6px 12px; border-radius: 6px; display: inline-block; color: var(--green); }
-.bb-content p { margin: 0 0 10px; font-size: 13px; text-align: left; } /* Убрали justify, чтобы не было растягивания */
+.bb-content p { margin: 0 0 10px; font-size: 13px; text-align: left; }
 .bb-content ul { margin: 0 0 15px; padding-left: 20px; font-size: 13px; }
 .bb-content li { margin-bottom: 5px; }
 .bb-content table { border-collapse: collapse; width: 100%; margin-bottom: 20px; font-size: 13px; }
@@ -89,17 +89,19 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
    <button data-view=""><span class="nav-text">Мастерская чудес</span></button>
 
    <button data-view="animators"><span class="nav-text">Аниматоры</span></button>
-   <button data-view="writers"><span class="nav-text">Писатели</span></button>
-   <button data-view="designers"><span class="nav-text">Оформители</span></button>
    
+   <!-- Живописцы теперь идут после Аниматоров -->
    <button id="paintersMenuBtn" data-view="artists"><span class="nav-text">Живописцы</span></button>
-   
    <div class="sub-nav" id="paintersSubNav">
      <button data-view="artists"><span class="ico">♙</span><span class="nav-text">Художники</span></button>
      <button data-view="board"><span class="ico">▦</span><span class="nav-text">Доска</span></button>
      <button data-view="works"><span class="ico">✎</span><span class="nav-text">Все работы</span></button>
      <button data-view="rewards"><span class="ico">★</span><span class="nav-text">Награды</span></button>
    </div>
+
+   <button data-view="writers"><span class="nav-text">Писатели</span></button>
+   <button data-view="designers"><span class="nav-text">Оформители</span></button>
+   
  </nav></div>
  
  <div class="side-note"><b>Только просмотр</b>Данные берутся из Google Таблицы. Для изменения данных отредактируйте таблицу.</div>
@@ -159,7 +161,7 @@ const slug=s=>String(s||'').toLowerCase().trim();
 // ===== HTML ДЛЯ СТАРТОВОЙ СТРАНИЦЫ =====
 const WELCOME_HTML = `
 <div class="bb-content">
-  <div style="text-align: center; margin-bottom: 25px;">
+  <div style="text-align: center; margin-bottom: 15px;">
     <img src="https://e.radikal.host/2026/08/30/SAPKA1.png" alt="Мастерская чудес" style="width: 100%; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
   </div>
 
@@ -179,11 +181,11 @@ const WELCOME_HTML = `
   <h2>Чем занимается помощник?</h2>
   <p>Ответственен за принятие заказов на мероприятие от соплеменников с дальнейшей передачей готовых документов ведущему творцу, коммуникациями с организаторами в период подготовки ивентов. Передаёт ВВ списки победителей при условии, что глава сферы творчества не участвовал как наблюдатель. Исполнитель заказов от ведущего творца внутри своей деятельности.</p>
 
-  <hr style="border:0; border-top:1px solid var(--line); margin: 30px 0;">
+  <hr style="border:0; border-top:1px solid var(--line); margin: 30px 0 0 0;">
 
   <!-- КЛИКАБЕЛЬНЫЙ ЗАГОЛОВОК АНИМАТОРОВ -->
   <a href="#" onclick="setView('animators'); return false;" style="text-decoration: none; display: block; text-align: center; margin-bottom: 10px;">
-    <h2 style="color: var(--accent); font-size: 24px; margin: 0; border-bottom: none; display: inline-block; transition: 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+    <h2 style="color: var(--accent); font-size: 24px; margin: 10px 0 0 0; border-bottom: none; display: inline-block; transition: 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
       АНИМАТОРЫ
     </h2>
   </a>
@@ -212,7 +214,7 @@ const WELCOME_HTML = `
     <li>Набор актёров на мероприятие;</li>
     <li>Оформление ТЗ по костюмам, фонам, медалям [создание ляжет на живописцев].</li>
   </ul>
-  <p><b>! Вся работа сдаётся Ведущему Творцу, а после одобрения уже начинаются следующие этапы создания.</b></p>
+  <p><b>!! Вся работа сдаётся ВТ, а после одобрения уже начинаются следующие этапы создания.</b></p>
 
   <h3>Порядок принятия в отряд:</h3>
   <p>Подать заявку на вступление в отряд может любой игрок, имеющий запах Теней, кроме переходящих или людей, ранее замеченными за серьезными нарушениями конфиденциальности мероприятий.</p>
@@ -233,7 +235,7 @@ const WELCOME_HTML = `
   <hr style="border:0; border-top:2px solid var(--line); margin: 40px 0 0 0;">
 
   <!-- НОВЫЙ БЛОК: СОЗДАНИЕ ИДЕИ -->
-  <h2 style="color: var(--accent); text-align: center; font-size: 22px; margin: 0 0 20px 0; display: block; width: 100%;">СОЗДАНИЕ ИДЕИ ДЛЯ БУДУЩЕГО МЕРОПРИЯТИЯ</h2>
+  <h2 style="color: var(--accent); text-align: center; font-size: 22px; margin: 15px 0 20px 0; display: block; width: 100%;">СОЗДАНИЕ ИДЕИ ДЛЯ БУДУЩЕГО МЕРОПРИЯТИЯ</h2>
   
   <p>У вас есть идея для мероприятия? Вы хотите порадовать племя и предложить ему занимательное времяпровождение? Тогда самое время стать заказчиком и обратиться к нам со своей идеей!</p>
   <p><i>Перед тем как писать с предложением мероприятия, ознакомьтесь с разделом по организации в <a href="https://catwar.net/about?id=14" target="_blank" style="color: var(--accent); text-decoration: underline;">"об игре."</a></i></p>
@@ -341,8 +343,21 @@ const WELCOME_HTML = `
 
   <hr style="border:0; border-top:1px solid var(--line); margin: 30px 0 0 0;">
 
-  <!-- ДАЛЬШЕ ИДЕТ ЖИВОПИСЦЫ, ОФОРМИТЕЛИ, ПИСАТЕЛИ И НАГРАДЫ -->
-  <h2 style="color: var(--accent); text-align: center; font-size: 24px; margin: 10px 0 20px 0;">ЖИВОПИСЦЫ</h2>
+  <!-- ЖИВОПИСЦЫ -->
+  <a href="#" onclick="setView('artists'); return false;" style="text-decoration: none; display: block; text-align: center; margin-bottom: 10px;">
+    <h2 style="color: var(--accent); font-size: 24px; margin: 10px 0 0 0; border-bottom: none; display: inline-block; transition: 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+      ЖИВОПИСЦЫ
+    </h2>
+  </a>
+  
+  <!-- Блок с ответственными за живописцев -->
+  <div style="background: #fdf6f3; border-top: 2px solid var(--accent); border-bottom: 2px solid var(--accent); padding: 10px 15px; margin-bottom: 20px; border-radius: 6px; text-align: center; width: fit-content; margin-left: auto; margin-right: auto;">
+    <p style="margin: 0; font-size: 14px; color: var(--ink);">
+      <b>Ответственный</b> — <a href="https://catwar.net/cat1692501" target="_blank" style="color: var(--accent); text-decoration: underline;">Клок Кометы</a> &nbsp;|&nbsp; 
+      <b>Помощник</b> — <a href="https://catwar.net/cat534171" target="_blank" style="color: var(--accent); text-decoration: underline;">Излечение</a>
+    </p>
+  </div>
+  
   <p><b>Живописцы</b> — это объединение художников Сумрака, которым периодически поступают заказы на рисование предметов/медалей/украшение фонов и тд.</p>
   
   <h3>Обязанности ветви:</h3>
@@ -361,14 +376,16 @@ const WELCOME_HTML = `
 
   <hr style="border:0; border-top:1px solid var(--line); margin: 30px 0 0 0;">
 
-  <h2 style="color: var(--accent); text-align: center; font-size: 24px; margin: 10px 0 20px 0;">ОФОРМИТЕЛИ</h2>
+  <!-- ОФОРМИТЕЛИ -->
+  <h2 style="color: var(--accent); text-align: center; font-size: 24px; margin: 10px 0 20px 0; display: block; width: 100%;">ОФОРМИТЕЛИ</h2>
   <p><b>Оформители</b> — это объединение теневых, умеющих работать с украшением текста и картинок. Им периодически поступают заказы на создание осебе на ивенты, гугл-таблиц, гугл-документов, блогов, уроков, баннеров.</p>
   <h3>Порядок принятия:</h3>
   <p>Написание ответственному или его помощнику с примерами оформительских работ.</p>
 
   <hr style="border:0; border-top:1px solid var(--line); margin: 30px 0 0 0;">
 
-  <h2 style="color: var(--accent); text-align: center; font-size: 24px; margin: 10px 0 20px 0;">ПИСАТЕЛИ</h2>
+  <!-- ПИСАТЕЛИ -->
+  <h2 style="color: var(--accent); text-align: center; font-size: 24px; margin: 10px 0 20px 0; display: block; width: 100%;">ПИСАТЕЛИ</h2>
   <p><b>Писатели</b> — это объединение теневых, умеющих писать тексты и стихи. Их основной деятельность является написание сборников, приуроченных к мероприятиям, сезонам, лору племени. Кроме того, писателями периодически поступают заказы по написанию сопроводительных текстов для мероприятий, блогов и других проектов.</p>
   
   <h3>Обязанности ветви:</h3>
@@ -380,9 +397,10 @@ const WELCOME_HTML = `
   <h3>Порядок принятия:</h3>
   <p>Написание ответственному или его помощнику с примерами писательского творчества [проза, лирика, диалоги к мероприятиям и т. д.].</p>
 
-  <hr style="border:0; border-top:1px solid var(--line); margin: 30px 0;">
+  <hr style="border:0; border-top:1px solid var(--line); margin: 30px 0 0 0;">
 
-  <h2 style="color: var(--accent); text-align: center; font-size: 24px;">НАГРАДЫ</h2>
+  <!-- НАГРАДЫ -->
+  <h2 style="color: var(--accent); text-align: center; font-size: 24px; margin: 10px 0 20px 0; display: block; width: 100%;">НАГРАДЫ</h2>
   <table>
     <thead>
       <tr>
@@ -865,7 +883,7 @@ function setView(v){
   if (v === '') {
     brandTitle.textContent = 'Мастерская чудес';
     view = '';
-    render(); // Рендерит стартовую страницу
+    render();
     return;
   }
 
