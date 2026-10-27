@@ -122,6 +122,32 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
    </section>
    <div class="toolbar">
      <div class="search"><input id="search" placeholder="Поиск по имени..."></div>
+     
+     <!-- Фильтр специальностей для ХУДОЖНИКОВ -->
+     <select id="specFilter" style="display:none;">
+       <option value="">Все специальности</option>
+       <option value="фон">Фоны</option>
+       <option value="костюм">Костюмы</option>
+       <option value="предмет">Предметы</option>
+       <option value="медал">Медали</option>
+       <option value="шапк">Шапки</option>
+       <option value="плашк">Плашки</option>
+       <option value="ачивк">Ачивки</option>
+     </select>
+
+     <!-- Фильтр профильностей для АНИМАТОРОВ -->
+     <select id="animSpecFilter" style="display:none;">
+       <option value="">Все профильности</option>
+       <option value="бельтейн">Бельтейн</option>
+       <option value="солнцестояние">Солнцестояние</option>
+       <option value="хэллоувин">Хэллоувин</option>
+       <option value="новый год">Новый Год</option>
+       <option value="съезд">Съезд</option>
+       <option value="ворожба">Ворожба</option>
+       <option value="гадючьи пляски">Гадючьи Пляски</option>
+       <option value="иное">Иное</option>
+     </select>
+
      <select id="artistFilter"><option value="">Все</option></select>
      <select id="sort">
        <option value="name">По имени</option>
@@ -710,11 +736,13 @@ function render(){
  updateStats();
  let q = slug($('search').value);
  let filter = $('artistFilter').value;
+ let spec = $('specFilter').value;
  let sort = $('sort').value;
  
  let list=artists.filter(a=>{
    if (filter && a.id !== filter) return false;
    if (q && !slug([a.name,a.catwar,a.vk,a.profile].join(' ')).includes(q)) return false;
+   if (spec && !slug(a.profile).includes(spec)) return false;
    return true;
  });
  
@@ -747,6 +775,13 @@ function render(){
 
 // ===== ОТРИСОВКА АНИМАТОРОВ =====
 function renderAnimatorsArtists(list){
+  // Добавляем фильтрацию по профильности
+  let animSpec = $('animSpecFilter').value;
+  list = list.filter(a => {
+      if (animSpec && !slug(a.profile).includes(animSpec)) return false;
+      return true;
+  });
+
   $('content').innerHTML = list.length ? 
   `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px">
     ${list.map(a => `
@@ -754,6 +789,9 @@ function renderAnimatorsArtists(list){
         <div class="artist-hero">
           <div class="avatar" style="width:55px;height:55px">${a.avatar ? `<img src="${esc(a.avatar)}" alt="">` : esc(initials(a))}</div>
           <div><div class="artist-name">${esc(a.name)}</div><div class="artist-sub">${esc(a.role)}</div></div>
+        </div>
+        <div class="mini-stat" style="margin-bottom:10px">
+           <span>Профильность</span><b style="font-size:12px;color:var(--accent)">${esc(a.profile||'Не указана')}</b>
         </div>
         <div class="mini-stats">
           <div class="mini-stat"><span>Баллы</span><b>${animatorPoints(a)}</b></div>
@@ -1163,6 +1201,11 @@ function setView(v){
         animators_rewards: 'Награды и разбалловка'
     })[v] || 'Аниматоры';
     
+    // Управление фильтрами
+    document.querySelector('.toolbar').style.display = v === 'animators_rewards' ? 'none' : 'flex';
+    document.getElementById('animSpecFilter').style.display = v === 'animators_stats' ? 'block' : 'none';
+    document.getElementById('specFilter').style.display = 'none';
+
     render();
     return;
   }
@@ -1179,21 +1222,21 @@ function setView(v){
     $('listTitle').textContent=({board:'Рабочее пространство',artists:'Список художников',works:'Реестр работ',rewards:'Награды'})[v];
     $('listSub').textContent=({board:'Выберите художника',artists:'Нажмите на карточку',works:'Все начисления в одном списке',rewards:'Информация о наградах и баллах'})[v];
     
-    if (v === 'rewards') {
-        document.querySelector('.toolbar').style.display = 'none';
-    } else {
-        document.querySelector('.toolbar').style.display = 'flex';
-    }
+    document.querySelector('.toolbar').style.display = v === 'rewards' ? 'none' : 'flex';
+    document.getElementById('animSpecFilter').style.display = 'none';
 
     if (v === 'board') {
+        document.getElementById('specFilter').style.display = 'none';
         document.getElementById('sort').style.display = 'none';
         document.getElementById('artistFilter').style.display = 'block';
     } else if (v === 'artists') {
+        document.getElementById('specFilter').style.display = 'block'; // Возвращаем фильтр!
         document.getElementById('sort').style.display = 'block';
         document.getElementById('artistFilter').style.display = 'none';
         let sortSelect = document.getElementById('sort');
         sortSelect.innerHTML = `<option value="name">По имени</option><option value="points">По баллам ↓</option>`;
     } else if (v === 'works') {
+        document.getElementById('specFilter').style.display = 'none';
         document.getElementById('sort').style.display = 'block';
         document.getElementById('artistFilter').style.display = 'block';
         let sortSelect = document.getElementById('sort');
@@ -1323,7 +1366,6 @@ function importAnimators(rows){
  let pti=idx('баллы', 'очки');
  let ui=idx('ссылка', 'url', 'блог', 'пост');
  
- // Новые поля
  let avi=idx('аватар');
  let vi=idx('вк', 'vk');
  let ci=idx('catwar');
@@ -1393,6 +1435,8 @@ function importPurchases(rows) {
 $('search').oninput=render;
 $('artistFilter').onchange=render;
 $('sort').onchange=render;
+$('specFilter').onchange=render;
+$('animSpecFilter').onchange=render;
 
 // При первом открытии
 view = '';
