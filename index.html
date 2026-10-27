@@ -156,7 +156,7 @@ const WELCOME_HTML = `
       <b>Ведущий творец</b> — <a href="https://catwar.net/cat1692501" target="_blank" style="color: var(--accent); text-decoration: underline;">Клик Журавлей</a>
     </p>
     <p style="margin: 0; font-size: 15px; color: var(--ink);">
-      <b>Помощники</b> — <a href="https://catwar.net/cat534171" target="_blank" style="color: var(--accent); text-decoration: underline;">Удав</a>, <a href="https://catwar.net/cat462778" target="_blank" style="color: var(--accent); text-decoration: underline;">Предвестник Зла</a>, <a href="https://catwar.net/cat1617429" target="_blank" style="color: var(--accent); text-decoration: underline;">Хорек</a>
+      <b>Помощники</b> — <a href="https://catwar.net/cat534171" target="_blank" style="color: var(--accent); text-decoration: underline;">Удав</a>, <a href="https://catwar.net/cat462778" target="_blank" style="color: var(--accent); text-decoration: underline;">Предвестник Зла</a>
     </p>
   </div>
 
@@ -168,8 +168,20 @@ const WELCOME_HTML = `
 
   <hr style="border:0; border-top:1px solid var(--line); margin: 30px 0;">
 
-  <h2 style="color: var(--accent); text-align: center; font-size: 24px;">АНИМАТОРЫ</h2>
-  <p style="text-align: center; color: var(--muted); font-size: 12px; margin-bottom: 15px;">Ответственный — <a href="#">[профиль]</a>. Помощник — <a href="#">[профиль]</a>.</p>
+  <!-- КЛИКАБЕЛЬНЫЙ ЗАГОЛОВОК АНИМАТОРОВ -->
+  <a href="#" onclick="setView('animators'); return false;" style="text-decoration: none; display: block; text-align: center; margin-bottom: 10px;">
+    <h2 style="color: var(--accent); font-size: 24px; margin: 0; border-bottom: none; display: inline-block; transition: 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">
+      АНИМАТОРЫ
+    </h2>
+  </a>
+  
+  <!-- Ссылки на ответственных за аниматоров (по центру) -->
+  <div style="background: #fdf6f3; border-top: 2px solid var(--accent); border-bottom: 2px solid var(--accent); padding: 10px 15px; margin-bottom: 20px; border-radius: 6px; text-align: center; width: fit-content; margin-left: auto; margin-right: auto;">
+    <p style="margin: 0; font-size: 14px; color: var(--ink);">
+      <b>Ответственный</b> — <a href="https://catwar.net/cat1692501" target="_blank" style="color: var(--accent); text-decoration: underline;">Клик Журавлей</a> &nbsp;|&nbsp; 
+      <b>Помощник</b> — <a href="https://catwar.net/cat534171" target="_blank" style="color: var(--accent); text-decoration: underline;">Удав</a>
+    </p>
+  </div>
   
   <p><b>Аниматоры</b> — это предвестники приятных впечатлений, интересных историй и, что самое главное, увлекательных мероприятий! Деятельность отряда направлена на создание, реализацию и проведение различных племенных и межплеменных конкурсов, эстафет, квестов и масштабных племенных игр. Главная задача — стабилизировать проведение квестов внутри племени и улучшить работу над новыми проектами.</p>
 
@@ -195,7 +207,15 @@ const WELCOME_HTML = `
     <li><b>Подмастерью</b> необходимо сообщить ответственному за отряд или его помощнику о желании вступить в отряд. Вам будет выдано небольшое собеседование, которое поможет оценить ваши творческие способности и навыки, необходимые для работы над мероприятиями. Собеседование состоит из 5-ти вопросов, ограничений по сроку написания нет.</li>
     <li><b>Кудеснику</b> нужно иметь опыт в организации не менее двух мероприятий и сообщить о желании занять должность кудесника. При необходимости ответственный задаст несколько вопросов, чтобы убедиться в ваших способностях. Ответственный имеет право отказать вам в повышении, даже если вы ответили на все вопросы.</li>
   </ul>
-  <p><b>Вся работа по организации мероприятий происходит в ВКонтакте, поэтому для вступления нужно иметь там страницу. Запрашивая собеседование, пишите Клику Журавлей напрямую в <a href="https://vk.com/dojslodinoyaemtva" target="_blank">ВК</a>.</b></p>
+  
+  <p>Вся работа по организации мероприятий происходит в ВКонтакте, поэтому для вступления нужно иметь там страницу.</p>
+
+  <!-- Кнопка запроса собеседования -->
+  <div style="text-align: center; margin: 25px 0 35px 0;">
+    <a href="https://vk.com/dojslodinoyaemtva" target="_blank" style="display: inline-block; background: var(--accent); color: #fff; font-weight: 800; font-size: 14px; padding: 12px 24px; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 12px rgba(200,111,82,0.3); transition: 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(200,111,82,0.4)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 12px rgba(200,111,82,0.3)'">
+      ЗАПРОСИТЬ СОБЕСЕДОВАНИЕ
+    </a>
+  </div>
 
   <h3>Правила создания ивентов</h3>
   <p><b>Заказчик</b> — кот от должности "оруженосец" с собственной идеей и программой для мероприятия. Может как подкинуть материал, так и полноценно участвовать в процессе его создания. Котята также могут предлагать варианты мероприятий и участвовать в разработке, при условии, что ранее находились в Сумраке с должностью выше оруженосца.</p>
