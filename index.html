@@ -144,8 +144,7 @@ const CSV_URL = 'https://docs.google.com/spreadsheets/d/1hjiRKo9s39_sUv9JCfZ70GA
 // ⚠️ ССЫЛКА НА ВАШУ ТАБЛИЦУ (Покупки живописцев)
 const PURCHASES_URL = 'https://docs.google.com/spreadsheets/d/1hjiRKo9s39_sUv9JCfZ70GAffxHH5K306Lyv-Yfu7os/export?format=csv&gid=1168996610';
 
-// ⚠️ ССЫЛКА НА ВАШУ ТАБЛИЦУ (Аниматоры - новый лист!)
-// ВСТАВЬТЕ СЮДА ССЫЛКУ НА НОВЫЙ ЛИСТ С МЕРОПРИЯТИЯМИ АНИМАТОРОВ
+// ⚠️ ССЫЛКА НА ВАШУ ТАБЛИЦУ (Аниматоры)
 const ANIMATORS_URL = 'https://docs.google.com/spreadsheets/d/1hjiRKo9s39_sUv9JCfZ70GAffxHH5K306Lyv-Yfu7os/export?format=csv&gid=1376028487'; 
 
 const CATS=['Фон с нуля','Украш. фон','Костюм фулл & боты','Костюм','Предметы','Медаль','Шапка','Иное'];
@@ -572,12 +571,10 @@ async function fetchData() {
         const textPurch = await resPurchases.text();
         importPurchases(parseCSV(textPurch));
     }
-    if (ANIMATORS_URL && !ANIMATORS_URL.includes('ВАШ_НОВЫЙ_GID')) {
-        const resAnims = await fetch(ANIMATORS_URL);
-        if (resAnims.ok) {
-            const textAnims = await resAnims.text();
-            importAnimators(parseCSV(textAnims));
-        }
+    const resAnims = await fetch(ANIMATORS_URL);
+    if (resAnims.ok) {
+        const textAnims = await resAnims.text();
+        importAnimators(parseCSV(textAnims));
     }
   } catch (e) {
     alert('Ошибка загрузки. Проверьте ссылки на CSV.');
@@ -654,7 +651,6 @@ function render(){
     $('workspace').style.display = 'block';
     updateStats();
     
-    // Скрываем поиск для наград
     if (view === 'animators_rewards') {
         document.querySelector('.toolbar').style.display = 'none';
     } else {
@@ -756,8 +752,8 @@ function renderAnimatorsArtists(list){
     ${list.map(a => `
       <div class="artist-panel" style="cursor:pointer" data-open="${a.id}">
         <div class="artist-hero">
-          <div class="avatar" style="width:55px;height:55px">${esc(initials(a))}</div>
-          <div><div class="artist-name">${esc(a.name)}</div></div>
+          <div class="avatar" style="width:55px;height:55px">${a.avatar ? `<img src="${esc(a.avatar)}" alt="">` : esc(initials(a))}</div>
+          <div><div class="artist-name">${esc(a.name)}</div><div class="artist-sub">${esc(a.role)}</div></div>
         </div>
         <div class="mini-stats">
           <div class="mini-stat"><span>Баллы</span><b>${animatorPoints(a)}</b></div>
@@ -795,12 +791,23 @@ function animatorBoardHTML(a) {
      </div>`;
   }).join('');
 
+  let tags = (a.profile || '').split(/[,;\n]/).map(x=>x.trim()).filter(Boolean);
+  let linksHtml = '';
+  if (a.catwar && a.catwar.startsWith('http')) linksHtml += `<a href="${esc(a.catwar)}" target="_blank" rel="noopener">↗ Профиль в игре</a>`;
+  if (a.vk) {
+      let vkUrl = a.vk.startsWith('http') ? a.vk : `https://vk.com/${esc(a.vk)}`;
+      linksHtml += `<a href="${esc(vkUrl)}" target="_blank" rel="noopener">↗ VK</a>`;
+  }
+
   return `<div class="board">
     <section class="artist-panel">
       <div class="artist-hero">
-        <div class="avatar">${esc(initials(a))}</div>
+        <div class="avatar">${a.avatar ? `<img src="${esc(a.avatar)}" alt="">` : esc(initials(a))}</div>
         <div><div class="artist-name">${esc(a.name)}</div></div>
       </div>
+      <div class="links">${linksHtml}</div>
+      <div class="divider"></div>
+      <div><div class="field-label">Профильность</div><div class="bio">${esc(a.role || 'Нет роли')}</div><div class="chips" style="margin-top:9px">${tags.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div></div>
       <div class="divider"></div>
       <div class="mini-stats">
         <div class="mini-stat"><span>Всего баллов</span><b>${animatorPoints(a)}</b></div>
@@ -817,7 +824,6 @@ function animatorBoardHTML(a) {
 }
 
 function renderAnimatorRewards() {
-  // Копируем рендер наград, меняя только ID
   let options = '<option value="">Выбрать аниматора</option>';
   animators.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).forEach(a => {
       options += `<option value="${a.id}" ${rewardCheckAnimatorId === a.id ? 'selected' : ''}>${esc(a.name)}</option>`;
@@ -825,7 +831,7 @@ function renderAnimatorRewards() {
 
   let checkedArtist = animators.find(a => a.id === rewardCheckAnimatorId);
   let aPts = checkedArtist ? animatorPoints(checkedArtist) : 0;
-  let aNb = 0; // Пока без НБ для аниматоров
+  let aNb = 0;
   let aRawNb = 0;
 
   const card = (title, desc, price, isNb, imgUrl, isLifetime = false) => {
@@ -838,7 +844,6 @@ function renderAnimatorRewards() {
       let isSpecial = (title === 'Костюм живописцев' || title === 'Медаль мероприятия');
 
       if (checkedArtist) {
-          // Заглушка для покупок, пока не подключим
           isBought = false; 
       }
       
@@ -907,7 +912,6 @@ function renderAnimatorRewards() {
       renderAnimatorRewards(); 
   };
 }
-
 
 function boardHTML(a){
  let aw=aWorks(a);
@@ -1318,6 +1322,13 @@ function importAnimators(rows){
  let di=idx('дата');
  let pti=idx('баллы', 'очки');
  let ui=idx('ссылка', 'url', 'блог', 'пост');
+ 
+ // Новые поля
+ let avi=idx('аватар');
+ let vi=idx('вк', 'vk');
+ let ci=idx('catwar');
+ let pi=idx('профильность', 'спец');
+ let roli=idx('роль', 'должность');
 
  rows.slice(1).forEach(r=>{
   let name=(r[ni]||'').trim();if(!name)return;
@@ -1325,8 +1336,22 @@ function importAnimators(rows){
   let a=animators.find(a=>slug(a.name)===slug(name));
   
   if(!a){
-    a={ id:'an'+animators.length, name };
+    a={ 
+        id:'an'+animators.length, 
+        name,
+        avatar: avi>=0?r[avi]||'':'',
+        vk: vi>=0?r[vi]||'':'',
+        catwar: ci>=0?r[ci]||'':'',
+        profile: pi>=0?r[pi]||'':'',
+        role: roli>=0?r[roli]||'':''
+    };
     animators.push(a);
+  } else {
+    if (!a.avatar && avi>=0) a.avatar = r[avi]||'';
+    if (!a.vk && vi>=0) a.vk = r[vi]||'';
+    if (!a.catwar && ci>=0) a.catwar = r[ci]||'';
+    if (!a.profile && pi>=0) a.profile = r[pi]||'';
+    if (!a.role && roli>=0) a.role = r[roli]||'';
   }
   
   if(ti>=0 && (r[ti]||'').trim()){
