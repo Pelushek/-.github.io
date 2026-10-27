@@ -685,12 +685,12 @@ function render(){
 
     const statsBlock = document.querySelector('.stats');
     // Исправление 3: скрываем статистику на вкладке "Доска" и "Награды"
-    if (view === 'animators_board' || view === 'animators_rewards') {
-        statsBlock.style.display = 'none';
+    if (view.startsWith('animators')) {
+        statsBlock.style.display = 'none'; // скрываем для всех вкладок аниматоров
     } else {
-        statsBlock.style.display = 'grid';
+        statsBlock.style.display = 'grid'; // показываем для художников
     }
-
+  
     if (view === 'animators_stats') {
         $('listTitle').textContent = 'Список аниматоров';
         $('listSub').textContent = 'Нажмите на карточку';
