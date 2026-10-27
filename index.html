@@ -6,9 +6,14 @@
 <style>
 :root{--bg:#f5f2ee;--paper:#fffdfa;--ink:#292723;--muted:#8c877f;--line:#e6e0d8;--accent:#c86f52;--green:#647b62;--shadow:0 8px 28px #31261b0b}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,ui-sans-serif,system-ui,sans-serif}
-button,input,select{font:inherit}button{cursor:pointer}.app{min-height:100vh;display:grid;grid-template-columns:248px 1fr}
-.sidebar{background:#292824;color:#f8f4ee;padding:25px 17px;display:flex;flex-direction:column;gap:24px;min-height:100vh}
-.brand{display:flex;align-items:center;gap:12px;padding:0 7px}
+button,input,select{font:inherit}button{cursor:pointer}
+.app{min-height:100vh;display:grid;grid-template-columns:248px 1fr}
+
+/* Фиксируем сайдбар, чтобы он не уезжал при скролле */
+.sidebar{background:#292824;color:#f8f4ee;padding:25px 17px;display:flex;flex-direction:column;gap:24px;height:100vh;position:sticky;top:0;overflow-y:auto;}
+.sidebar::-webkit-scrollbar { width: 0; }
+
+.brand{display:flex;align-items:center;gap:12px;padding:0 7px;cursor:pointer;}
 .logo{width:39px;height:39px;border-radius:13px;background:#d48a6f;color:#292824;display:grid;place-items:center;font-size:21px;font-weight:800}
 .brand strong{font-size:16px; transition: 0.2s;}
 .brand small{display:block;color:#aaa49b;font-size:11px;margin-top:2px}
@@ -54,19 +59,23 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
 .bb-content { background: var(--paper); border: 1px solid var(--line); border-radius: 15px; padding: 25px; box-shadow: var(--shadow); max-width: 900px; margin: 0 auto; color: var(--ink); line-height: 1.6; }
 .bb-content h2 { font-size: 20px; margin: 20px 0 10px; border-bottom: 2px solid var(--line); padding-bottom: 5px; color: var(--accent); }
 .bb-content h3 { font-size: 15px; margin: 15px 0 10px; background: #f7f4ef; padding: 6px 12px; border-radius: 6px; display: inline-block; color: var(--green); }
-.bb-content p { margin: 0 0 10px; font-size: 13px; text-align: justify; }
+.bb-content p { margin: 0 0 10px; font-size: 13px; text-align: left; } /* Убрали justify, чтобы не было растягивания */
 .bb-content ul { margin: 0 0 15px; padding-left: 20px; font-size: 13px; }
 .bb-content li { margin-bottom: 5px; }
 .bb-content table { border-collapse: collapse; width: 100%; margin-bottom: 20px; font-size: 13px; }
 .bb-content th, .bb-content td { padding: 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: middle; }
 .bb-content th { background: #f7f4ef; font-weight: 700; color: var(--ink); }
 .bb-content img { max-width: 100%; border-radius: 8px; }
+
+/* Убираем лишний пробел в самом верху страницы */
+#content { margin-top: 0; padding-top: 0; }
 </style></head>
 <body>
 <div id="loadingOverlay">Загрузка данных из Google Таблицы...</div>
 <div class="app">
 <aside class="sidebar">
- <div class="brand">
+ <!-- Кликабельный логотип для возврата на главную -->
+ <div class="brand" onclick="setView('')">
    <div class="logo">✦</div>
    <div>
      <strong id="brandTitle">Мастерская чудес</strong>
@@ -75,6 +84,10 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
  </div>
  
  <div style="width:100%"><div class="side-label">Рабочее место</div><nav class="nav">
+   
+   <!-- Новая главная вкладка -->
+   <button data-view=""><span class="nav-text">Мастерская чудес</span></button>
+
    <button data-view="animators"><span class="nav-text">Аниматоры</span></button>
    <button data-view="writers"><span class="nav-text">Писатели</span></button>
    <button data-view="designers"><span class="nav-text">Оформители</span></button>
@@ -847,8 +860,15 @@ function setView(v){
   }
 
   subNav.classList.remove('open');
-  document.querySelector(`.nav > button[data-view="${v}"]`).classList.add('active');
+  document.querySelector(`.nav > button[data-view="${v}"]`)?.classList.add('active');
   
+  if (v === '') {
+    brandTitle.textContent = 'Мастерская чудес';
+    view = '';
+    render(); // Рендерит стартовую страницу
+    return;
+  }
+
   if (v === 'animators') brandTitle.textContent = 'Аниматоры';
   else if (v === 'writers') brandTitle.textContent = 'Писатели';
   else if (v === 'designers') brandTitle.textContent = 'Оформители';
