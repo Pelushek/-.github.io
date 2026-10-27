@@ -214,7 +214,7 @@ const WELCOME_HTML = `
     <li>Набор актёров на мероприятие;</li>
     <li>Оформление ТЗ по костюмам, фонам, медалям [создание ляжет на живописцев].</li>
   </ul>
-  <p><b>!! Вся работа сдаётся ВТ, а после одобрения уже начинаются следующие этапы создания.</b></p>
+  <p><b>! Вся работа сдаётся Ведущему Творцу, а после одобрения уже начинаются следующие этапы создания.</b></p>
 
   <h3>Порядок принятия в отряд:</h3>
   <p>Подать заявку на вступление в отряд может любой игрок, имеющий запах Теней, кроме переходящих или людей, ранее замеченными за серьезными нарушениями конфиденциальности мероприятий.</p>
@@ -354,8 +354,8 @@ const WELCOME_HTML = `
   <div style="background: #fdf6f3; border-top: 2px solid var(--accent); border-bottom: 2px solid var(--accent); padding: 10px 15px; margin-bottom: 20px; border-radius: 6px; text-align: center; width: fit-content; margin-left: auto; margin-right: auto;">
     <p style="margin: 0; font-size: 14px; color: var(--ink);">
       <b>Ответственный</b> — <a href="https://catwar.net/cat1692501" target="_blank" style="color: var(--accent); text-decoration: underline;">Клок Кометы</a> &nbsp;|&nbsp; 
-      <b>Помощник</b> — <a href="https://catwar.net/cat534171" target="_blank" style="color: var(--accent); text-decoration: underline;">Излечение</a> &nbsp;|&nbsp;
-      <b>Отпись Маляру</b> — <a href="https://catwar.net/cat000000" target="_blank" style="color: var(--accent); text-decoration: underline;">Имя_Маляра</a>
+      <b>Помощник</b> — <a href="https://catwar.net/cat462778" target="_blank" style="color: var(--accent); text-decoration: underline;">Предвестник Зла</a> &nbsp;|&nbsp;
+      <b>Отпись Маляру</b> — <a href="https://catwar.net/cat1648203" target="_blank" style="color: var(--accent); text-decoration: underline;">Излечение</a>
     </p>
   </div>
   
@@ -380,8 +380,8 @@ const WELCOME_HTML = `
   </div>
 
   <div style="text-align: center; margin: 25px 0 35px 0;">
-    <a href="https://catwar.net/cat462778" target="_blank" style="display: inline-block; background: var(--accent); color: #fff; font-weight: 800; font-size: 14px; padding: 12px 24px; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 12px rgba(200,111,82,0.3); transition: 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(200,111,82,0.4)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 12px rgba(200,111,82,0.3)'">
-      НАПИСАТЬ ПРЕДВЕСТНИКУ ЗЛА С ПОРТФОЛИО
+    <a href="https://vk.ru/sanya_musorskoy" target="_blank" style="display: inline-block; background: var(--accent); color: #fff; font-weight: 800; font-size: 14px; padding: 12px 24px; border-radius: 8px; text-decoration: none; box-shadow: 0 4px 12px rgba(200,111,82,0.3); transition: 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(200,111,82,0.4)'" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 12px rgba(200,111,82,0.3)'">
+      ПРИСЛАТЬ ПОРТФОЛИО
     </a>
   </div>
 
@@ -1022,6 +1022,8 @@ view = '';
 $('workspace').style.display = 'none';
 document.getElementById('brandTitle').textContent = 'Мастерская чудес';
 document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+// Автоматически выделяем вкладку "Мастерская чудес" при загрузке
+document.querySelector(`.nav > button[data-view=""]`).classList.add('active');
 
 fetchData();
 </script></body></html>
