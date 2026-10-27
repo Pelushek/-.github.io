@@ -121,7 +121,7 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
     <div class="stat"><span id="statLabel4">Без работ</span><strong id="statEmpty">0</strong></div>
    </section>
    <div class="toolbar">
-     <div class="search"><input id="search" placeholder="Поиск по имени..."></div>
+     <div class="search"><input id="search" placeholder="Поиск по имени и VK..."></div>
      
      <!-- Фильтр специальностей для ХУДОЖНИКОВ -->
      <select id="specFilter" style="display:none;">
@@ -684,7 +684,8 @@ function render(){
     }
 
     const statsBlock = document.querySelector('.stats');
-    if (view === 'animators_rewards') {
+    // Исправление 3: скрываем статистику на вкладке "Доска" и "Награды"
+    if (view === 'animators_board' || view === 'animators_rewards') {
         statsBlock.style.display = 'none';
     } else {
         statsBlock.style.display = 'grid';
@@ -697,7 +698,8 @@ function render(){
            let filter = $('artistFilter').value;
            if (filter && a.id !== filter) return false;
            let q = slug($('search').value);
-           if (q && !slug(a.name).includes(q)) return false;
+           // Исправление 4: поиск по имени или по ссылке VK
+           if (q && !(slug(a.name).includes(q) || slug(a.vk).includes(q))) return false;
            return true;
         });
         renderAnimatorsArtists(list);
@@ -710,7 +712,7 @@ function render(){
            let filter = $('artistFilter').value;
            if (filter && a.id !== filter) return false;
            let q = slug($('search').value);
-           if (q && !slug(a.name).includes(q)) return false;
+           if (q && !(slug(a.name).includes(q) || slug(a.vk).includes(q))) return false;
            return true;
         });
         if(!currentAnimator || !animators.some(a=>a.id===currentAnimator)) currentAnimator = (list[0]||{}).id;
@@ -782,6 +784,7 @@ function renderAnimatorsArtists(list){
       return true;
   });
 
+  // Исправление 1: убран блок "Профильность" из карточки
   $('content').innerHTML = list.length ? 
   `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px">
     ${list.map(a => `
@@ -789,9 +792,6 @@ function renderAnimatorsArtists(list){
         <div class="artist-hero">
           <div class="avatar" style="width:55px;height:55px">${a.avatar ? `<img src="${esc(a.avatar)}" alt="">` : esc(initials(a))}</div>
           <div><div class="artist-name">${esc(a.name)}</div><div class="artist-sub">${esc(a.role)}</div></div>
-        </div>
-        <div class="mini-stat" style="margin-bottom:10px">
-           <span>Профильность</span><b style="font-size:12px;color:var(--accent)">${esc(a.profile||'Не указана')}</b>
         </div>
         <div class="mini-stats">
           <div class="mini-stat"><span>Баллы</span><b>${animatorPoints(a)}</b></div>
@@ -807,6 +807,7 @@ function renderAnimatorsArtists(list){
   });
 }
 
+// Исправление 2: добавлена ссылка на профиль в игре
 function animatorBoardHTML(a) {
   let evs = aEvents(a);
   let sortMode = $('sort').value;
@@ -831,6 +832,7 @@ function animatorBoardHTML(a) {
 
   let tags = (a.profile || '').split(/[,;\n]/).map(x=>x.trim()).filter(Boolean);
   let linksHtml = '';
+  // Добавляем ссылку на профиль в игре
   if (a.catwar && a.catwar.startsWith('http')) linksHtml += `<a href="${esc(a.catwar)}" target="_blank" rel="noopener">↗ Профиль в игре</a>`;
   if (a.vk) {
       let vkUrl = a.vk.startsWith('http') ? a.vk : `https://vk.com/${esc(a.vk)}`;
@@ -1176,6 +1178,7 @@ function renderRewards() {
   };
 }
 
+// Исправление 5: исправлена логика открытия подменю в сайдбаре
 function setView(v){
   view = v;
   const animNav = document.getElementById('animatorsSubNav');
@@ -1183,6 +1186,9 @@ function setView(v){
   const menuBtns = document.querySelectorAll('.nav > button');
   const brandTitle = document.getElementById('brandTitle');
   
+  // Закрываем все подменю и убираем активный класс у всех кнопок
+  animNav.classList.remove('open');
+  paintNav.classList.remove('open');
   menuBtns.forEach(b => b.classList.remove('active'));
   animNav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
   paintNav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
@@ -1254,8 +1260,7 @@ function setView(v){
     return;
   }
 
-  animNav.classList.remove('open');
-  paintNav.classList.remove('open');
+  // Писатели / Оформители / Главная
   document.querySelector(`.nav > button[data-view="${v}"]`)?.classList.add('active');
   
   if (v === '') {
