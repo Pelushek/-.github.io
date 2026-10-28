@@ -212,9 +212,9 @@ const MANUAL_NB_URL = MANUAL_NB_GID ? SHEET_BASE + MANUAL_NB_GID : '';
 
 // ⚠️ ОФОРМИТЕЛИ: впишите gid двух новых листов. Пока gid пустой — лист пропускается (появится жёлтая плашка).
 // Лист «Оформители» (работы, колонки как у живописцев)
-const DESIGNERS_GID = '1228094250';
+const DESIGNERS_GID = '';
 // Лист «Покупки оформителей» (кому что выдано)
-const DESIGNER_PURCHASES_GID = '1309502360';
+const DESIGNER_PURCHASES_GID = '';
 const DESIGNERS_URL = DESIGNERS_GID ? SHEET_BASE + DESIGNERS_GID : '';
 const DESIGNER_PURCHASES_URL = DESIGNER_PURCHASES_GID ? SHEET_BASE + DESIGNER_PURCHASES_GID : '';
 
@@ -1290,6 +1290,13 @@ function renderRewards() {
 function dWorks(d){return designerWorks.filter(w=>w.artistId===d.id)}
 function dPoints(d){return dWorks(d).reduce((s,w)=>s+(Number(w.points)||0),0)} // баллы у оформителей не списываются
 
+function designerWorkCardHTML(w){
+ const hasUrl = w.url && /^https?:\/\//i.test(w.url);
+ const hasPrev = w.preview && /^https?:\/\//i.test(w.preview);
+ let thumb = hasPrev ? `<img class="thumb" src="${esc(w.preview)}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div class="thumb-fallback" style="display:none">🖼</div>` : `<div class="thumb-fallback">🖼</div>`;
+ return `<div class="work-card">${thumb}${hasUrl?`<a href="${esc(w.url)}" target="_blank" rel="noopener">${esc(w.title||'Без названия')} ↗</a>`:`<b>${esc(w.title||'Без названия')}</b>`}<div class="meta"><span>${esc(w.date||'')}</span><span class="points">+${+w.points||0}</span></div></div>`;
+}
+
 function designerBoardHTML(a){
  let aw=dWorks(a);
  let sortMode = $('sort').value;
@@ -1327,7 +1334,7 @@ function designerBoardHTML(a){
       let ws=aw.filter(w=>w.category===cat);
       let isExpanded = expandedCats[cat] || false;
       let visibleWorks = isExpanded ? ws : ws.slice(0, 3);
-      let cardsHtml = visibleWorks.map(w=>workCardHTML(w)).join('');
+      let cardsHtml = visibleWorks.map(w=>designerWorkCardHTML(w)).join('');
       let btnHtml = '';
       if (ws.length > 3) {
           btnHtml = `<button class="show-more-btn" data-toggle-cat="${esc(cat)}">${isExpanded ? '↑ Свернуть' : `↓ Показать все (${ws.length})`}</button>`;
@@ -1361,8 +1368,9 @@ function renderDesignerWorks(){
 
  $('content').innerHTML=ws.length?`<div style="background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:auto"><table style="border-collapse:collapse;width:100%;min-width:650px"><thead><tr>${['Превью','Оформитель','Работа','Категория','Дата','Баллы'].map(x=>`<th style="text-align:left;padding:12px;border-bottom:1px solid var(--line);font-size:11px;color:var(--muted)">${x}</th>`).join('')}</tr></thead><tbody>${ws.map(w=>{
   const hasUrl = w.url && /^https?:\/\//i.test(w.url);
-  const thumbCell = hasUrl 
-    ? `<td style="padding:6px 12px;border-bottom:1px solid var(--line)"><img src="${esc(w.url)}" alt="" style="width:56px;height:40px;object-fit:cover;border-radius:5px;background:#f0ebe5" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span style="display:none;width:56px;height:40px;align-items:center;justify-content:center;color:#b5a99c;background:#f0ebe5;border-radius:5px">🖼</span></td>`
+  const hasPrev = w.preview && /^https?:\/\//i.test(w.preview);
+  const thumbCell = hasPrev 
+    ? `<td style="padding:6px 12px;border-bottom:1px solid var(--line)"><img src="${esc(w.preview)}" alt="" style="width:56px;height:40px;object-fit:cover;border-radius:5px;background:#f0ebe5" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span style="display:none;width:56px;height:40px;align-items:center;justify-content:center;color:#b5a99c;background:#f0ebe5;border-radius:5px">🖼</span></td>`
     : `<td style="padding:6px 12px;border-bottom:1px solid var(--line)"><span style="display:flex;width:56px;height:40px;align-items:center;justify-content:center;color:#b5a99c;background:#f0ebe5;border-radius:5px">🖼</span></td>`;
   return `<tr>${thumbCell}<td style="padding:12px;border-bottom:1px solid var(--line)">${esc((designers.find(a=>a.id===w.artistId)||{}).name||'—')}</td><td style="padding:12px;border-bottom:1px solid var(--line)">${hasUrl?`<a href="${esc(w.url)}" target="_blank" rel="noopener">${esc(w.title||'Без названия')} ↗</a>`:esc(w.title||'Без названия')}</td><td style="padding:12px;border-bottom:1px solid var(--line)">${esc(w.category)}</td><td style="padding:12px;border-bottom:1px solid var(--line)">${esc(w.date||'—')}</td><td style="padding:12px;border-bottom:1px solid var(--line);font-weight:800;color:var(--green)">+${+w.points||0}</td></tr>`
 }).join('')}</tbody></table></div>`:'<div class="empty-state"><b>Работ пока нет</b>Добавьте первую работу в Google Таблицу.</div>';
@@ -1430,6 +1438,19 @@ function renderDesignerRewards() {
       ${card('Отрядное оформление сокровищницы', '', null, false, 'https://d.zaix.ru/GbGk.png')}
       ${card('Костюм оформителей', 'Выдается оформителям-активистам сезона [3 месяца]<br>Подробности и условия выдачи можно узнать в Сезонке.', 0, false, 'https://i.ibb.co/RGSbKRTy/1.png')}
     </div>
+
+    <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--line); padding-bottom:5px;">Информационная сводка</h3>
+    <div class="info-block" style="margin-top:15px;">
+        <h3 style="border-bottom:none; color:var(--accent);">Разбалловка</h3>
+        <ul>
+            <li><b>Осебе</b> — 2–4 балла (за 1 шаблон на 1 ивенте можно получить только 1 балл; если меняется более половины кода первого шаблона на этом ивенте (не учитывается изменение цвета, текста), то прибавляется ещё 1 балл за каждый такой новый шаблон);</li>
+            <li><b>Баннеры</b> — 2 балла;</li>
+            <li><b>Таблицы</b> — 1–4 балла (лёгкие, средние, сложные);</li>
+            <li><b>Гугл-документы</b> — 1–4 балла;</li>
+            <li><b>Блоги</b> (на ивенты/конкурсы и прочее) — 4–8 баллов;</li>
+            <li><b>Уроки</b> — 4 балла.</li>
+        </ul>
+    </div>
   `;
   $('rewardDesignerSelect').onchange = (e) => { rewardCheckDesignerId = e.target.value; renderDesignerRewards(); };
 }
@@ -1447,7 +1468,10 @@ function importDesigners(rows){
  let bi=idx('описание','коммент');
  let wi=idx('название работ','работа','название');
  let cati=idx('категория','тип');
- let ui=idx('ссылка на работу','ссылка','url');
+ let pvi=idx('ссылка на превью','превью','preview');
+ let ui=headers.findIndex(h=>h==='ссылканаработу');
+ if (ui<0) ui=headers.findIndex((h,i)=>i!==pvi && (h.startsWith('ссылканаработ') || h==='url' || h==='ссылка'));
+ if (ui<0) ui=headers.findIndex((h,i)=>i!==pvi && h.includes('ссылка'));
  let di=idx('дата');
  let pti=idx('баллы','очки');
  if (ni < 0) { warnMissingColumn('Оформители', 'Имя оформителя'); return; }
@@ -1483,7 +1507,8 @@ function importDesigners(rows){
        artistId:d.id,
        title:r[wi].trim(),
        category:known,
-       url:ui>=0?r[ui]||'':'',
+       url:ui>=0?(r[ui]||'').trim():'',
+       preview:pvi>=0?(r[pvi]||'').trim():'',
        date:di>=0?r[di]||'':'',
        points:pti>=0?Number(String(r[pti]||'0').replace(',','.'))||0:0
    });
