@@ -130,6 +130,7 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
  
 </aside>
 <main>
+ <div id="dataWarn" style="display:none;background:#fff7e6;border:1px solid #f0d9a8;color:#7a5a12;border-radius:10px;padding:10px 14px;margin-bottom:16px;font-size:12px;line-height:1.5;"></div>
  <div id="workspace" style="display:none;">
    <div class="topbar"><div><div class="eyebrow">Панель координатора</div><h1 id="pageTitle">Все художники</h1></div><div class="actions"><button class="btn" onclick="location.reload()">↻ Обновить</button></div></div>
    <section class="stats" style="display:none;">
@@ -204,6 +205,21 @@ const CATS=['Фон с нуля','Украш. фон','Костюм фулл & �
 let artists=[], works=[], purchases=[], currentArtist=null, view='';
 let animators=[], animatorEvents=[], currentAnimator=null;
 let animatorPurchases=[], manualNb=[];
+let importWarnings=[];
+const ANIMATOR_REWARD_NAMES = ['За фантазию и организованность', 'Ачивка аниматоров', 'Отрядное оформление сокровищницы'];
+function warnMissingColumn(sheet, colName){ importWarnings.push(`Лист «${sheet}»: не найдена колонка «${colName}» — строки не учтены.`); }
+function warnUnmatched(sheet, kind, set){
+  if (!set.size) return;
+  const list = [...set];
+  importWarnings.push(`Лист «${sheet}»: ${kind}: ${list.slice(0,6).join(', ')}${list.length>6 ? ' и ещё '+(list.length-6) : ''}.`);
+}
+function showWarnings(){
+  const el = $('dataWarn');
+  if (!importWarnings.length) { el.style.display = 'none'; el.innerHTML = ''; return; }
+  importWarnings.forEach(w => console.warn(w));
+  el.innerHTML = '<b>Проверьте таблицы:</b><br>' + importWarnings.map(esc).join('<br>');
+  el.style.display = 'block';
+}
 
 let expandedCats = {}; 
 let rewardCheckArtistId = ''; 
@@ -640,6 +656,7 @@ async function fetchCSV(url) {
 
 async function fetchData() {
   $('loadingOverlay').style.display = 'flex';
+  importWarnings = [];
   const optional = url => url ? fetchCSV(url) : Promise.resolve(null);
   const names = ['Работы живописцев', 'Покупки живописцев', 'Аниматоры', 'Награды аниматоров', 'НБ вручную'];
   const results = await Promise.allSettled([
@@ -659,6 +676,9 @@ async function fetchData() {
   } catch (e) {
     errors.push('Ошибка обработки данных: ' + e.message);
   }
+  if (!ANIM_PURCHASES_URL) importWarnings.push('Лист «Награды аниматоров» не подключён: в коде не указан ANIM_PURCHASES_GID.');
+  if (!MANUAL_NB_URL) importWarnings.push('Лист «НБ вручную» не подключён: в коде не указан MANUAL_NB_GID.');
+  showWarnings();
   $('loadingOverlay').style.display = 'none';
   if (errors.length) alert('Не удалось загрузить:\n' + errors.join('\n'));
   render();
@@ -1346,11 +1366,12 @@ function parseCSV(text){
 function makeIdx(headers){
   return (...names) => {
     const keys = names.map(norm);
+    // 1) точное совпадение заголовка
     for (const k of keys) { const i = headers.findIndex(h => h === k); if (i >= 0) return i; }
-    for (const k of keys) {
-      const i = headers.findIndex(h => k.length > 3 ? h.includes(k) : (h.startsWith(k) || h.endsWith(k)));
-      if (i >= 0) return i;
-    }
+    // 2) заголовок начинается/заканчивается на название
+    for (const k of keys) { const i = headers.findIndex(h => h.startsWith(k) || h.endsWith(k)); if (i >= 0) return i; }
+    // 3) любое вхождение (как в самой первой версии кода)
+    for (const k of keys) { const i = headers.findIndex(h => h.includes(k)); if (i >= 0) return i; }
     return -1;
   };
 }
@@ -1468,21 +1489,25 @@ function importAnimators(rows){
 }
 
 function importPurchases(rows) {
-  if(!rows.length)return;
   purchases = [];
+  if(!rows.length)return;
   let headers=rows[0].map(norm),idx=makeIdx(headers);
-  
+
   let ni=idx('имя художника','имя','художник');
   let ri=idx('что куплено','награда','предмет');
   let qi=idx('количество','колво');
+  if (ni < 0) { warnMissingColumn('Покупки живописцев', 'Имя художника'); return; }
+  if (ri < 0) { warnMissingColumn('Покупки живописцев', 'Что куплено'); return; }
 
+  const unknownNames = new Set(), unknownRewards = new Set();
   rows.slice(1).forEach(r => {
     let name = (r[ni]||'').trim();
     let rewardName = (r[ri]||'').trim();
     if(!name || !rewardName) return;
-    
+
     let a = artists.find(a => slug(a.name) === slug(name));
-    if(!a) return;
+    if(!a) { unknownNames.add(name); return; }
+    if(!ALL_REWARDS.some(x => slug(x.name) === slug(rewardName))) unknownRewards.add(rewardName);
 
     let qty = qi >= 0 ? (Number(String(r[qi]||'').replace(',','.')) || 1) : 1;
     purchases.push({
@@ -1491,6 +1516,8 @@ function importPurchases(rows) {
       qty: qty
     });
   });
+  warnUnmatched('Покупки живописцев', 'имена не найдены среди художников', unknownNames);
+  warnUnmatched('Покупки живописцев', 'названия наград не совпадают с сайтом', unknownRewards);
 }
 
 function importAnimatorPurchases(rows) {
@@ -1499,14 +1526,20 @@ function importAnimatorPurchases(rows) {
   let headers = rows[0].map(norm), idx = makeIdx(headers);
   let ni = idx('имя аниматора', 'имя', 'аниматор');
   let ri = idx('что выдано', 'что куплено', 'награда', 'предмет');
+  if (ni < 0) { warnMissingColumn('Награды аниматоров', 'Имя аниматора'); return; }
+  if (ri < 0) { warnMissingColumn('Награды аниматоров', 'Награда'); return; }
+  const unknownNames = new Set(), unknownRewards = new Set();
   rows.slice(1).forEach(r => {
     let name = (r[ni] || '').trim();
     let rewardName = (r[ri] || '').trim();
     if (!name || !rewardName) return;
     let a = animators.find(a => slug(a.name) === slug(name));
-    if (!a) return;
+    if (!a) { unknownNames.add(name); return; }
+    if (!ANIMATOR_REWARD_NAMES.some(x => slug(x) === slug(rewardName))) unknownRewards.add(rewardName);
     animatorPurchases.push({ animatorId: a.id, rewardName });
   });
+  warnUnmatched('Награды аниматоров', 'имена не найдены среди аниматоров', unknownNames);
+  warnUnmatched('Награды аниматоров', 'названия наград не совпадают с сайтом', unknownRewards);
 }
 
 function importManualNb(rows) {
@@ -1517,13 +1550,16 @@ function importManualNb(rows) {
   let ai = idx('нб', 'баллы', 'количество');
   let ri = idx('причина', 'за что', 'комментарий');
   let di = idx('дата');
+  if (ni < 0) { warnMissingColumn('НБ вручную', 'Имя художника'); return; }
+  if (ai < 0) { warnMissingColumn('НБ вручную', 'НБ'); return; }
+  const unknownNames = new Set();
   rows.slice(1).forEach(r => {
     let name = (r[ni] || '').trim();
-    if (!name || ai < 0) return;
+    if (!name) return;
     let amount = Number(String(r[ai] || '').replace(',', '.'));
     if (!amount) return;
     let a = artists.find(a => slug(a.name) === slug(name));
-    if (!a) return;
+    if (!a) { unknownNames.add(name); return; }
     manualNb.push({
       artistId: a.id,
       amount,
@@ -1531,6 +1567,7 @@ function importManualNb(rows) {
       date: di >= 0 ? (r[di] || '').trim() : ''
     });
   });
+  warnUnmatched('НБ вручную', 'имена не найдены среди художников', unknownNames);
 }
 
 $('search').oninput=render;
