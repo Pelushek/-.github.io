@@ -124,7 +124,15 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
      <button data-view="rewards"><span class="ico">★</span><span class="nav-text">Награды</span></button>
    </div>
 
-   <button data-view="designers"><span class="nav-text">Оформители</span></button>
+   <!-- Оформители -->
+   <button id="designersMenuBtn" data-view="designers_artists"><span class="nav-text">Оформители</span></button>
+   <div class="sub-nav" id="designersSubNav">
+     <button data-view="designers_artists"><span class="ico">♙</span><span class="nav-text">Оформители</span></button>
+     <button data-view="designers_board"><span class="ico">▦</span><span class="nav-text">Доска</span></button>
+     <button data-view="designers_works"><span class="ico">✎</span><span class="nav-text">Все работы</span></button>
+     <button data-view="designers_rewards"><span class="ico">★</span><span class="nav-text">Награды</span></button>
+   </div>
+
    <button data-view="writers"><span class="nav-text">Писатели</span></button>
    
  </nav></div>
@@ -202,10 +210,23 @@ const MANUAL_NB_GID = '1573644042';
 const ANIM_PURCHASES_URL = ANIM_PURCHASES_GID ? SHEET_BASE + ANIM_PURCHASES_GID : '';
 const MANUAL_NB_URL = MANUAL_NB_GID ? SHEET_BASE + MANUAL_NB_GID : '';
 
+// ⚠️ ОФОРМИТЕЛИ: впишите gid двух новых листов. Пока gid пустой — лист пропускается (появится жёлтая плашка).
+// Лист «Оформители» (работы, колонки как у живописцев)
+const DESIGNERS_GID = '1228094250';
+// Лист «Покупки оформителей» (кому что выдано)
+const DESIGNER_PURCHASES_GID = '1309502360';
+const DESIGNERS_URL = DESIGNERS_GID ? SHEET_BASE + DESIGNERS_GID : '';
+const DESIGNER_PURCHASES_URL = DESIGNER_PURCHASES_GID ? SHEET_BASE + DESIGNER_PURCHASES_GID : '';
+
 const CATS=['Фон с нуля','Украш. фон','Костюм фулл & боты','Костюм','Предметы','Медаль','Шапка','Иное'];
 let artists=[], works=[], purchases=[], currentArtist=null, view='';
 let animators=[], animatorEvents=[], currentAnimator=null;
 let animatorPurchases=[], manualNb=[];
+let designers=[], designerWorks=[], designerPurchases=[], currentDesigner=null;
+const SPEC_PAINTERS=document.getElementById('specFilter').innerHTML;
+const DESIGNER_CATS=['Осебе','Баннеры','Таблицы','Гугл-документы','Блоги','Уроки','Иное'];
+const DESIGNER_REWARD_NAMES=['За проявление творческой жилки','Ачивка оформителей','Плашка оформителей','Отрядное оформление сокровищницы','Костюм оформителей'];
+const SPEC_DESIGNERS='<option value="">Все специальности</option><option value="осебе">Осебе</option><option value="баннер">Баннеры</option><option value="таблиц">Таблицы</option><option value="гугл">Гугл-документы</option><option value="блог">Блоги</option><option value="урок">Уроки</option><option value="иное">Иное</option>';
 let importWarnings=[];
 const ANIMATOR_REWARD_NAMES = ['За фантазию и организованность', 'Ачивка аниматоров', 'Отрядное оформление сокровищницы'];
 function warnMissingColumn(sheet, colName){ importWarnings.push(`Лист «${sheet}»: не найдена колонка «${colName}» — строки не учтены.`); }
@@ -225,6 +246,7 @@ function showWarnings(){
 let expandedCats = {}; 
 let rewardCheckArtistId = ''; 
 let rewardCheckAnimatorId = '';
+let rewardCheckDesignerId = '';
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -659,10 +681,11 @@ async function fetchData() {
   $('loadingOverlay').style.display = 'flex';
   importWarnings = [];
   const optional = url => url ? fetchCSV(url) : Promise.resolve(null);
-  const names = ['Работы живописцев', 'Покупки живописцев', 'Аниматоры', 'Награды аниматоров', 'НБ вручную'];
+  const names = ['Работы живописцев', 'Покупки живописцев', 'Аниматоры', 'Награды аниматоров', 'НБ вручную', 'Оформители', 'Покупки оформителей'];
   const results = await Promise.allSettled([
     fetchCSV(CSV_URL), fetchCSV(PURCHASES_URL), fetchCSV(ANIMATORS_URL),
-    optional(ANIM_PURCHASES_URL), optional(MANUAL_NB_URL)
+    optional(ANIM_PURCHASES_URL), optional(MANUAL_NB_URL),
+    optional(DESIGNERS_URL), optional(DESIGNER_PURCHASES_URL)
   ]);
   const errors = [];
   results.forEach((r, i) => { if (r.status === 'rejected') errors.push(names[i] + ': ' + ((r.reason && r.reason.message) || r.reason)); });
@@ -674,11 +697,15 @@ async function fetchData() {
     if (val(2)) importAnimators(val(2));
     if (val(3)) importAnimatorPurchases(val(3));
     if (val(4)) importManualNb(val(4));
+    if (val(5)) importDesigners(val(5));
+    if (val(6)) importDesignerPurchases(val(6));
   } catch (e) {
     errors.push('Ошибка обработки данных: ' + e.message);
   }
   if (!ANIM_PURCHASES_URL) importWarnings.push('Лист «Награды аниматоров» не подключён: в коде не указан ANIM_PURCHASES_GID.');
   if (!MANUAL_NB_URL) importWarnings.push('Лист «НБ вручную» не подключён: в коде не указан MANUAL_NB_GID.');
+  if (!DESIGNERS_URL) importWarnings.push('Лист «Оформители» не подключён: в коде не указан DESIGNERS_GID.');
+  if (!DESIGNER_PURCHASES_URL) importWarnings.push('Лист «Покупки оформителей» не подключён: в коде не указан DESIGNER_PURCHASES_GID.');
   showWarnings();
   $('loadingOverlay').style.display = 'none';
   if (errors.length) alert('Не удалось загрузить:\n' + errors.join('\n'));
@@ -703,7 +730,7 @@ const ALL_REWARDS = [
   { name: 'Упоминание в блоге', price: 150, isNb: true, spend: false }
 ];
 
-const SPECIAL_REWARDS = ['Костюм живописцев', 'Медаль мероприятия'];
+const SPECIAL_REWARDS = ['Костюм живописцев', 'Костюм оформителей', 'Медаль мероприятия'];
 const SORT_ALL = '<option value="name">По имени</option><option value="points">По баллам ↓</option><option value="date_desc">По дате (сначала новые)</option><option value="date_asc">По дате (сначала старые)</option>';
 const SORT_NP = '<option value="name">По имени</option><option value="points">По баллам ↓</option>';
 
@@ -792,6 +819,20 @@ function updateStats(){ document.querySelector('.stats').classList.toggle('three
     const old = $('artistFilter').value;
     $('artistFilter').innerHTML = '<option value="">Все аниматоры</option>' + animators.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('');
     $('artistFilter').value = old;
+  } else if (view.startsWith('designers')) {
+    $('statLabel1').textContent = "Оформителей";
+    $('statLabel2').textContent = "Работ учтено";
+    $('statLabel3').textContent = "Начислено баллов";
+    $('statLabel4').textContent = "Без работ";
+
+    $('statArtists').textContent = designers.length;
+    $('statWorks').textContent = designerWorks.length;
+    $('statPoints').textContent = designerWorks.reduce((s,w)=>s+(+w.points||0),0);
+    $('statEmpty').textContent = designers.filter(d=>!dWorks(d).length).length;
+
+    const oldD = $('artistFilter').value;
+    $('artistFilter').innerHTML = '<option value="">Все оформители</option>' + designers.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('');
+    $('artistFilter').value = oldD;
   } else {
     $('statLabel1').textContent = "Художников";
     $('statLabel2').textContent = "Работ учтено";
@@ -813,11 +854,12 @@ function render(){
    $('content').innerHTML = WELCOME_HTML;
    return;
  }
- if (['writers','designers'].includes(view)) {
+ if (view === 'writers') {
    $('workspace').style.display = 'none';
    $('content').innerHTML = '';
    return;
  }
+ if (view.startsWith('designers')) { renderDesigners(); return; }
 
  // Блок рендера аниматоров
  if (view.startsWith('animators')) {
@@ -1243,25 +1285,259 @@ function renderRewards() {
   };
 }
 
+
+// ===================== ОФОРМИТЕЛИ =====================
+function dWorks(d){return designerWorks.filter(w=>w.artistId===d.id)}
+function dPoints(d){return dWorks(d).reduce((s,w)=>s+(Number(w.points)||0),0)} // баллы у оформителей не списываются
+
+function designerBoardHTML(a){
+ let aw=dWorks(a);
+ let sortMode = $('sort').value;
+ if (sortMode === 'date_desc') aw.sort((x,y)=>parseDate(y.date)-parseDate(x.date));
+ else if (sortMode === 'date_asc') aw.sort((x,y)=>parseDate(x.date)-parseDate(y.date));
+
+ let tags=(a.profile||'').split(/[,;\n]/).map(x=>x.trim()).filter(Boolean);
+ 
+ let linksHtml = '';
+ if (a.catwar && a.catwar.startsWith('http')) linksHtml += `<a href="${esc(a.catwar)}" target="_blank" rel="noopener">↗ Профиль в игре</a>`;
+ if (a.vk) {
+     let vkUrl = a.vk.startsWith('http') ? a.vk : `https://vk.com/${encodeURI(a.vk)}`;
+     linksHtml += `<a href="${esc(vkUrl)}" target="_blank" rel="noopener">↗ VK</a>`;
+ }
+
+ return `<div class="board">
+ <section class="artist-panel">
+  <div class="artist-hero">
+   <div class="avatar">${a.avatar?`<img src="${esc(a.avatar)}" alt="">`:esc(initials(a))}</div>
+   <div><div class="artist-name">${esc(a.name)}</div><div class="artist-sub">${esc(a.catwar && !a.catwar.startsWith('http') ? a.catwar : '')}</div></div>
+  </div>
+  <div class="links">${linksHtml}</div>
+  <div class="divider"></div>
+  <div><div class="field-label">Профильность</div><div class="bio">${esc(a.bio||'Нет описания.')}</div><div class="chips" style="margin-top:9px">${tags.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}</div></div>
+  <div class="divider"></div>
+  <div class="mini-stats">
+    <div class="mini-stat"><span>Текущие баллы</span><b>${dPoints(a)}</b></div>
+    <div class="mini-stat"><span>Работ</span><b>${aw.length}</b></div>
+  </div>
+ </section>
+ <section class="work-area">
+  <div class="work-head"><h3>Работы</h3><span>${aw.length} шт.</span></div>
+  <div class="work-columns">
+    ${DESIGNER_CATS.map(cat=>{
+      let ws=aw.filter(w=>w.category===cat);
+      let isExpanded = expandedCats[cat] || false;
+      let visibleWorks = isExpanded ? ws : ws.slice(0, 3);
+      let cardsHtml = visibleWorks.map(w=>workCardHTML(w)).join('');
+      let btnHtml = '';
+      if (ws.length > 3) {
+          btnHtml = `<button class="show-more-btn" data-toggle-cat="${esc(cat)}">${isExpanded ? '↑ Свернуть' : `↓ Показать все (${ws.length})`}</button>`;
+      }
+      return `<div class="work-col"><div class="col-title"><span>${esc(cat)}</span><span class="count">${ws.length}</span></div>${ws.length ? cardsHtml + btnHtml : '<div class="empty">Нет работ</div>'}</div>`
+    }).join('')}
+  </div>
+ </section>
+ </div>`;
+}
+
+function renderDesignerArtists(list){
+ $('content').innerHTML=list.length?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px">${list.map(a=>`<div class="artist-panel" style="cursor:pointer" data-open="${a.id}"><div class="artist-hero"><div class="avatar" style="width:55px;height:55px">${a.avatar?`<img src="${esc(a.avatar)}" alt="">`:esc(initials(a))}</div><div><div class="artist-name">${esc(a.name)}</div><div class="artist-sub">${esc(a.catwar && !a.catwar.startsWith('http') ? a.catwar : '')}</div></div></div><div class="bio">${esc(a.bio)}</div><div class="mini-stats"><div class="mini-stat"><span>Баллы</span><b>${dPoints(a)}</b></div><div class="mini-stat"><span>Работы</span><b>${dWorks(a).length}</b></div></div></div>`).join('')}</div>`:'<div class="empty-state"><b>Ничего не найдено</b></div>';
+ document.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>{currentDesigner=el.dataset.open;setView('designers_board')});
+}
+
+function renderDesignerWorks(){
+ let ws=designerWorks.filter(w=>(!$('artistFilter').value||w.artistId===$('artistFilter').value)&&(!slug($('search').value)||slug([w.title,w.category,(designers.find(a=>a.id===w.artistId)||{}).name].join(' ')).includes(slug($('search').value))));
+ 
+ let sortMode = $('sort').value;
+ if (sortMode === 'date_desc') ws.sort((x,y)=>parseDate(y.date)-parseDate(x.date));
+ else if (sortMode === 'date_asc') ws.sort((x,y)=>parseDate(x.date)-parseDate(y.date));
+ else if (sortMode === 'points') ws.sort((x,y)=>y.points - x.points);
+ else if (sortMode === 'name') {
+     ws.sort((x,y)=>{
+         let n1 = (designers.find(a=>a.id===x.artistId)||{}).name || '';
+         let n2 = (designers.find(a=>a.id===y.artistId)||{}).name || '';
+         return n1.localeCompare(n2, 'ru');
+     });
+ }
+
+ $('content').innerHTML=ws.length?`<div style="background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:auto"><table style="border-collapse:collapse;width:100%;min-width:650px"><thead><tr>${['Превью','Оформитель','Работа','Категория','Дата','Баллы'].map(x=>`<th style="text-align:left;padding:12px;border-bottom:1px solid var(--line);font-size:11px;color:var(--muted)">${x}</th>`).join('')}</tr></thead><tbody>${ws.map(w=>{
+  const hasUrl = w.url && /^https?:\/\//i.test(w.url);
+  const thumbCell = hasUrl 
+    ? `<td style="padding:6px 12px;border-bottom:1px solid var(--line)"><img src="${esc(w.url)}" alt="" style="width:56px;height:40px;object-fit:cover;border-radius:5px;background:#f0ebe5" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><span style="display:none;width:56px;height:40px;align-items:center;justify-content:center;color:#b5a99c;background:#f0ebe5;border-radius:5px">🖼</span></td>`
+    : `<td style="padding:6px 12px;border-bottom:1px solid var(--line)"><span style="display:flex;width:56px;height:40px;align-items:center;justify-content:center;color:#b5a99c;background:#f0ebe5;border-radius:5px">🖼</span></td>`;
+  return `<tr>${thumbCell}<td style="padding:12px;border-bottom:1px solid var(--line)">${esc((designers.find(a=>a.id===w.artistId)||{}).name||'—')}</td><td style="padding:12px;border-bottom:1px solid var(--line)">${hasUrl?`<a href="${esc(w.url)}" target="_blank" rel="noopener">${esc(w.title||'Без названия')} ↗</a>`:esc(w.title||'Без названия')}</td><td style="padding:12px;border-bottom:1px solid var(--line)">${esc(w.category)}</td><td style="padding:12px;border-bottom:1px solid var(--line)">${esc(w.date||'—')}</td><td style="padding:12px;border-bottom:1px solid var(--line);font-weight:800;color:var(--green)">+${+w.points||0}</td></tr>`
+}).join('')}</tbody></table></div>`:'<div class="empty-state"><b>Работ пока нет</b>Добавьте первую работу в Google Таблицу.</div>';
+}
+
+function renderDesigners(){
+  $('workspace').style.display = 'block';
+  updateStats();
+  if (view === 'designers_rewards') { renderDesignerRewards(); return; }
+
+  let q = slug($('search').value);
+  let filter = $('artistFilter').value;
+  let spec = norm($('specFilter').value);
+  let sort = $('sort').value;
+
+  let list = designers.filter(d => {
+    if (filter && d.id !== filter) return false;
+    if (q && !slug([d.name, d.catwar, d.vk, d.profile].join(' ')).includes(q)) return false;
+    if (spec && !norm(d.profile).includes(spec)) return false;
+    return true;
+  });
+  list.sort((a,b)=>{
+    if (sort === 'points') return dPoints(b)-dPoints(a);
+    return a.name.localeCompare(b.name,'ru');
+  });
+
+  if (view === 'designers_works') { renderDesignerWorks(); return; }
+  if (view === 'designers_artists') { renderDesignerArtists(list); return; }
+
+  // Доска
+  if (!currentDesigner || !designers.some(d=>d.id===currentDesigner)) currentDesigner = (list[0]||{}).id;
+  if (!list.length) { $('content').innerHTML = '<div class="empty-state"><b>Пока никого нет</b>Попробуйте изменить фильтры или заполните лист «Оформители» в Google Таблице.</div>'; return; }
+  if (!list.some(d=>d.id===currentDesigner)) currentDesigner = list[0].id;
+  if (render.lastArtist !== currentDesigner) { expandedCats = {}; render.lastArtist = currentDesigner; }
+  const d = designers.find(x=>x.id===currentDesigner);
+  $('content').innerHTML = designerBoardHTML(d);
+  bindBoardEvents();
+}
+
+function isDesignerRewardBought(d, title) {
+  return designerPurchases.some(p => p.designerId === d.id && slug(p.rewardName) === slug(title));
+}
+
+function renderDesignerRewards() {
+  let options = '<option value="">Выбрать оформителя</option>';
+  designers.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).forEach(d => {
+    options += `<option value="${d.id}" ${rewardCheckDesignerId === d.id ? 'selected' : ''}>${esc(d.name)}</option>`;
+  });
+  const checked = designers.find(d => d.id === rewardCheckDesignerId);
+  const pts = checked ? dPoints(checked) : 0;
+  const card = makeRewardCard({checked, pts, nb: 0, rawNb: 0, isBoughtFn: t => isDesignerRewardBought(checked, t)});
+
+  $('content').innerHTML = `
+    <div class="info-block" style="padding:15px; margin-bottom:20px; display:flex; align-items:center; gap:15px;">
+      <strong style="font-size:14px;">Проверить доступность наград для:</strong>
+      <select id="rewardDesignerSelect" style="flex:1; max-width:300px; padding:8px;">${options}</select>
+    </div>
+
+    <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--accent); padding-bottom:5px; color:var(--accent);">Награды оформителей</h3>
+    <p style="font-size:12px; color:var(--muted); margin:8px 0 0;">Баллы за награды не списываются: награда выдаётся, когда накоплено нужное количество.</p>
+    <div class="rewards-grid" style="margin-top:15px;">
+      ${card('За проявление творческой жилки', 'Могут получить писатели, оформители, живописцы.', 20, false, 'https://i.ibb.co/CsV1YFWZ/223.png')}
+      ${card('Ачивка оформителей', '', null, false, null)}
+      ${card('Плашка оформителей', '', 40, false, 'https://i.ibb.co/FrxGcgY/image.png')}
+      ${card('Отрядное оформление сокровищницы', '', null, false, 'https://d.zaix.ru/GbGk.png')}
+      ${card('Костюм оформителей', 'Выдается оформителям-активистам сезона [3 месяца]<br>Подробности и условия выдачи можно узнать в Сезонке.', 0, false, 'https://i.ibb.co/RGSbKRTy/1.png')}
+    </div>
+  `;
+  $('rewardDesignerSelect').onchange = (e) => { rewardCheckDesignerId = e.target.value; renderDesignerRewards(); };
+}
+
+function importDesigners(rows){
+ designers=[]; designerWorks=[];
+ if(!rows.length)return;
+ let headers=rows[0].map(norm),idx=makeIdx(headers);
+
+ let ni=idx('имя оформителя','имя художника','имя','оформитель');
+ let avi=idx('аватар');
+ let vi=idx('вк','vk');
+ let ci=idx('catwar');
+ let pi=idx('профильность','спец');
+ let bi=idx('описание','коммент');
+ let wi=idx('название работ','работа','название');
+ let cati=idx('категория','тип');
+ let ui=idx('ссылка на работу','ссылка','url');
+ let di=idx('дата');
+ let pti=idx('баллы','очки');
+ if (ni < 0) { warnMissingColumn('Оформители', 'Имя оформителя'); return; }
+
+ const unknownCats = new Set();
+ rows.slice(1).forEach(r=>{
+  let name=(r[ni]||'').trim();if(!name)return;
+  let catwarValue = ci>=0 ? (r[ci]||'').trim() : '';
+  let d=designers.find(x=>slug(x.name)===slug(name));
+  if(!d){
+    d={
+      id:'d'+designers.length,
+      name,
+      catwar: catwarValue,
+      vk: vi>=0?r[vi]||'':'',
+      profile: pi>=0?r[pi]||'':'',
+      bio: bi>=0?r[bi]||'':'',
+      avatar: avi>=0?r[avi]||'':''
+    };
+    designers.push(d);
+  } else {
+    if (!d.vk && vi>=0) d.vk = r[vi]||'';
+    if (!d.avatar && avi>=0) d.avatar = r[avi]||'';
+    if (!d.catwar && ci>=0) d.catwar = catwarValue;
+  }
+
+  if(wi>=0 && (r[wi]||'').trim()){
+   let category=(cati>=0?r[cati]:'').trim();
+   let known=DESIGNER_CATS.find(c=>norm(c)===norm(category));
+   if(!known){ if(category) unknownCats.add(category); known='Иное'; }
+   designerWorks.push({
+       id:'dw'+designerWorks.length,
+       artistId:d.id,
+       title:r[wi].trim(),
+       category:known,
+       url:ui>=0?r[ui]||'':'',
+       date:di>=0?r[di]||'':'',
+       points:pti>=0?Number(String(r[pti]||'0').replace(',','.'))||0:0
+   });
+  }
+ });
+ warnUnmatched('Оформители', 'категории не из списка (записаны как «Иное»)', unknownCats);
+}
+
+function importDesignerPurchases(rows){
+ designerPurchases=[];
+ if(!rows.length)return;
+ let headers=rows[0].map(norm),idx=makeIdx(headers);
+ let ni=idx('имя оформителя','имя художника','имя','оформитель');
+ let ri=idx('что куплено','что выдано','награда','предмет');
+ if (ni < 0) { warnMissingColumn('Покупки оформителей', 'Имя оформителя'); return; }
+ if (ri < 0) { warnMissingColumn('Покупки оформителей', 'Что куплено'); return; }
+ const unknownNames = new Set(), unknownRewards = new Set();
+ rows.slice(1).forEach(r=>{
+   let name=(r[ni]||'').trim();
+   let rewardName=(r[ri]||'').trim();
+   if(!name||!rewardName)return;
+   let d=designers.find(x=>slug(x.name)===slug(name));
+   if(!d){ unknownNames.add(name); return; }
+   if(!DESIGNER_REWARD_NAMES.some(x=>slug(x)===slug(rewardName))) unknownRewards.add(rewardName);
+   designerPurchases.push({designerId:d.id, rewardName});
+ });
+ warnUnmatched('Покупки оформителей', 'имена не найдены среди оформителей', unknownNames);
+ warnUnmatched('Покупки оформителей', 'названия наград не совпадают с сайтом', unknownRewards);
+}
+
 // Исправление 5: исправлена логика открытия подменю в сайдбаре
 function setView(v){
+  if (v === 'designers') v = 'designers_artists';
   view = v;
   // сбрасываем фильтры и панель, чтобы скрытые фильтры не влияли на другие вкладки
   $('artistFilter').value = ''; $('specFilter').value = ''; $('animSpecFilter').value = '';
+  $('specFilter').innerHTML = v.startsWith('designers') ? SPEC_DESIGNERS : SPEC_PAINTERS; $('specFilter').value = '';
   $('sort').innerHTML = SORT_ALL; $('sort').value = 'name';
   ['sort','artistFilter'].forEach(id => $(id).style.display = 'block');
   ['specFilter','animSpecFilter'].forEach(id => $(id).style.display = 'none');
   const animNav = document.getElementById('animatorsSubNav');
   const paintNav = document.getElementById('paintersSubNav');
+  const designNav = document.getElementById('designersSubNav');
   const menuBtns = document.querySelectorAll('.nav > button');
   const brandTitle = document.getElementById('brandTitle');
   
   // Закрываем все подменю и убираем активный класс у всех кнопок
   animNav.classList.remove('open');
   paintNav.classList.remove('open');
+  designNav.classList.remove('open');
   menuBtns.forEach(b => b.classList.remove('active'));
   animNav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
   paintNav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  designNav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
 
   // Аниматоры
   if (v.startsWith('animators')) {
@@ -1290,6 +1566,41 @@ function setView(v){
     return;
   }
   
+  // Оформители
+  if (['designers_artists', 'designers_board', 'designers_works', 'designers_rewards'].includes(v)) {
+    designNav.classList.add('open');
+    document.getElementById('designersMenuBtn').classList.add('active');
+    designNav.querySelector(`[data-view="${v}"]`).classList.add('active');
+    brandTitle.textContent = 'Оформители';
+
+    $('workspace').style.display = 'block';
+    $('pageTitle').textContent = ({designers_board:'Доска оформителей',designers_artists:'Все оформители',designers_works:'Все работы',designers_rewards:'Награды оформителей'})[v];
+    $('listTitle').textContent = ({designers_board:'Рабочее пространство',designers_artists:'Список оформителей',designers_works:'Реестр работ',designers_rewards:'Награды'})[v];
+    $('listSub').textContent = ({designers_board:'Выберите оформителя',designers_artists:'Нажмите на карточку',designers_works:'Все начисления в одном списке',designers_rewards:'Информация о наградах и баллах'})[v];
+
+    document.querySelector('.toolbar').style.display = v === 'designers_rewards' ? 'none' : 'flex';
+    $('animSpecFilter').style.display = 'none';
+
+    if (v === 'designers_board') {
+        $('specFilter').style.display = 'none';
+        $('sort').style.display = 'none';
+        $('artistFilter').style.display = 'block';
+    } else if (v === 'designers_artists') {
+        $('specFilter').style.display = 'block';
+        $('sort').style.display = 'block';
+        $('artistFilter').style.display = 'none';
+        $('sort').innerHTML = SORT_NP;
+    } else if (v === 'designers_works') {
+        $('specFilter').style.display = 'none';
+        $('sort').style.display = 'block';
+        $('artistFilter').style.display = 'block';
+    }
+    document.querySelector('.stats').style.display = v === 'designers_artists' ? 'grid' : 'none';
+
+    render();
+    return;
+  }
+
   // Живописцы
   if (['artists', 'board', 'works', 'rewards'].includes(v)) {
     paintNav.classList.add('open');
@@ -1345,7 +1656,6 @@ function setView(v){
   }
 
   if (v === 'writers') brandTitle.textContent = 'Писатели';
-  else if (v === 'designers') brandTitle.textContent = 'Оформители';
   
   $('workspace').style.display = 'none';
   $('content').innerHTML = '';
