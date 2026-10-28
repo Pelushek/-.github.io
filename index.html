@@ -43,6 +43,7 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
 .reward-card.available {border: 2px solid var(--green); background: #f4f9f4; box-shadow: 0 4px 12px rgba(100, 123, 98, 0.15);}
 .reward-card.available::after {content: "✓ ДОСТУПНО"; position: absolute; top: -10px; right: 10px; background: var(--green); color: white; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 12px; letter-spacing: 0.5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); z-index: 2;}
 .reward-card.bought {opacity: 0.7; border-color: #ccc; background: #f9f9f9;}
+.reward-card.bought.repeat {opacity: 1;}
 .reward-card.bought::after {content: "УЖЕ КУПЛЕНО"; position: absolute; top: -10px; right: 10px; background: #888; color: white; font-size: 10px; font-weight: 800; padding: 3px 8px; border-radius: 12px; letter-spacing: 0.5px;}
 .reward-img{width:80px;height:80px;flex:none;border-radius:8px;background:#f0ebe5;object-fit:contain;border:1px solid var(--line);padding:4px;display:flex;align-items:center;justify-content:center;color:#b5a99c;font-size:12px;text-align:center;}
 .reward-info{flex:1;min-width:0}
@@ -706,6 +707,11 @@ const SPECIAL_REWARDS = ['Костюм живописцев', 'Медаль ме
 const SORT_ALL = '<option value="name">По имени</option><option value="points">По баллам ↓</option><option value="date_desc">По дате (сначала новые)</option><option value="date_asc">По дате (сначала старые)</option>';
 const SORT_NP = '<option value="name">По имени</option><option value="points">По баллам ↓</option>';
 
+function rewardBoughtCount(a, title) {
+  return purchases.filter(p => p.artistId === a.id && slug(p.rewardName) === slug(title))
+                  .reduce((s, p) => s + (p.qty || 1), 0);
+}
+
 function isRewardBought(a, title) {
   const def = ALL_REWARDS.find(r => slug(r.name) === slug(title));
   if (def && def.repeat) return false;
@@ -724,6 +730,9 @@ function makeRewardCard(ctx) {
     const isTbd = price == null;
 
     if (ctx.checked) isBought = ctx.isBoughtFn(title);
+    // повторяемые награды: считаем, сколько раз уже куплено
+    const timesBought = (ctx.checked && ctx.countFn) ? ctx.countFn(title) : 0;
+    const boughtBefore = !isBought && timesBought > 0;
 
     if (isTbd) {
       statusHtml = `<div class="reward-status status-no" style="background:#f0f0f0; color:#666; border-color:#ddd;">Цена уточняется</div>`;
@@ -738,12 +747,15 @@ function makeRewardCard(ctx) {
       statusHtml = avail ? `` : `<div class="reward-status status-no">До награды: не хватает ${Math.round((price - currentValue) * 10) / 10} ${typeName}</div>`;
     }
 
+    if (boughtBefore) statusHtml = `<div class="reward-status" style="display:inline-block; margin-top:8px; padding:5px 8px; border-radius:6px; font-size:11px; font-weight:700; background:#eee; color:#555;">Куплено: ${timesBought}${avail ? ' · можно взять ещё' : ''}</div>` + statusHtml;
+
     let imgHtml = imgUrl ? `<img src="${esc(imgUrl)}" class="reward-img" alt="">` : `<div class="reward-img">Нет фото</div>`;
     let descHtml = desc ? `<div class="reward-desc">${desc}</div>` : '';
 
     let cardClass = 'reward-card';
     if (avail && !isBought) cardClass += ' available';
     if (isBought) cardClass += ' bought';
+    else if (boughtBefore) cardClass += ' bought repeat';
 
     let priceDisplay = isTbd
       ? `<span style="font-weight:400; font-size:11px; color:var(--muted);">Цена: уточняется</span>`
@@ -1011,7 +1023,7 @@ function renderAnimatorRewards() {
   let aNb = 0;
   let aRawNb = 0;
 
-  const card = makeRewardCard({checked: checkedArtist, pts: aPts, nb: aNb, rawNb: aRawNb, isBoughtFn: t => isRewardBought(checkedArtist, t)});
+  const card = makeRewardCard({checked: checkedArtist, pts: aPts, nb: aNb, rawNb: aRawNb, isBoughtFn: t => isRewardBought(checkedArtist, t), countFn: t => rewardBoughtCount(checkedArtist, t)});
 
   let html = `
     <div class="info-block" style="padding:15px; margin-bottom:20px; display:flex; align-items:center; gap:15px;">
