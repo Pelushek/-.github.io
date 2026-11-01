@@ -133,7 +133,14 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
      <button data-view="designers_rewards"><span class="ico">★</span><span class="nav-text">Награды</span></button>
    </div>
 
-   <button data-view="writers"><span class="nav-text">Писатели</span></button>
+   <!-- Писатели -->
+   <button id="writersMenuBtn" data-view="writers_artists"><span class="nav-text">Писатели</span></button>
+   <div class="sub-nav" id="writersSubNav">
+     <button data-view="writers_artists"><span class="ico">♙</span><span class="nav-text">Писатели</span></button>
+     <button data-view="writers_board"><span class="ico">▦</span><span class="nav-text">Доска</span></button>
+     <button data-view="writers_works"><span class="ico">✎</span><span class="nav-text">Все работы</span></button>
+     <button data-view="writers_rewards"><span class="ico">★</span><span class="nav-text">Награды</span></button>
+   </div>
    
  </nav></div>
  
@@ -218,12 +225,33 @@ const DESIGNER_PURCHASES_GID = '1309502360';
 const DESIGNERS_URL = DESIGNERS_GID ? SHEET_BASE + DESIGNERS_GID : '';
 const DESIGNER_PURCHASES_URL = DESIGNER_PURCHASES_GID ? SHEET_BASE + DESIGNER_PURCHASES_GID : '';
 
+// ⚠️ ПИСАТЕЛИ: впишите gid двух новых листов. Пока gid пустой — лист пропускается (появится жёлтая плашка).
+// Лист «Писатели» (работы: объём в словах / строках стиха)
+const WRITERS_GID = '659295003';
+// Лист «Покупки писателей» (кому что выдано)
+const WRITER_PURCHASES_GID = '2073433252';
+const WRITERS_URL = WRITERS_GID ? SHEET_BASE + WRITERS_GID : '';
+const WRITER_PURCHASES_URL = WRITER_PURCHASES_GID ? SHEET_BASE + WRITER_PURCHASES_GID : '';
+
+// Расчёт баллов писателей: 1 балл за каждые 100 слов или 4 строки стиха.
+const WRITER_WORDS_PER_POINT = 100;
+const WRITER_LINES_PER_POINT = 4;
+// Округление по каждой работе. Math.floor — считаются только полные сотни слов / четвёрки строк
+// (250 слов = 2 балла). Чтобы считать дробно (250 слов = 2.5), замените на: x => Math.round(x * 10) / 10
+const writerRound = Math.floor;
+function writerPoints(words, lines) {
+  return writerRound(words / WRITER_WORDS_PER_POINT) + writerRound(lines / WRITER_LINES_PER_POINT);
+}
+
 const CATS=['Фон с нуля','Украш. фон','Костюм фулл & боты','Костюм','Предметы','Медаль','Шапка','Иное'];
 let artists=[], works=[], purchases=[], currentArtist=null, view='';
 let animators=[], animatorEvents=[], currentAnimator=null;
 let animatorPurchases=[], manualNb=[];
 let designers=[], designerWorks=[], designerPurchases=[], currentDesigner=null;
+let writers=[], writerWorks=[], writerPurchases=[], currentWriter=null;
 const SPEC_PAINTERS=document.getElementById('specFilter').innerHTML;
+const WRITER_CATS=['Работы'];
+const WRITER_REWARD_NAMES=['За проявление творческой жилки','Ачивка писателей','Плашка писателей','Отрядное оформление сокровищницы','Костюм писателей'];
 const DESIGNER_CATS=['Осебе','Баннеры','Таблицы','Гугл-документы','Блоги','Уроки','Иное'];
 const DESIGNER_REWARD_NAMES=['За проявление творческой жилки','Ачивка оформителей','Плашка оформителей','Отрядное оформление сокровищницы','Костюм оформителей'];
 const SPEC_DESIGNERS='<option value="">Все специальности</option><option value="осебе">Осебе</option><option value="баннер">Баннеры</option><option value="таблиц">Таблицы</option><option value="гугл">Гугл-документы</option><option value="блог">Блоги</option><option value="урок">Уроки</option><option value="иное">Иное</option>';
@@ -247,6 +275,7 @@ let expandedCats = {};
 let rewardCheckArtistId = ''; 
 let rewardCheckAnimatorId = '';
 let rewardCheckDesignerId = '';
+let rewardCheckWriterId = '';
 
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -681,11 +710,12 @@ async function fetchData() {
   $('loadingOverlay').style.display = 'flex';
   importWarnings = [];
   const optional = url => url ? fetchCSV(url) : Promise.resolve(null);
-  const names = ['Работы живописцев', 'Покупки живописцев', 'Аниматоры', 'Награды аниматоров', 'НБ вручную', 'Оформители', 'Покупки оформителей'];
+  const names = ['Работы живописцев', 'Покупки живописцев', 'Аниматоры', 'Награды аниматоров', 'НБ вручную', 'Оформители', 'Покупки оформителей', 'Писатели', 'Покупки писателей'];
   const results = await Promise.allSettled([
     fetchCSV(CSV_URL), fetchCSV(PURCHASES_URL), fetchCSV(ANIMATORS_URL),
     optional(ANIM_PURCHASES_URL), optional(MANUAL_NB_URL),
-    optional(DESIGNERS_URL), optional(DESIGNER_PURCHASES_URL)
+    optional(DESIGNERS_URL), optional(DESIGNER_PURCHASES_URL),
+    optional(WRITERS_URL), optional(WRITER_PURCHASES_URL)
   ]);
   const errors = [];
   results.forEach((r, i) => { if (r.status === 'rejected') errors.push(names[i] + ': ' + ((r.reason && r.reason.message) || r.reason)); });
@@ -699,6 +729,8 @@ async function fetchData() {
     if (val(4)) importManualNb(val(4));
     if (val(5)) importDesigners(val(5));
     if (val(6)) importDesignerPurchases(val(6));
+    if (val(7)) importWriters(val(7));
+    if (val(8)) importWriterPurchases(val(8));
   } catch (e) {
     errors.push('Ошибка обработки данных: ' + e.message);
   }
@@ -706,6 +738,8 @@ async function fetchData() {
   if (!MANUAL_NB_URL) importWarnings.push('Лист «НБ вручную» не подключён: в коде не указан MANUAL_NB_GID.');
   if (!DESIGNERS_URL) importWarnings.push('Лист «Оформители» не подключён: в коде не указан DESIGNERS_GID.');
   if (!DESIGNER_PURCHASES_URL) importWarnings.push('Лист «Покупки оформителей» не подключён: в коде не указан DESIGNER_PURCHASES_GID.');
+  if (!WRITERS_URL) importWarnings.push('Лист «Писатели» не подключён: в коде не указан WRITERS_GID.');
+  if (!WRITER_PURCHASES_URL) importWarnings.push('Лист «Покупки писателей» не подключён: в коде не указан WRITER_PURCHASES_GID.');
   showWarnings();
   $('loadingOverlay').style.display = 'none';
   if (errors.length) alert('Не удалось загрузить:\n' + errors.join('\n'));
@@ -730,7 +764,7 @@ const ALL_REWARDS = [
   { name: 'Упоминание в блоге', price: 150, isNb: true, spend: false }
 ];
 
-const SPECIAL_REWARDS = ['Костюм живописцев', 'Костюм оформителей', 'Медаль мероприятия'];
+const SPECIAL_REWARDS = ['Костюм живописцев', 'Костюм оформителей', 'Костюм писателей', 'Медаль мероприятия'];
 const SORT_ALL = '<option value="name">По имени</option><option value="points">По баллам ↓</option><option value="date_desc">По дате (сначала новые)</option><option value="date_asc">По дате (сначала старые)</option>';
 const SORT_NP = '<option value="name">По имени</option><option value="points">По баллам ↓</option>';
 
@@ -819,6 +853,20 @@ function updateStats(){ document.querySelector('.stats').classList.toggle('three
     const old = $('artistFilter').value;
     $('artistFilter').innerHTML = '<option value="">Все аниматоры</option>' + animators.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('');
     $('artistFilter').value = old;
+  } else if (view.startsWith('writers')) {
+    $('statLabel1').textContent = "Писателей";
+    $('statLabel2').textContent = "Работ учтено";
+    $('statLabel3').textContent = "Начислено баллов";
+    $('statLabel4').textContent = "Без работ";
+
+    $('statArtists').textContent = writers.length;
+    $('statWorks').textContent = writerWorks.length;
+    $('statPoints').textContent = writerWorks.reduce((s,w)=>s+(+w.points||0),0);
+    $('statEmpty').textContent = writers.filter(d=>!wWorks(d).length).length;
+
+    const oldW = $('artistFilter').value;
+    $('artistFilter').innerHTML = '<option value="">Все писатели</option>' + writers.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).map(a=>`<option value="${a.id}">${esc(a.name)}</option>`).join('');
+    $('artistFilter').value = oldW;
   } else if (view.startsWith('designers')) {
     $('statLabel1').textContent = "Оформителей";
     $('statLabel2').textContent = "Работ учтено";
@@ -854,11 +902,7 @@ function render(){
    $('content').innerHTML = WELCOME_HTML;
    return;
  }
- if (view === 'writers') {
-   $('workspace').style.display = 'none';
-   $('content').innerHTML = '';
-   return;
- }
+ if (view.startsWith('writers')) { renderWriters(); return; }
  if (view.startsWith('designers')) { renderDesigners(); return; }
 
  // Блок рендера аниматоров
@@ -1539,9 +1583,255 @@ function importDesignerPurchases(rows){
  warnUnmatched('Покупки оформителей', 'названия наград не совпадают с сайтом', unknownRewards);
 }
 
+// ===================== ПИСАТЕЛИ =====================
+function wWorks(d){return writerWorks.filter(w=>w.artistId===d.id)}
+function wPoints(d){return Math.round(wWorks(d).reduce((s,w)=>s+(Number(w.points)||0),0)*10)/10} // баллы у писателей не списываются
+function writerVolumeText(w){
+  const parts = [];
+  if (w.words) parts.push(`${w.words} сл.`);
+  if (w.lines) parts.push(`${w.lines} стр.`);
+  return parts.join(' · ');
+}
+
+function writerWorkCardHTML(w){
+ const hasUrl = w.url && /^https?:\/\//i.test(w.url);
+ const vol = writerVolumeText(w);
+ return `<div class="work-card">${hasUrl?`<a href="${esc(w.url)}" target="_blank" rel="noopener">${esc(w.title||'Без названия')} ↗</a>`:`<b>${esc(w.title||'Без названия')}</b>`}<div class="meta"><span>${esc([w.date, vol].filter(Boolean).join(' · '))}</span><span class="points">+${+w.points||0}</span></div></div>`;
+}
+
+function writerBoardHTML(a){
+ let aw=wWorks(a);
+ let sortMode = $('sort').value;
+ if (sortMode === 'date_desc') aw.sort((x,y)=>parseDate(y.date)-parseDate(x.date));
+ else if (sortMode === 'date_asc') aw.sort((x,y)=>parseDate(x.date)-parseDate(y.date));
+
+ let linksHtml = '';
+ if (a.catwar && a.catwar.startsWith('http')) linksHtml += `<a href="${esc(a.catwar)}" target="_blank" rel="noopener">↗ Профиль в игре</a>`;
+ if (a.vk) {
+     let vkUrl = a.vk.startsWith('http') ? a.vk : `https://vk.com/${encodeURI(a.vk)}`;
+     linksHtml += `<a href="${esc(vkUrl)}" target="_blank" rel="noopener">↗ VK</a>`;
+ }
+ const totalWords = aw.reduce((s,w)=>s+(w.words||0),0);
+ const totalLines = aw.reduce((s,w)=>s+(w.lines||0),0);
+ const volParts = [];
+ if (totalWords) volParts.push(`${totalWords} слов`);
+ if (totalLines) volParts.push(`${totalLines} строк стиха`);
+
+ const cat = WRITER_CATS[0];
+ const isExpanded = expandedCats[cat] || false;
+ const LIMIT = 6;
+ const visibleWorks = isExpanded ? aw : aw.slice(0, LIMIT);
+ const btnHtml = aw.length > LIMIT
+   ? `<button class="show-more-btn" data-toggle-cat="${esc(cat)}">${isExpanded ? '↑ Свернуть' : `↓ Показать все (${aw.length})`}</button>` : '';
+
+ return `<div class="board">
+ <section class="artist-panel">
+  <div class="artist-hero">
+   <div class="avatar">${a.avatar?`<img src="${esc(a.avatar)}" alt="">`:esc(initials(a))}</div>
+   <div><div class="artist-name">${esc(a.name)}</div><div class="artist-sub">${esc(a.catwar && !a.catwar.startsWith('http') ? a.catwar : '')}</div></div>
+  </div>
+  <div class="links">${linksHtml}</div>
+  <div class="divider"></div>
+  <div><div class="field-label">Описание</div><div class="bio">${esc(a.bio||'Нет описания.')}</div></div>
+  <div class="divider"></div>
+  <div class="mini-stats">
+    <div class="mini-stat"><span>Текущие баллы</span><b>${wPoints(a)}</b></div>
+    <div class="mini-stat"><span>Работ</span><b>${aw.length}</b></div>
+    ${volParts.length ? `<div class="mini-stat full-width"><span>Объём</span><b style="font-size:14px">${esc(volParts.join(' · '))}</b></div>` : ''}
+  </div>
+ </section>
+ <section class="work-area">
+  <div class="work-head"><h3>Работы</h3><span>${aw.length} шт.</span></div>
+  <div class="work-columns" style="grid-template-columns:1fr">
+    <div class="work-col"><div class="col-title"><span>${esc(cat)}</span><span class="count">${aw.length}</span></div>${aw.length ? visibleWorks.map(w=>writerWorkCardHTML(w)).join('') + btnHtml : '<div class="empty">Нет работ</div>'}</div>
+  </div>
+ </section>
+ </div>`;
+}
+
+function renderWriterArtists(list){
+ $('content').innerHTML=list.length?`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px">${list.map(a=>`<div class="artist-panel" style="cursor:pointer" data-open="${a.id}"><div class="artist-hero"><div class="avatar" style="width:55px;height:55px">${a.avatar?`<img src="${esc(a.avatar)}" alt="">`:esc(initials(a))}</div><div><div class="artist-name">${esc(a.name)}</div><div class="artist-sub">${esc(a.catwar && !a.catwar.startsWith('http') ? a.catwar : '')}</div></div></div><div class="bio">${esc(a.bio)}</div><div class="mini-stats"><div class="mini-stat"><span>Баллы</span><b>${wPoints(a)}</b></div><div class="mini-stat"><span>Работы</span><b>${wWorks(a).length}</b></div></div></div>`).join('')}</div>`:'<div class="empty-state"><b>Ничего не найдено</b></div>';
+ document.querySelectorAll('[data-open]').forEach(el=>el.onclick=()=>{currentWriter=el.dataset.open;setView('writers_board')});
+}
+
+function renderWriterWorks(){
+ let q = slug($('search').value);
+ let ws=writerWorks.filter(w=>(!$('artistFilter').value||w.artistId===$('artistFilter').value)&&(!q||slug([w.title,(writers.find(a=>a.id===w.artistId)||{}).name].join(' ')).includes(q)));
+
+ let sortMode = $('sort').value;
+ const nameOf = w => (writers.find(a=>a.id===w.artistId)||{}).name || '';
+ if (sortMode === 'date_desc') ws.sort((x,y)=>parseDate(y.date)-parseDate(x.date));
+ else if (sortMode === 'date_asc') ws.sort((x,y)=>parseDate(x.date)-parseDate(y.date));
+ else if (sortMode === 'points') ws.sort((x,y)=>y.points - x.points);
+ else if (sortMode === 'name') ws.sort((x,y)=>nameOf(x).localeCompare(nameOf(y), 'ru'));
+
+ const td = 'padding:12px;border-bottom:1px solid var(--line)';
+ $('content').innerHTML = ws.length ? `<div style="background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:auto"><table style="border-collapse:collapse;width:100%;min-width:650px"><thead><tr>${['Писатель','Работа','Дата','Объём','Баллы'].map(x=>`<th style="text-align:left;padding:12px;border-bottom:1px solid var(--line);font-size:11px;color:var(--muted)">${x}</th>`).join('')}</tr></thead><tbody>${ws.map(w=>{
+  const hasUrl = w.url && /^https?:\/\//i.test(w.url);
+  return `<tr><td style="${td}">${esc(nameOf(w)||'—')}</td><td style="${td}">${hasUrl?`<a href="${esc(w.url)}" target="_blank" rel="noopener">${esc(w.title||'Без названия')} ↗</a>`:esc(w.title||'Без названия')}</td><td style="${td}">${esc(w.date||'—')}</td><td style="${td}">${esc(writerVolumeText(w)||'—')}</td><td style="${td};font-weight:800;color:var(--green)">+${+w.points||0}</td></tr>`;
+ }).join('')}</tbody></table></div>` : '<div class="empty-state"><b>Работ пока нет</b>Добавьте первую работу в Google Таблицу.</div>';
+}
+
+function renderWriters(){
+  $('workspace').style.display = 'block';
+  updateStats();
+  if (view === 'writers_rewards') { renderWriterRewards(); return; }
+
+  let q = slug($('search').value);
+  let filter = $('artistFilter').value;
+  let sort = $('sort').value;
+
+  let list = writers.filter(d => {
+    if (filter && d.id !== filter) return false;
+    if (q && !slug([d.name, d.catwar, d.vk].join(' ')).includes(q)) return false;
+    return true;
+  });
+  list.sort((a,b)=>{
+    if (sort === 'points') return wPoints(b)-wPoints(a);
+    return a.name.localeCompare(b.name,'ru');
+  });
+
+  if (view === 'writers_works') { renderWriterWorks(); return; }
+  if (view === 'writers_artists') { renderWriterArtists(list); return; }
+
+  // Доска
+  if (!list.length) { $('content').innerHTML = '<div class="empty-state"><b>Пока никого нет</b>Попробуйте изменить фильтры или заполните лист «Писатели» в Google Таблице.</div>'; return; }
+  if (!currentWriter || !list.some(d=>d.id===currentWriter)) currentWriter = list[0].id;
+  if (render.lastArtist !== currentWriter) { expandedCats = {}; render.lastArtist = currentWriter; }
+  const d = writers.find(x=>x.id===currentWriter);
+  $('content').innerHTML = writerBoardHTML(d);
+  bindBoardEvents();
+}
+
+function isWriterRewardBought(d, title) {
+  return writerPurchases.some(p => p.writerId === d.id && slug(p.rewardName) === slug(title));
+}
+
+function renderWriterRewards() {
+  let options = '<option value="">Выбрать писателя</option>';
+  writers.slice().sort((a,b)=>a.name.localeCompare(b.name,'ru')).forEach(d => {
+    options += `<option value="${d.id}" ${rewardCheckWriterId === d.id ? 'selected' : ''}>${esc(d.name)}</option>`;
+  });
+  const checked = writers.find(d => d.id === rewardCheckWriterId);
+  const pts = checked ? wPoints(checked) : 0;
+  const card = makeRewardCard({checked, pts, nb: 0, rawNb: 0, isBoughtFn: t => isWriterRewardBought(checked, t)});
+
+  $('content').innerHTML = `
+    <div class="info-block" style="padding:15px; margin-bottom:20px; display:flex; align-items:center; gap:15px;">
+      <strong style="font-size:14px;">Проверить доступность наград для:</strong>
+      <select id="rewardWriterSelect" style="flex:1; max-width:300px; padding:8px;">${options}</select>
+    </div>
+
+    <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--accent); padding-bottom:5px; color:var(--accent);">Награды писателей</h3>
+    <p style="font-size:12px; color:var(--muted); margin:8px 0 0;">Баллы за награды не списываются: награда выдаётся, когда накоплено нужное количество.</p>
+    <div class="rewards-grid" style="margin-top:15px;">
+      ${card('За проявление творческой жилки', 'Могут получить писатели, оформители, живописцы.', 50, false, 'https://i.ibb.co/CsV1YFWZ/223.png')}
+      ${card('Ачивка писателей', '', null, false, null)}
+      ${card('Плашка писателей', '', 100, false, 'https://i.ibb.co/r2TvbmWW/image.png')}
+      ${card('Отрядное оформление сокровищницы', '', null, false, 'https://d.zaix.ru/GbGk.png')}
+      ${card('Костюм писателей', 'Выдается писателям-активистам сезона [3 месяца]<br>Подробности и условия выдачи можно узнать в Сезонке.', 0, false, 'https://i.ibb.co/WNgYWPyF/3.png')}
+    </div>
+
+    <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--line); padding-bottom:5px;">Информационная сводка</h3>
+    <div class="info-block" style="margin-top:15px;">
+        <h3 style="border-bottom:none; color:var(--accent);">Разбалловка</h3>
+        <ul>
+            <li>Писатели получают по <b>1 баллу</b> за каждые <b>100 слов</b> текста / <b>4 строки</b> стиха.</li>
+            <li>Учитываются работы на съезд, на ивент, для оформления постов по заказу, сборников, текстов в блог и прочее.</li>
+        </ul>
+    </div>
+  `;
+  $('rewardWriterSelect').onchange = (e) => { rewardCheckWriterId = e.target.value; renderWriterRewards(); };
+}
+
+function importWriters(rows){
+ writers=[]; writerWorks=[];
+ if(!rows.length)return;
+ let headers=rows[0].map(norm),idx=makeIdx(headers);
+
+ let ni=idx('имя писателя','имя автора','имя','писатель','автор');
+ let avi=idx('аватар');
+ let vi=idx('вк','vk');
+ let ci=idx('catwar');
+ let bi=idx('описание','коммент');
+ let wi=idx('название работ','работа','название');
+ let ui=headers.findIndex(h=>h==='ссылканаработу');
+ if (ui<0) ui=headers.findIndex(h=>h.startsWith('ссылканаработ') || h==='url' || h==='ссылка');
+ if (ui<0) ui=headers.findIndex(h=>h.includes('ссылка'));
+ let di=idx('дата');
+ let wci=idx('слов','количество слов');
+ let lci=idx('строк','строки','стих');
+ if (ni < 0) { warnMissingColumn('Писатели', 'Имя писателя'); return; }
+ if (wci < 0 && lci < 0) { warnMissingColumn('Писатели', 'Слов / Строк (стих)'); }
+
+ const num = v => Number(String(v||'').replace(/\s/g,'').replace(',','.')) || 0;
+ const noVolume = new Set();
+ rows.slice(1).forEach(r=>{
+  let name=(r[ni]||'').trim();if(!name)return;
+  let catwarValue = ci>=0 ? (r[ci]||'').trim() : '';
+  let d=writers.find(x=>slug(x.name)===slug(name));
+  if(!d){
+    d={
+      id:'p'+writers.length,
+      name,
+      catwar: catwarValue,
+      vk: vi>=0?r[vi]||'':'',
+      bio: bi>=0?r[bi]||'':'',
+      avatar: avi>=0?r[avi]||'':''
+    };
+    writers.push(d);
+  } else {
+    if (!d.vk && vi>=0) d.vk = r[vi]||'';
+    if (!d.avatar && avi>=0) d.avatar = r[avi]||'';
+    if (!d.catwar && ci>=0) d.catwar = catwarValue;
+    if (!d.bio && bi>=0) d.bio = r[bi]||'';
+  }
+
+  if(wi>=0 && (r[wi]||'').trim()){
+   let words = wci>=0 ? num(r[wci]) : 0;
+   let lines = lci>=0 ? num(r[lci]) : 0;
+   if (!words && !lines) noVolume.add(r[wi].trim());
+   writerWorks.push({
+       id:'pw'+writerWorks.length,
+       artistId:d.id,
+       title:r[wi].trim(),
+       category:WRITER_CATS[0],
+       url:ui>=0?(r[ui]||'').trim():'',
+       date:di>=0?r[di]||'':'',
+       words, lines,
+       points: writerPoints(words, lines)
+   });
+  }
+ });
+ warnUnmatched('Писатели', 'у работ не указан объём, баллы = 0', noVolume);
+}
+
+function importWriterPurchases(rows){
+ writerPurchases=[];
+ if(!rows.length)return;
+ let headers=rows[0].map(norm),idx=makeIdx(headers);
+ let ni=idx('имя писателя','имя автора','имя','писатель','автор');
+ let ri=idx('что куплено','что выдано','награда','предмет');
+ if (ni < 0) { warnMissingColumn('Покупки писателей', 'Имя писателя'); return; }
+ if (ri < 0) { warnMissingColumn('Покупки писателей', 'Что куплено'); return; }
+ const unknownNames = new Set(), unknownRewards = new Set();
+ rows.slice(1).forEach(r=>{
+   let name=(r[ni]||'').trim();
+   let rewardName=(r[ri]||'').trim();
+   if(!name||!rewardName)return;
+   let d=writers.find(x=>slug(x.name)===slug(name));
+   if(!d){ unknownNames.add(name); return; }
+   if(!WRITER_REWARD_NAMES.some(x=>slug(x)===slug(rewardName))) unknownRewards.add(rewardName);
+   writerPurchases.push({writerId:d.id, rewardName});
+ });
+ warnUnmatched('Покупки писателей', 'имена не найдены среди писателей', unknownNames);
+ warnUnmatched('Покупки писателей', 'названия наград не совпадают с сайтом', unknownRewards);
+}
+
 // Исправление 5: исправлена логика открытия подменю в сайдбаре
 function setView(v){
   if (v === 'designers') v = 'designers_artists';
+  if (v === 'writers') v = 'writers_artists';
   view = v;
   // сбрасываем фильтры и панель, чтобы скрытые фильтры не влияли на другие вкладки
   $('artistFilter').value = ''; $('specFilter').value = ''; $('animSpecFilter').value = '';
@@ -1552,6 +1842,7 @@ function setView(v){
   const animNav = document.getElementById('animatorsSubNav');
   const paintNav = document.getElementById('paintersSubNav');
   const designNav = document.getElementById('designersSubNav');
+  const writeNav = document.getElementById('writersSubNav');
   const menuBtns = document.querySelectorAll('.nav > button');
   const brandTitle = document.getElementById('brandTitle');
   
@@ -1559,10 +1850,12 @@ function setView(v){
   animNav.classList.remove('open');
   paintNav.classList.remove('open');
   designNav.classList.remove('open');
+  writeNav.classList.remove('open');
   menuBtns.forEach(b => b.classList.remove('active'));
   animNav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
   paintNav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
   designNav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  writeNav.querySelectorAll('button').forEach(b => b.classList.remove('active'));
 
   // Аниматоры
   if (v.startsWith('animators')) {
@@ -1626,6 +1919,39 @@ function setView(v){
     return;
   }
 
+  // Писатели
+  if (['writers_artists', 'writers_board', 'writers_works', 'writers_rewards'].includes(v)) {
+    writeNav.classList.add('open');
+    document.getElementById('writersMenuBtn').classList.add('active');
+    writeNav.querySelector(`[data-view="${v}"]`).classList.add('active');
+    brandTitle.textContent = 'Писатели';
+
+    $('workspace').style.display = 'block';
+    $('pageTitle').textContent = ({writers_board:'Доска писателей',writers_artists:'Все писатели',writers_works:'Все работы',writers_rewards:'Награды писателей'})[v];
+    $('listTitle').textContent = ({writers_board:'Рабочее пространство',writers_artists:'Список писателей',writers_works:'Реестр работ',writers_rewards:'Награды'})[v];
+    $('listSub').textContent = ({writers_board:'Выберите писателя',writers_artists:'Нажмите на карточку',writers_works:'Все начисления в одном списке',writers_rewards:'Информация о наградах и баллах'})[v];
+
+    document.querySelector('.toolbar').style.display = v === 'writers_rewards' ? 'none' : 'flex';
+    $('animSpecFilter').style.display = 'none';
+    $('specFilter').style.display = 'none'; // у писателей нет профильности
+
+    if (v === 'writers_board') {
+        $('sort').style.display = 'none';
+        $('artistFilter').style.display = 'block';
+    } else if (v === 'writers_artists') {
+        $('sort').style.display = 'block';
+        $('artistFilter').style.display = 'none';
+        $('sort').innerHTML = SORT_NP;
+    } else if (v === 'writers_works') {
+        $('sort').style.display = 'block';
+        $('artistFilter').style.display = 'block';
+    }
+    document.querySelector('.stats').style.display = v === 'writers_artists' ? 'grid' : 'none';
+
+    render();
+    return;
+  }
+
   // Живописцы
   if (['artists', 'board', 'works', 'rewards'].includes(v)) {
     paintNav.classList.add('open');
@@ -1680,7 +2006,6 @@ function setView(v){
     return;
   }
 
-  if (v === 'writers') brandTitle.textContent = 'Писатели';
   
   $('workspace').style.display = 'none';
   $('content').innerHTML = '';
