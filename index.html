@@ -1990,7 +1990,7 @@ function seasonWinnersHTML(sObj, branch, showPending = false) {
   if (!list.length) return '<span style="color:var(--muted)">—</span>';
   return list.map(r => {
     const issued = seasonIssued(branch, r.person, sObj.info);
-    const status = issued ? `<span class="sbadge">✓ выдан</span>` : (showPending ? `<span class="sbadge gray">ожидает выдачи</span>` : '');
+    const status = issued ? `<span class="sbadge">✓ выдан</span>` : (showPending && seasonStatus(sObj.info, new Date()) === 'issuing' ? `<span class="sbadge gray">ожидает выдачи</span>` : '');
     return `<div style="margin:2px 0"><b>${esc(r.person.name)}</b> <span class="sbadge">${esc(sObj.winners.get(r.person.id).map(x => SEASON_REASON[x]).join(' · '))}</span> ${status}</div>`;
   }).join('');
 }
@@ -2041,7 +2041,7 @@ function renderSeasons() {
 
   const rows = sel.rows.length ? sel.rows.map((r, i) => {
     const w = sel.winners.get(r.person.id);
-    return `<tr class="${w ? 'win' : ''}"><td>${i + 1}</td><td><b>${esc(r.person.name)}</b></td><td>${r.points}</td><td>${r.count}</td><td>${w ? `<span class="sbadge">✓ активист</span> <span style="font-size:11px;color:var(--muted)">${esc(w.map(x => SEASON_REASON[x]).join(' · '))}</span> <span class="sbadge ${seasonIssued(seasonBranch,r.person,sel.info) ? '' : 'gray'}">${seasonIssued(seasonBranch,r.person,sel.info) ? 'выдан' : 'не выдан'}</span>` : ''}</td></tr>`;
+    return `<tr class="${w ? 'win' : ''}"><td>${i + 1}</td><td><b>${esc(r.person.name)}</b></td><td>${r.points}</td><td>${r.count}</td><td>${w ? `<span class="sbadge">✓ активист</span> <span style="font-size:11px;color:var(--muted)">${esc(w.map(x => SEASON_REASON[x]).join(' · '))}</span> ${seasonIssued(seasonBranch,r.person,sel.info) ? `<span class="sbadge">выдан</span>` : (selStatus === 'issuing' ? `<span class="sbadge gray">не выдан</span>` : '')}` : ''}</td></tr>`;
   }).join('') : `<tr><td colspan="5" style="color:var(--muted)">В этом сезоне пока нет работ с датой.</td></tr>`;
 
   const history = all.map(x => {
