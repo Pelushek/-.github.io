@@ -1985,10 +1985,14 @@ function seasonCostumeHit(branch, person, title) {
   return { title: seasonTitle(prev), issue: seasonFmt(prev.issue), reasons: why.map(x => SEASON_REASON[x]).join(', '), issued: seasonIssued(branch, person, prev) };
 }
 
-function seasonWinnersHTML(sObj, branch) {
+function seasonWinnersHTML(sObj, branch, showPending = false) {
   const list = sObj.rows.filter(r => sObj.winners.has(r.person.id));
   if (!list.length) return '<span style="color:var(--muted)">—</span>';
-  return list.map(r => { const issued = seasonIssued(branch, r.person, sObj.info); return `<div style="margin:2px 0"><b>${esc(r.person.name)}</b> <span class="sbadge">${esc(sObj.winners.get(r.person.id).map(x => SEASON_REASON[x]).join(' · '))}</span> <span class="sbadge ${issued ? '' : 'gray'}">${issued ? '✓ выдан' : 'ожидает выдачи'}</span></div>`; }).join('');
+  return list.map(r => {
+    const issued = seasonIssued(branch, r.person, sObj.info);
+    const status = issued ? `<span class="sbadge">✓ выдан</span>` : (showPending ? `<span class="sbadge gray">ожидает выдачи</span>` : '');
+    return `<div style="margin:2px 0"><b>${esc(r.person.name)}</b> <span class="sbadge">${esc(sObj.winners.get(r.person.id).map(x => SEASON_REASON[x]).join(' · '))}</span> ${status}</div>`;
+  }).join('');
 }
 
 function setSeasonBranch(b) { seasonBranch = b; seasonSel = ''; renderSeasons(); }
@@ -2010,12 +2014,12 @@ function renderSeasons() {
       <h3 style="border-bottom:none; color:var(--accent); margin-bottom:8px">${esc(cfg.label)}</h3>
       <div style="${issuing ? 'background:#e8f5e9;border-radius:8px;padding:8px 10px;margin-bottom:10px' : 'margin-bottom:10px'}">
         <div style="font-size:12px;color:var(--muted)">${issuing ? '✓ К выдаче' : 'Прошлый сезон'} · ${esc(seasonTitle(prev))} (${esc(seasonPeriod(prev))})${issuing ? ` · выдача с ${seasonFmt(prev.issue)}` : ''}</div>
-        ${seasonWinnersHTML(prevS, b)}
+        ${seasonWinnersHTML(prevS, b, issuing)}
       </div>
       <div>
         <div style="font-size:12px;color:var(--muted)">Идёт · ${esc(seasonTitle(cur))} (${esc(seasonPeriod(cur))}) · выдача ${seasonFmt(cur.issue)}</div>
         <div style="font-size:12px;margin-top:2px">Лидеры сейчас:</div>
-        ${seasonWinnersHTML(curS, b)}
+        ${seasonWinnersHTML(curS, b, false)}
       </div>
     </div>`;
   }).join('');
