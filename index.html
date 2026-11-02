@@ -815,7 +815,7 @@ function makeRewardCard(ctx) {
     } else if (isSpecial) {
       if (seasonHit) {
         avail = true;
-        statusHtml = `<div class="reward-status status-avail" style="display:block; background:#e8f5e9; color:#2e7d32; padding:5px; border-radius:6px; margin-top:8px;">Активист сезона «${esc(seasonHit.title)}» (${esc(seasonHit.reasons)}). Костюм выдаётся с ${esc(seasonHit.issue)}${isBought ? '. В таблице уже есть запись о костюме.' : '.'}</div>`;
+        statusHtml = `<div class="reward-status status-avail" style="display:block; background:#e8f5e9; color:#2e7d32; padding:5px; border-radius:6px; margin-top:8px;">Активист сезона «${esc(seasonHit.title)}» (${esc(seasonHit.reasons)}). Костюм выдаётся с ${esc(seasonHit.issue)}${seasonHit.issued ? ' · ✓ Выдан' : ' · Ожидает выдачи'}.</div>`;
       } else if (isBought) {
         statusHtml = `<div class="reward-status status-avail" style="display:block; background:#e8f5e9; color:#2e7d32; padding:5px; border-radius:6px; margin-top:8px;">Выдан (внесен в таблицу)</div>`;
       } else {
@@ -1586,6 +1586,7 @@ function importDesignerPurchases(rows){
  let headers=rows[0].map(norm),idx=makeIdx(headers);
  let ni=idx('имя оформителя','имя художника','имя','оформитель');
  let ri=idx('что куплено','что выдано','награда','предмет');
+ let di=idx('дата выдачи','дата'); let si=idx('статус','состояние');
  if (ni < 0) { warnMissingColumn('Покупки оформителей', 'Имя оформителя'); return; }
  if (ri < 0) { warnMissingColumn('Покупки оформителей', 'Что куплено'); return; }
  const unknownNames = new Set(), unknownRewards = new Set();
@@ -1596,7 +1597,7 @@ function importDesignerPurchases(rows){
    let d=designers.find(x=>slug(x.name)===slug(name));
    if(!d){ unknownNames.add(name); return; }
    if(!DESIGNER_REWARD_NAMES.some(x=>slug(x)===slug(rewardName))) unknownRewards.add(rewardName);
-   designerPurchases.push({designerId:d.id, rewardName});
+   designerPurchases.push({designerId:d.id, rewardName, issuedDate:di>=0?(r[di]||'').trim():'', status:si>=0?(r[si]||'').trim():''});
  });
  warnUnmatched('Покупки оформителей', 'имена не найдены среди оформителей', unknownNames);
  warnUnmatched('Покупки оформителей', 'названия наград не совпадают с сайтом', unknownRewards);
@@ -1831,6 +1832,7 @@ function importWriterPurchases(rows){
  let headers=rows[0].map(norm),idx=makeIdx(headers);
  let ni=idx('имя писателя','имя автора','имя','писатель','автор');
  let ri=idx('что куплено','что выдано','награда','предмет');
+ let di=idx('дата выдачи','дата'); let si=idx('статус','состояние');
  if (ni < 0) { warnMissingColumn('Покупки писателей', 'Имя писателя'); return; }
  if (ri < 0) { warnMissingColumn('Покупки писателей', 'Что куплено'); return; }
  const unknownNames = new Set(), unknownRewards = new Set();
@@ -1841,7 +1843,7 @@ function importWriterPurchases(rows){
    let d=writers.find(x=>slug(x.name)===slug(name));
    if(!d){ unknownNames.add(name); return; }
    if(!WRITER_REWARD_NAMES.some(x=>slug(x)===slug(rewardName))) unknownRewards.add(rewardName);
-   writerPurchases.push({writerId:d.id, rewardName});
+   writerPurchases.push({writerId:d.id, rewardName, issuedDate:di>=0?(r[di]||'').trim():'', status:si>=0?(r[si]||'').trim():''});
  });
  warnUnmatched('Покупки писателей', 'имена не найдены среди писателей', unknownNames);
  warnUnmatched('Покупки писателей', 'названия наград не совпадают с сайтом', unknownRewards);
@@ -1905,26 +1907,21 @@ function seasonStatus(info, now) {
   return 'done';
 }
 
-// Активисты: 1) больше всех баллов; 2) больше всех работ, а если это тот же человек — следующий по баллам.
-// Ничья — костюм получают все, кто разделил место.
+// Активисты: первый слот — максимум баллов; второй — максимум работ среди остальных.
+// Если число работ одинаковое, внутри этой группы решают баллы; ничья по баллам сохраняется.
 function seasonPickWinners(rows) {
   const res = new Map();
   const add = (r, why) => { if (!res.has(r.person.id)) res.set(r.person.id, []); const a = res.get(r.person.id); if (!a.includes(why)) a.push(why); };
   const act = rows.filter(r => r.count > 0);
   if (!act.length) return res;
   const maxP = Math.max(...act.map(r => r.points));
-  if (maxP > 0) act.filter(r => r.points === maxP).forEach(r => add(r, 'points'));
-  const maxC = Math.max(...act.map(r => r.count));
-  const wl = act.filter(r => r.count === maxC);
-  const fresh = wl.filter(r => !res.has(r.person.id));
-  wl.forEach(r => add(r, 'works'));
-  if (!fresh.length) {
-    const rest = act.filter(r => !res.has(r.person.id));
-    if (rest.length) {
-      const maxR = Math.max(...rest.map(r => r.points));
-      if (maxR > 0) rest.filter(r => r.points === maxR).forEach(r => add(r, 'next'));
-    }
-  }
+  act.filter(r => r.points === maxP).forEach(r => add(r, 'points'));
+  const rest = act.filter(r => !res.has(r.person.id));
+  if (!rest.length) return res;
+  const maxC = Math.max(...rest.map(r => r.count));
+  const workLeaders = rest.filter(r => r.count === maxC);
+  const maxWorkPoints = Math.max(...workLeaders.map(r => r.points));
+  workLeaders.filter(r => r.points === maxWorkPoints).forEach(r => add(r, 'works'));
   return res;
 }
 
@@ -1961,6 +1958,18 @@ function seasonCalc(branch) {
   return map;
 }
 
+// Фактическая выдача: статус «Выдан» + дата выдачи совпадает с датой сезона.
+function seasonIssued(branch, person, season) {
+  const cfg = SEASON_BRANCHES[branch];
+  const list = branch === 'painters' ? purchases : branch === 'designers' ? designerPurchases : writerPurchases;
+  const idKey = branch === 'painters' ? 'artistId' : branch === 'designers' ? 'designerId' : 'writerId';
+  return list.some(p => {
+    if (p[idKey] !== person.id || slug(p.rewardName) !== slug(cfg.costume) || slug(p.status) !== slug('Выдан')) return false;
+    const d = seasonDateParts(p.issuedDate); if (!d || d.y !== season.issue.getFullYear() || d.m !== season.issue.getMonth()+1) return false;
+    const day = String(p.issuedDate).match(/^(\d{1,2})/); return day && Number(day[1]) === season.issue.getDate();
+  });
+}
+
 // Для раздела «Награды»: человек — активист сезона, за который сейчас идёт выдача костюмов?
 function seasonCostumeHit(branch, person, title) {
   const cfg = SEASON_BRANCHES[branch];
@@ -1973,13 +1982,13 @@ function seasonCostumeHit(branch, person, title) {
   const sObj = seasonCalc(branch).get(prev.key);
   const why = sObj && sObj.winners.get(person.id);
   if (!why) return null;
-  return { title: seasonTitle(prev), issue: seasonFmt(prev.issue), reasons: why.map(x => SEASON_REASON[x]).join(', ') };
+  return { title: seasonTitle(prev), issue: seasonFmt(prev.issue), reasons: why.map(x => SEASON_REASON[x]).join(', '), issued: seasonIssued(branch, person, prev) };
 }
 
-function seasonWinnersHTML(sObj) {
+function seasonWinnersHTML(sObj, branch) {
   const list = sObj.rows.filter(r => sObj.winners.has(r.person.id));
   if (!list.length) return '<span style="color:var(--muted)">—</span>';
-  return list.map(r => `<div style="margin:2px 0"><b>${esc(r.person.name)}</b> <span class="sbadge">${esc(sObj.winners.get(r.person.id).map(x => SEASON_REASON[x]).join(' · '))}</span></div>`).join('');
+  return list.map(r => { const issued = seasonIssued(branch, r.person, sObj.info); return `<div style="margin:2px 0"><b>${esc(r.person.name)}</b> <span class="sbadge">${esc(sObj.winners.get(r.person.id).map(x => SEASON_REASON[x]).join(' · '))}</span> <span class="sbadge ${issued ? '' : 'gray'}">${issued ? '✓ выдан' : 'ожидает выдачи'}</span></div>`; }).join('');
 }
 
 function setSeasonBranch(b) { seasonBranch = b; seasonSel = ''; renderSeasons(); }
@@ -2001,12 +2010,12 @@ function renderSeasons() {
       <h3 style="border-bottom:none; color:var(--accent); margin-bottom:8px">${esc(cfg.label)}</h3>
       <div style="${issuing ? 'background:#e8f5e9;border-radius:8px;padding:8px 10px;margin-bottom:10px' : 'margin-bottom:10px'}">
         <div style="font-size:12px;color:var(--muted)">${issuing ? '✓ К выдаче' : 'Прошлый сезон'} · ${esc(seasonTitle(prev))} (${esc(seasonPeriod(prev))})${issuing ? ` · выдача с ${seasonFmt(prev.issue)}` : ''}</div>
-        ${seasonWinnersHTML(prevS)}
+        ${seasonWinnersHTML(prevS, b)}
       </div>
       <div>
         <div style="font-size:12px;color:var(--muted)">Идёт · ${esc(seasonTitle(cur))} (${esc(seasonPeriod(cur))}) · выдача ${seasonFmt(cur.issue)}</div>
         <div style="font-size:12px;margin-top:2px">Лидеры сейчас:</div>
-        ${seasonWinnersHTML(curS)}
+        ${seasonWinnersHTML(curS, b)}
       </div>
     </div>`;
   }).join('');
@@ -2028,7 +2037,7 @@ function renderSeasons() {
 
   const rows = sel.rows.length ? sel.rows.map((r, i) => {
     const w = sel.winners.get(r.person.id);
-    return `<tr class="${w ? 'win' : ''}"><td>${i + 1}</td><td><b>${esc(r.person.name)}</b></td><td>${r.points}</td><td>${r.count}</td><td>${w ? `<span class="sbadge">✓ активист</span> <span style="font-size:11px;color:var(--muted)">${esc(w.map(x => SEASON_REASON[x]).join(' · '))}</span>` : ''}</td></tr>`;
+    return `<tr class="${w ? 'win' : ''}"><td>${i + 1}</td><td><b>${esc(r.person.name)}</b></td><td>${r.points}</td><td>${r.count}</td><td>${w ? `<span class="sbadge">✓ активист</span> <span style="font-size:11px;color:var(--muted)">${esc(w.map(x => SEASON_REASON[x]).join(' · '))}</span> <span class="sbadge ${seasonIssued(seasonBranch,r.person,sel.info) ? '' : 'gray'}">${seasonIssued(seasonBranch,r.person,sel.info) ? 'выдан' : 'не выдан'}</span>` : ''}</td></tr>`;
   }).join('') : `<tr><td colspan="5" style="color:var(--muted)">В этом сезоне пока нет работ с датой.</td></tr>`;
 
   const history = all.map(x => {
@@ -2047,7 +2056,7 @@ function renderSeasons() {
       <ul style="margin:0">
         <li>Костюм получает <b>игрок с наибольшим количеством баллов</b> за сезон;</li>
         <li>и <b>игрок с наибольшим количеством работ</b> за сезон (если это тот же человек — следующий по баллам);</li>
-        <li>при ничьей костюм получают все, кто разделил место. Костюм выдаётся в 1-й день после окончания сезона.</li>
+        <li>если игрок уже победил по баллам, для категории работ берётся следующий по числу работ; при равенстве работ сравниваются баллы. Ничья сохраняется.</li><li>Костюм выдаётся в 1-й день после окончания сезона. При одной работе за сезон второй активист определяется по баллам среди остальных.</li>
       </ul>
     </div>
 
@@ -2420,6 +2429,7 @@ function importPurchases(rows) {
   let ni=idx('имя художника','имя','художник');
   let ri=idx('что куплено','награда','предмет');
   let qi=idx('количество','колво');
+  let di=idx('дата выдачи','дата'); let si=idx('статус','состояние');
   if (ni < 0) { warnMissingColumn('Покупки живописцев', 'Имя художника'); return; }
   if (ri < 0) { warnMissingColumn('Покупки живописцев', 'Что куплено'); return; }
 
@@ -2437,7 +2447,7 @@ function importPurchases(rows) {
     purchases.push({
       artistId: a.id,
       rewardName: rewardName,
-      qty: qty
+      qty: qty, issuedDate: di>=0?(r[di]||'').trim():'', status:si>=0?(r[si]||'').trim():''
     });
   });
   warnUnmatched('Покупки живописцев', 'имена не найдены среди художников', unknownNames);
