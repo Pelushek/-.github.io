@@ -88,6 +88,16 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
 
 /* Убираем лишний пробел в самом верху страницы */
 #content { margin-top: 0; padding-top: 0; }
+.sbadge{display:inline-block;background:#e8f5e9;color:#2e7d32;border-radius:10px;padding:2px 8px;font-size:11px;font-weight:700;margin-left:4px;white-space:nowrap}
+.sbadge.gray{background:#eee;color:#666}
+.s-tab{padding:8px 14px;border:1px solid var(--line);background:var(--paper);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600}
+.s-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.s-table{border-collapse:collapse;width:100%;min-width:560px}
+.s-table th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);font-size:11px;color:var(--muted)}
+.s-table td{padding:10px 12px;border-bottom:1px solid var(--line);font-size:13px;vertical-align:top}
+.s-table tr.win td{background:#f4f9f4}
+.s-table tr.clickable{cursor:pointer}
+.s-table tr.clickable:hover td{background:#faf7f2}
 </style></head>
 <body>
 <div id="loadingOverlay">Загрузка данных из Google Таблицы...</div>
@@ -141,6 +151,9 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
      <button data-view="writers_works"><span class="ico">✎</span><span class="nav-text">Все работы</span></button>
      <button data-view="writers_rewards"><span class="ico">★</span><span class="nav-text">Награды</span></button>
    </div>
+
+   <!-- Сезонка -->
+   <button data-view="seasons"><span class="nav-text">Сезонка: костюмы-активистов</span></button>
    
  </nav></div>
  
@@ -789,6 +802,7 @@ function makeRewardCard(ctx) {
     let typeName = isNb ? 'НБ' : 'баллов';
     let isBought = false;
     const isSpecial = SPECIAL_REWARDS.includes(title);
+    const seasonHit = (isSpecial && ctx.checked && ctx.seasonFn) ? ctx.seasonFn(title) : null;
     const isTbd = price == null;
 
     if (ctx.checked) isBought = ctx.isBoughtFn(title);
@@ -799,7 +813,10 @@ function makeRewardCard(ctx) {
     if (isTbd) {
       statusHtml = `<div class="reward-status status-no" style="background:#f0f0f0; color:#666; border-color:#ddd;">Цена уточняется</div>`;
     } else if (isSpecial) {
-      if (isBought) {
+      if (seasonHit) {
+        avail = true;
+        statusHtml = `<div class="reward-status status-avail" style="display:block; background:#e8f5e9; color:#2e7d32; padding:5px; border-radius:6px; margin-top:8px;">Активист сезона «${esc(seasonHit.title)}» (${esc(seasonHit.reasons)}). Костюм выдаётся с ${esc(seasonHit.issue)}${isBought ? '. В таблице уже есть запись о костюме.' : '.'}</div>`;
+      } else if (isBought) {
         statusHtml = `<div class="reward-status status-avail" style="display:block; background:#e8f5e9; color:#2e7d32; padding:5px; border-radius:6px; margin-top:8px;">Выдан (внесен в таблицу)</div>`;
       } else {
         statusHtml = `<div class="reward-status status-no" style="background:#f0f0f0; color:#666; border-color:#ddd;">Выдается вручную</div>`;
@@ -815,8 +832,8 @@ function makeRewardCard(ctx) {
     let descHtml = desc ? `<div class="reward-desc">${desc}</div>` : '';
 
     let cardClass = 'reward-card';
-    if (avail && !isBought) cardClass += ' available';
-    if (isBought) cardClass += ' bought';
+    if (avail && (!isBought || seasonHit)) cardClass += ' available';
+    if (isBought && !seasonHit) cardClass += ' bought';
     else if (boughtBefore) cardClass += ' bought repeat';
 
     let priceDisplay = isTbd
@@ -903,6 +920,7 @@ function render(){
    $('content').innerHTML = WELCOME_HTML;
    return;
  }
+ if (view === 'seasons') { renderSeasons(); return; }
  if (view.startsWith('writers')) { renderWriters(); return; }
  if (view.startsWith('designers')) { renderDesigners(); return; }
 
@@ -1259,7 +1277,7 @@ function renderRewards() {
   let aNb = checkedArtist ? currentBonusPoints(checkedArtist) : 0;
   let aRawNb = checkedArtist ? rawBonusPoints(checkedArtist) : 0;
 
-  const card = makeRewardCard({checked: checkedArtist, pts: aPts, nb: aNb, rawNb: aRawNb, isBoughtFn: t => isRewardBought(checkedArtist, t), countFn: t => rewardBoughtCount(checkedArtist, t)});
+  const card = makeRewardCard({checked: checkedArtist, pts: aPts, nb: aNb, rawNb: aRawNb, isBoughtFn: t => isRewardBought(checkedArtist, t), countFn: t => rewardBoughtCount(checkedArtist, t), seasonFn: t => seasonCostumeHit('painters', checkedArtist, t)});
 
   let html = `
     <div class="info-block" style="padding:15px; margin-bottom:20px; display:flex; align-items:center; gap:15px;">
@@ -1466,7 +1484,7 @@ function renderDesignerRewards() {
   });
   const checked = designers.find(d => d.id === rewardCheckDesignerId);
   const pts = checked ? dPoints(checked) : 0;
-  const card = makeRewardCard({checked, pts, nb: 0, rawNb: 0, isBoughtFn: t => isDesignerRewardBought(checked, t)});
+  const card = makeRewardCard({checked, pts, nb: 0, rawNb: 0, isBoughtFn: t => isDesignerRewardBought(checked, t), seasonFn: t => seasonCostumeHit('designers', checked, t)});
 
   $('content').innerHTML = `
     <div class="info-block" style="padding:15px; margin-bottom:20px; display:flex; align-items:center; gap:15px;">
@@ -1715,7 +1733,7 @@ function renderWriterRewards() {
   });
   const checked = writers.find(d => d.id === rewardCheckWriterId);
   const pts = checked ? wPoints(checked) : 0;
-  const card = makeRewardCard({checked, pts, nb: 0, rawNb: 0, isBoughtFn: t => isWriterRewardBought(checked, t)});
+  const card = makeRewardCard({checked, pts, nb: 0, rawNb: 0, isBoughtFn: t => isWriterRewardBought(checked, t), seasonFn: t => seasonCostumeHit('writers', checked, t)});
 
   $('content').innerHTML = `
     <div class="info-block" style="padding:15px; margin-bottom:20px; display:flex; align-items:center; gap:15px;">
@@ -1827,6 +1845,230 @@ function importWriterPurchases(rows){
  });
  warnUnmatched('Покупки писателей', 'имена не найдены среди писателей', unknownNames);
  warnUnmatched('Покупки писателей', 'названия наград не совпадают с сайтом', unknownRewards);
+}
+
+// ===================== СЕЗОНКА: КОСТЮМЫ-АКТИВИСТОВ =====================
+// winterStart — месяц, с которого начинается «зима» у ветви (сезон = 3 месяца подряд).
+// Название сезона и год берутся по ПОСЛЕДНЕМУ месяцу окна: «зима 2027» у писателей = дек 2026 – фев 2027.
+const SEASON_NAMES = ['зима', 'весна', 'лето', 'осень'];
+const MONTHS_SHORT = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+const SEASON_BRANCHES = {
+  painters:  { label: 'Живописцы',  winterStart: 1,  costume: 'Костюм живописцев', people: () => artists,   works: () => works },
+  designers: { label: 'Оформители', winterStart: 11, costume: 'Костюм оформителей', people: () => designers, works: () => designerWorks },
+  writers:   { label: 'Писатели',   winterStart: 12, costume: 'Костюм писателей',   people: () => writers,   works: () => writerWorks }
+};
+// Кого не учитывать в сезонке (по имени, во всех ветвях)
+const SEASON_EXCLUDE = ['Рохля'];
+// Сколько дней после начала выдачи награда «горит» зелёным в разделе «Награды»
+const SEASON_ISSUE_DAYS = 31;
+const SEASON_REASON = { points: 'больше всех баллов', works: 'больше всех работ', next: 'следующий по баллам' };
+const SEASON_STATUS_LABEL = { current: 'идёт', issuing: 'идёт выдача', done: 'завершён', future: 'впереди' };
+let seasonBranch = 'painters', seasonSel = '';
+
+// Дата работы: только dd.mm.yyyy (или dd.mm.yy) и yyyy-mm-dd. Всё остальное (в т.ч. пусто) — работа не учитывается.
+function seasonDateParts(str) {
+  str = String(str || '');
+  let m = str.match(/(\d{1,2})\.(\d{1,2})\.(\d{4}|\d{2})(?!\d)/);
+  if (m) { let y = +m[3]; if (y < 100) y += 2000; const mo = +m[2]; if (mo >= 1 && mo <= 12) return { y, m: mo }; }
+  m = str.match(/(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (m) { const mo = +m[2]; if (mo >= 1 && mo <= 12) return { y: +m[1], m: mo }; }
+  return null;
+}
+
+function seasonInfo(startY, startM, k) {
+  const endIdx = startY * 12 + (startM - 1) + 2;
+  const endY = Math.floor(endIdx / 12), endM = endIdx % 12 + 1;
+  const nextIdx = endIdx + 1;
+  return {
+    key: String(startY * 12 + startM - 1), k, name: SEASON_NAMES[k], year: endY,
+    startY, startM, endY, endM,
+    start: new Date(startY, startM - 1, 1),
+    end: new Date(endY, endM, 0, 23, 59, 59),
+    issue: new Date(Math.floor(nextIdx / 12), nextIdx % 12, 1)
+  };
+}
+function seasonOf(cfg, y, mo) {
+  const off = (mo - cfg.winterStart + 12) % 12, k = Math.floor(off / 3);
+  const startM = (cfg.winterStart - 1 + 3 * k) % 12 + 1;
+  return seasonInfo(mo >= startM ? y : y - 1, startM, k);
+}
+function seasonTitle(i) { return `${i.name} ${i.year}`; }
+function seasonPeriod(i) {
+  const a = MONTHS_SHORT[i.startM - 1], b = MONTHS_SHORT[i.endM - 1];
+  return i.startY === i.endY ? `${a}–${b} ${i.endY}` : `${a} ${i.startY} – ${b} ${i.endY}`;
+}
+function seasonFmt(d) { return String(d.getDate()).padStart(2, '0') + '.' + String(d.getMonth() + 1).padStart(2, '0') + '.' + d.getFullYear(); }
+function seasonStatus(info, now) {
+  if (now < info.start) return 'future';
+  if (now <= info.end) return 'current';
+  if (now < new Date(info.issue.getTime() + SEASON_ISSUE_DAYS * 864e5)) return 'issuing';
+  return 'done';
+}
+
+// Активисты: 1) больше всех баллов; 2) больше всех работ, а если это тот же человек — следующий по баллам.
+// Ничья — костюм получают все, кто разделил место.
+function seasonPickWinners(rows) {
+  const res = new Map();
+  const add = (r, why) => { if (!res.has(r.person.id)) res.set(r.person.id, []); const a = res.get(r.person.id); if (!a.includes(why)) a.push(why); };
+  const act = rows.filter(r => r.count > 0);
+  if (!act.length) return res;
+  const maxP = Math.max(...act.map(r => r.points));
+  if (maxP > 0) act.filter(r => r.points === maxP).forEach(r => add(r, 'points'));
+  const maxC = Math.max(...act.map(r => r.count));
+  const wl = act.filter(r => r.count === maxC);
+  const fresh = wl.filter(r => !res.has(r.person.id));
+  wl.forEach(r => add(r, 'works'));
+  if (!fresh.length) {
+    const rest = act.filter(r => !res.has(r.person.id));
+    if (rest.length) {
+      const maxR = Math.max(...rest.map(r => r.points));
+      if (maxR > 0) rest.filter(r => r.points === maxR).forEach(r => add(r, 'next'));
+    }
+  }
+  return res;
+}
+
+// Считает все сезоны ветви по датам работ. Возвращает Map: key -> {info, rows, winners}
+function seasonCalc(branch) {
+  const cfg = SEASON_BRANCHES[branch];
+  const ex = SEASON_EXCLUDE.map(slug);
+  const people = cfg.people().filter(p => !ex.includes(slug(p.name)));
+  const byId = new Map(people.map(p => [p.id, p]));
+  const map = new Map();
+  const ensure = info => { let s = map.get(info.key); if (!s) { s = { info, stats: new Map() }; map.set(info.key, s); } return s; };
+
+  cfg.works().forEach(w => {
+    const p = byId.get(w.artistId); if (!p) return;
+    const dp = seasonDateParts(w.date); if (!dp) return;      // нет даты — не учитываем, без предупреждений
+    const sObj = ensure(seasonOf(cfg, dp.y, dp.m));
+    let st = sObj.stats.get(p.id);
+    if (!st) { st = { person: p, points: 0, count: 0 }; sObj.stats.set(p.id, st); }
+    st.points += Number(w.points) || 0; st.count++;
+  });
+
+  // текущий и предыдущий сезоны показываем всегда, даже без работ
+  const now = new Date();
+  const cur = seasonOf(cfg, now.getFullYear(), now.getMonth() + 1);
+  ensure(cur);
+  const before = new Date(cur.start.getTime() - 864e5);
+  ensure(seasonOf(cfg, before.getFullYear(), before.getMonth() + 1));
+
+  map.forEach(sObj => {
+    sObj.rows = [...sObj.stats.values()].map(r => ({ ...r, points: Math.round(r.points * 10) / 10 }))
+      .sort((a, b) => b.points - a.points || b.count - a.count || a.person.name.localeCompare(b.person.name, 'ru'));
+    sObj.winners = seasonPickWinners(sObj.rows);
+  });
+  return map;
+}
+
+// Для раздела «Награды»: человек — активист сезона, за который сейчас идёт выдача костюмов?
+function seasonCostumeHit(branch, person, title) {
+  const cfg = SEASON_BRANCHES[branch];
+  if (!person || title !== cfg.costume) return null;
+  const now = new Date();
+  const cur = seasonOf(cfg, now.getFullYear(), now.getMonth() + 1);
+  const before = new Date(cur.start.getTime() - 864e5);
+  const prev = seasonOf(cfg, before.getFullYear(), before.getMonth() + 1);
+  if (seasonStatus(prev, now) !== 'issuing') return null;
+  const sObj = seasonCalc(branch).get(prev.key);
+  const why = sObj && sObj.winners.get(person.id);
+  if (!why) return null;
+  return { title: seasonTitle(prev), issue: seasonFmt(prev.issue), reasons: why.map(x => SEASON_REASON[x]).join(', ') };
+}
+
+function seasonWinnersHTML(sObj) {
+  const list = sObj.rows.filter(r => sObj.winners.has(r.person.id));
+  if (!list.length) return '<span style="color:var(--muted)">—</span>';
+  return list.map(r => `<div style="margin:2px 0"><b>${esc(r.person.name)}</b> <span class="sbadge">${esc(sObj.winners.get(r.person.id).map(x => SEASON_REASON[x]).join(' · '))}</span></div>`).join('');
+}
+
+function setSeasonBranch(b) { seasonBranch = b; seasonSel = ''; renderSeasons(); }
+function setSeasonKey(k) { seasonSel = k; renderSeasons(); }
+
+function renderSeasons() {
+  $('workspace').style.display = 'none';
+  const now = new Date();
+
+  // --- Обзор по трём ветвям
+  const overview = Object.keys(SEASON_BRANCHES).map(b => {
+    const cfg = SEASON_BRANCHES[b], map = seasonCalc(b);
+    const cur = seasonOf(cfg, now.getFullYear(), now.getMonth() + 1);
+    const before = new Date(cur.start.getTime() - 864e5);
+    const prev = seasonOf(cfg, before.getFullYear(), before.getMonth() + 1);
+    const curS = map.get(cur.key), prevS = map.get(prev.key);
+    const issuing = seasonStatus(prev, now) === 'issuing';
+    return `<div class="info-block" style="margin:0">
+      <h3 style="border-bottom:none; color:var(--accent); margin-bottom:8px">${esc(cfg.label)}</h3>
+      <div style="${issuing ? 'background:#e8f5e9;border-radius:8px;padding:8px 10px;margin-bottom:10px' : 'margin-bottom:10px'}">
+        <div style="font-size:12px;color:var(--muted)">${issuing ? '✓ К выдаче' : 'Прошлый сезон'} · ${esc(seasonTitle(prev))} (${esc(seasonPeriod(prev))})${issuing ? ` · выдача с ${seasonFmt(prev.issue)}` : ''}</div>
+        ${seasonWinnersHTML(prevS)}
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--muted)">Идёт · ${esc(seasonTitle(cur))} (${esc(seasonPeriod(cur))}) · выдача ${seasonFmt(cur.issue)}</div>
+        <div style="font-size:12px;margin-top:2px">Лидеры сейчас:</div>
+        ${seasonWinnersHTML(curS)}
+      </div>
+    </div>`;
+  }).join('');
+
+  // --- Выбранная ветвь и сезон
+  const cfg = SEASON_BRANCHES[seasonBranch];
+  const map = seasonCalc(seasonBranch);
+  const all = [...map.values()].sort((a, b) => +b.info.key - +a.info.key);
+  const cur = seasonOf(cfg, now.getFullYear(), now.getMonth() + 1);
+  const before = new Date(cur.start.getTime() - 864e5);
+  const prev = seasonOf(cfg, before.getFullYear(), before.getMonth() + 1);
+  let selKey = seasonSel;
+  if (!map.has(selKey)) selKey = seasonStatus(prev, now) === 'issuing' ? prev.key : cur.key;
+  const sel = map.get(selKey);
+  const selStatus = seasonStatus(sel.info, now);
+
+  const tabs = Object.keys(SEASON_BRANCHES).map(b => `<button class="s-tab ${b === seasonBranch ? 'active' : ''}" onclick="setSeasonBranch('${b}')">${esc(SEASON_BRANCHES[b].label)}</button>`).join('');
+  const options = all.map(x => `<option value="${x.info.key}" ${x.info.key === selKey ? 'selected' : ''}>${esc(seasonTitle(x.info))} (${esc(seasonPeriod(x.info))})</option>`).join('');
+
+  const rows = sel.rows.length ? sel.rows.map((r, i) => {
+    const w = sel.winners.get(r.person.id);
+    return `<tr class="${w ? 'win' : ''}"><td>${i + 1}</td><td><b>${esc(r.person.name)}</b></td><td>${r.points}</td><td>${r.count}</td><td>${w ? `<span class="sbadge">✓ активист</span> <span style="font-size:11px;color:var(--muted)">${esc(w.map(x => SEASON_REASON[x]).join(' · '))}</span>` : ''}</td></tr>`;
+  }).join('') : `<tr><td colspan="5" style="color:var(--muted)">В этом сезоне пока нет работ с датой.</td></tr>`;
+
+  const history = all.map(x => {
+    const st = seasonStatus(x.info, now);
+    const winners = x.rows.filter(r => x.winners.has(r.person.id));
+    return `<tr class="clickable ${x.info.key === selKey ? 'win' : ''}" onclick="setSeasonKey('${x.info.key}')">
+      <td><b>${esc(seasonTitle(x.info))}</b></td><td>${esc(seasonPeriod(x.info))}</td><td>${seasonFmt(x.info.issue)}</td>
+      <td><span class="sbadge ${st === 'issuing' || st === 'current' ? '' : 'gray'}">${SEASON_STATUS_LABEL[st]}</span></td>
+      <td>${winners.length ? winners.map(r => `${esc(r.person.name)}`).join(', ') : '<span style="color:var(--muted)">—</span>'}</td></tr>`;
+  }).join('');
+
+  $('content').innerHTML = `
+    <div class="topbar" style="margin-bottom:14px"><div><div class="eyebrow">Панель координатора</div><h1>Сезонка: костюмы-активистов</h1></div></div>
+    <div class="info-block" style="margin-bottom:18px">
+      <p style="margin:0 0 6px"><b>Как считается.</b> Сезон — 3 месяца подряд, у каждой ветви свои. Берутся работы, у которых указана дата; работы без даты не учитываются.</p>
+      <ul style="margin:0">
+        <li>Костюм получает <b>игрок с наибольшим количеством баллов</b> за сезон;</li>
+        <li>и <b>игрок с наибольшим количеством работ</b> за сезон (если это тот же человек — следующий по баллам);</li>
+        <li>при ничьей костюм получают все, кто разделил место. Костюм выдаётся в 1-й день после окончания сезона.</li>
+      </ul>
+    </div>
+
+    <h3 style="font-size:16px;margin:0 0 10px">Обзор по ветвям</h3>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:26px">${overview}</div>
+
+    <h3 style="font-size:16px;margin:0 0 10px">Рейтинг сезона</h3>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:12px">
+      ${tabs}
+      <select onchange="setSeasonKey(this.value)" style="padding:8px;min-width:240px">${options}</select>
+      <span class="sbadge ${selStatus === 'issuing' || selStatus === 'current' ? '' : 'gray'}">${SEASON_STATUS_LABEL[selStatus]}</span>
+      <span style="font-size:12px;color:var(--muted)">выдача ${seasonFmt(sel.info.issue)}</span>
+    </div>
+    <div style="background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:auto;margin-bottom:26px">
+      <table class="s-table"><thead><tr><th>#</th><th>Имя</th><th>Баллы</th><th>Работ</th><th>Активист</th></tr></thead><tbody>${rows}</tbody></table>
+    </div>
+
+    <h3 style="font-size:16px;margin:0 0 10px">История сезонов: ${esc(cfg.label)}</h3>
+    <div style="background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:auto">
+      <table class="s-table"><thead><tr><th>Сезон</th><th>Период</th><th>Выдача</th><th>Статус</th><th>Активисты</th></tr></thead><tbody>${history}</tbody></table>
+    </div>`;
 }
 
 // Исправление 5: исправлена логика открытия подменю в сайдбаре
@@ -1993,6 +2235,15 @@ function setView(v){
         statsBlock.style.display = 'grid';
     }
 
+    render();
+    return;
+  }
+
+  // Сезонка
+  if (v === 'seasons') {
+    document.querySelector('.nav > button[data-view="seasons"]')?.classList.add('active');
+    brandTitle.textContent = 'Сезонка';
+    $('workspace').style.display = 'none';
     render();
     return;
   }
