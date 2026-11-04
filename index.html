@@ -123,8 +123,8 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
 /* карточка */
 .hr-card{background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;transition:.18s;border-top:4px solid var(--c,var(--all))}
 .hr-card:hover{transform:translateY(-3px);box-shadow:0 14px 32px #31261b18}
-.hr-frame{height:132px;background:linear-gradient(#faf6f0,#f2ece4);display:grid;place-items:center;padding:14px}
-.hr-frame img{max-width:100%;max-height:100%;object-fit:contain}
+.hr-frame{height:132px;background:linear-gradient(#faf6f0,#f2ece4);position:relative;overflow:hidden;display:grid;place-items:center}
+.hr-frame img{position:absolute;top:14px;left:14px;width:calc(100% - 28px);height:calc(100% - 28px);max-width:none;max-height:none;object-fit:contain;object-position:center;margin:0;border:0;border-radius:0;box-shadow:none}
 .hr-ph{width:64px;height:64px;border:2px dashed #cdc4b8;border-radius:14px;display:grid;place-items:center;color:#b5a99c;font-size:22px}
 .hr-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
 .hr-tag{font-size:11px;font-weight:700;color:var(--c,var(--all));text-transform:uppercase;letter-spacing:.4px}
