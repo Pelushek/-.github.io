@@ -98,6 +98,47 @@ main{min-width:0;padding:28px clamp(18px,3vw,42px) 48px}.topbar{display:flex;ali
 .s-table tr.win td{background:#f4f9f4}
 .s-table tr.clickable{cursor:pointer}
 .s-table tr.clickable:hover td{background:#faf7f2}
+/* ===== Награды на главной ===== */
+.hr-wrap{max-width:1040px;margin:0 auto}
+.hr-wrap{--painters:#c86f52;--designers:#5b7fa6;--writers:#8a6bb0;--animators:#647b62;--all:#8c877f}
+
+
+.hr-lead{text-align:center;color:var(--muted);margin:0 auto 22px;max-width:620px}
+
+/* фильтр */
+.hr-filters{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:26px}
+.hr-chip{border:1px solid var(--line);background:var(--paper);padding:8px 16px;border-radius:999px;font-weight:600;font-size:13px;display:inline-flex;align-items:center;gap:8px;transition:.15s}
+.hr-chip i{width:9px;height:9px;border-radius:50%;background:var(--c,var(--all))}
+.hr-chip:hover{border-color:var(--c,var(--all))}
+.hr-chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+
+/* группы */
+.hr-group{margin-bottom:30px}
+.hr-group-head{display:flex;align-items:baseline;gap:12px;border-bottom:2px solid var(--line);padding-bottom:8px;margin-bottom:14px;flex-wrap:wrap}
+.hr-group-head h3{margin:0;font-size:18px;background:none;padding:0;border:0;border-radius:0;color:var(--ink);display:block;width:auto}
+.hr-group-head p{margin:0;color:var(--muted);font-size:13px}
+.hr-group.season .hr-group-head{border-color:var(--green)}
+.hr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+
+/* карточка */
+.hr-card{background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);display:flex;flex-direction:column;transition:.18s;border-top:4px solid var(--c,var(--all))}
+.hr-card:hover{transform:translateY(-3px);box-shadow:0 14px 32px #31261b18}
+.hr-frame{height:132px;background:linear-gradient(#faf6f0,#f2ece4);display:grid;place-items:center;padding:14px}
+.hr-frame img{max-width:100%;max-height:100%;object-fit:contain}
+.hr-ph{width:64px;height:64px;border:2px dashed #cdc4b8;border-radius:14px;display:grid;place-items:center;color:#b5a99c;font-size:22px}
+.hr-body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1}
+.hr-tag{font-size:11px;font-weight:700;color:var(--c,var(--all));text-transform:uppercase;letter-spacing:.4px}
+.hr-name{font-weight:700;font-size:14.5px;line-height:1.25}
+.hr-desc{font-size:12.5px;color:var(--muted);flex:1}
+.hr-price{align-self:flex-start;margin-top:4px;padding:5px 11px;border-radius:999px;font-size:12px;font-weight:800;background:#f3e3dc;color:#a4452b}
+.hr-price.nb{background:#e3ecf5;color:#2f5a86}
+.hr-price.manual{background:#e5eee4;color:#3f6a3c}
+.hr-price.tbd{background:#eee;color:#777;font-weight:600}
+.hr-card.wide{grid-column:span 1}
+.hr-note{margin-top:10px;font-size:12.5px;color:var(--muted);background:#f4f9f4;border:1px solid #dce8da;border-radius:12px;padding:10px 14px}
+.hr-note a{color:var(--green);font-weight:700}
+
+
 </style></head>
 <body>
 <div id="loadingOverlay">Загрузка данных из Google Таблицы...</div>
@@ -296,6 +337,81 @@ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const slug=s=>String(s||'').toLowerCase().trim();
 
 // ===== HTML ДЛЯ СТАРТОВОЙ СТРАНИЦЫ =====
+function initHomeRewards(){
+  if(!document.getElementById("hrFilters")) return;
+  const BR = {
+    all:       {label:'Все',        c:'var(--all)'},
+    painters:  {label:'Живописцы',  c:'var(--painters)'},
+    designers: {label:'Оформители', c:'var(--designers)'},
+    writers:   {label:'Писатели',   c:'var(--writers)'},
+    animators: {label:'Аниматоры',  c:'var(--animators)'}
+  };
+  const R = [
+   // --- медали
+   {g:'medals', br:['animators'], name:'За фантазию и организованность', desc:'Могут получить все аниматоры.', price:'40 баллов', img:'https://i.ibb.co/MxxJ86PF/500.png'},
+   {g:'medals', br:['painters','designers','writers'], name:'За проявление творческой жилки', desc:'Могут получить художники, оформители, писатели и любой член племени.', price:'от 20 баллов', note:'20 / 50 / 100 — по ветви', prices:{painters:'100 баллов',designers:'20 баллов',writers:'50 баллов'}, img:'https://catwar.net/medal/223.png'},
+   // --- плашки
+   {g:'plaques', br:['painters'], name:'Плашка живописцев', desc:'Выдаётся за накопленные баллы живописцев.', price:'250 баллов', img:'https://i.ibb.co/WNK9mFsv/image.png'},
+   {g:'plaques', br:['designers'], name:'Плашка оформителей', desc:'Выдаётся за накопленные баллы оформителей.', price:'40 баллов', img:'https://i.ibb.co/FrxGcgY/image.png'},
+   {g:'plaques', br:['writers'], name:'Плашка писателей', desc:'Выдаётся за накопленные баллы писателей.', price:'100 баллов', img:'https://i.ibb.co/XfXbfVdS/Gb-Fj.png'},
+   // --- ачивки и следы
+   {g:'marks', br:['painters'], name:'Ачивка живописцев', desc:'Личная ачивка за баллы живописцев.', price:'100 баллов', img:'https://d.zaix.ru/Edpa.png'},
+   {g:'marks', br:['designers'], name:'Ачивка оформителей', desc:'Скоро.', price:'цена уточняется', tbd:1},
+   {g:'marks', br:['writers'], name:'Ачивка писателей', desc:'Скоро.', price:'цена уточняется', tbd:1},
+   {g:'marks', br:['animators'], name:'Ачивка аниматоров', desc:'Скоро.', price:'цена уточняется', tbd:1},
+   {g:'marks', br:['painters'], name:'След живописцев', desc:'След на фоне сроком на полгода.', price:'400 баллов', img:'https://d.zaix.ru/GbGk.png'},
+   {g:'marks', br:['painters','designers','writers','animators'], name:'Отрядное оформление сокровищницы', desc:'Одна из наград для всех ветвей, цены ветвей уточняются.', price:'цена уточняется', tbd:1, img:'https://d.zaix.ru/GbGk.png'},
+   // --- костюмы
+   {g:'suits', br:['painters'], name:'Костюм живописцев', desc:'Активисту сезона [3 месяца]: больше всех баллов и больше всех работ.', price:'активист сезона', manual:1, img:'https://i.ibb.co/23Xm2FVL/1.png'},
+   {g:'suits', br:['designers'], name:'Костюм оформителей', desc:'Активисту сезона [3 месяца]: больше всех баллов и больше всех работ.', price:'активист сезона', manual:1, img:'https://i.ibb.co/RGSbKRTy/1.png'},
+   {g:'suits', br:['writers'], name:'Костюм писателей', desc:'Активисту сезона [3 месяца]: больше всех баллов и больше всех работ.', price:'активист сезона', manual:1, img:'https://i.ibb.co/WNgYWPyF/3.png'},
+   // --- НБ (живописцы)
+   {g:'nb', br:['painters'], name:'Обмен на жетоны', desc:'Не более 15 в месяц.', price:'1 НБ', nb:1, img:'https://i.ibb.co/zWkPkVyt/utt-BQa9-Xi0u-JUQs-Dx-GY8-Ll-HQ0-FF3se-Ql-Wy1p-TGFH54y-Qcd-Zgh-Q0b-Ge-Lpw-Kn-GX-KLflwnb1-G1-GGj-LU4-HLKz-R.png'},
+   {g:'nb', br:['painters'], name:'Личный костюм', desc:'На неделю или на две.', price:'30–50 НБ', nb:1, img:'https://i.ibb.co/jkHvSQmS/image.png'},
+   {g:'nb', br:['painters'], name:'След на фоне (1 сезон)', desc:'Свой след на любой фон на 1 сезон.', price:'15 НБ', nb:1, img:'https://i.ibb.co/0RFx5HZN/7-cmi-Hp73ct4n-ZZt-B0-Anq-Laep-HUqiv4-Y95jq-Y6u-SO6ne-WXZJ5-ahu-IIg-UIc-JCn5-6jo6-JSGZ-7-Xhvd-S08-Fg-CVr7.jpg'},
+   {g:'nb', br:['painters'], name:'Личная ачивка', desc:'Порог НБ за всё время. Выдаётся по желанию, НБ не списываются.', price:'50 НБ (порог)', nb:1, img:'https://i.ibb.co/9k037Wt1/54324234.png'},
+   {g:'nb', br:['painters'], name:'След на фоне (навсегда)', desc:'Порог НБ за всё время. Может потеряться, если фон перерисуют с нуля.', price:'100 НБ (порог)', nb:1, img:'https://i.ibb.co/TDY645GJ/L0-PCm4-Thb-QKCFGHJtc-T716es-X5o-L6-N1i9-Wx-Wc-ULk-M7k-Vbx-CHN-Nm-Y15-N-v-WSJLGLFat0i-RDOTuvp4-Z50q8-Zg-K8-D.jpg'}
+  ];
+  const G = [
+   {id:'medals',  t:'Медали', s:''},
+   {id:'plaques', t:'Плашки', s:'Выдаются при достижении порога баллов своей ветви'},
+   {id:'marks',   t:'Ачивки, следы и оформление', s:'Личные награды за баллы'},
+   {id:'suits',   t:'Костюмы-активистам сезона', s:'Не за баллы, а по итогам сезона (3 месяца)', season:1, note:true},
+   {id:'nb',      t:'Наградные баллы (НБ)', s:'Только у живописцев: магазин и пороги за всё время'}
+  ];
+  let cur = 'all';
+  
+  function cardHTML(r){
+    const own = cur !== 'all' && r.prices && r.prices[cur];
+    const b = BR[r.br[0]];
+    const tag = own ? BR[cur].label : r.br.length > 1 && r.br.length < 4 ? r.br.map(x => BR[x].label).join(' · ') : r.br.length === 4 ? 'Все ветви' : b.label;
+    const img = r.img ? `<img src="${esc(r.img)}" alt="" loading="lazy">` : `<div class="hr-ph">✦</div>`;
+    const cls = r.nb ? 'nb' : r.manual ? 'manual' : r.tbd ? 'tbd' : '';
+    return `<div class="hr-card" style="--c:${own ? BR[cur].c : r.br.length > 1 ? 'var(--all)' : b.c}">
+      <div class="hr-frame">${img}</div>
+      <div class="hr-body"><div class="hr-tag">${esc(tag)}</div><div class="hr-name">${esc(r.name)}</div>
+      <div class="hr-desc">${esc(r.desc)}</div>
+      <span class="hr-price ${cls}">${esc(own ? r.prices[cur] : r.price)}</span>${r.note && !own ? `<div class="hr-desc" style="font-size:11px">${esc(r.note)}</div>` : ''}</div></div>`;
+  }
+  function render(){
+    document.getElementById('hrGroups').innerHTML = G.map(g => {
+      const items = R.filter(r => r.g === g.id && (cur === 'all' || r.br.includes(cur)));
+      if (!items.length) return '';
+      return `<section class="hr-group ${g.season ? 'season' : ''}"><div class="hr-group-head"><h3>${g.t}</h3>${g.s ? `<p>${g.s}</p>` : ''}</div>
+        <div class="hr-grid">${items.map(cardHTML).join('')}</div>
+        ${g.note ? `<div class="hr-note">Кто стал активистом сезона и когда выдача, смотрите во вкладке <a href="#" onclick="setView('seasons'); return false;">«Сезонка: костюмы-активистов»</a>.</div>` : ''}</section>`;
+    }).join('') || '<p class="hr-lead">Для этой ветви наград пока нет.</p>';
+  }
+  document.getElementById('hrFilters').innerHTML = Object.keys(BR).map(k => `<button class="hr-chip ${k === cur ? 'active' : ''}" style="--c:${BR[k].c}" data-k="${k}">${k !== 'all' ? '<i></i>' : ''}${BR[k].label}</button>`).join('');
+  document.getElementById('hrFilters').onclick = e => {
+    const b = e.target.closest('.hr-chip'); if (!b) return;
+    cur = b.dataset.k;
+    document.querySelectorAll('.hr-chip').forEach(c => c.classList.toggle('active', c === b));
+    render();
+  };
+  render();
+}
+
 const WELCOME_HTML = `
 <div class="bb-content">
   <div style="text-align: center; margin-bottom: 15px;">
@@ -590,56 +706,11 @@ const WELCOME_HTML = `
 
   <!-- НАГРАДЫ -->
   <h2 style="color: var(--accent); text-align: center; font-size: 24px; margin: 10px 0 20px 0; display: block; width: 100%;">НАГРАДЫ</h2>
-  <table>
-    <thead>
-      <tr>
-        <th style="width: 100px; text-align: center;">Иконка</th>
-        <th>Название и описание</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td style="text-align: center;"><img src="https://i.ibb.co/MxxJ86PF/500.png" alt="Медаль" style="width: 50px; border-radius: 0; box-shadow: none;"></td>
-        <td><b>За фантазию и организованность</b><br>Могут получить все аниматоры.</td>
-      </tr>
-      <tr>
-        <td style="text-align: center;"><img src="https://catwar.net/medal/223.png" alt="Медаль" style="width: 50px; border-radius: 0; box-shadow: none;"></td>
-        <td><b>За проявление творческой жилки</b><br>Могут получить художники из Живописцев, а также любой член племени.</td>
-      </tr>
-      <tr>
-        <td style="text-align: center;"><img src="https://i.ibb.co/XfXbfVdS/Gb-Fj.png" alt="Плашка" style="width: 120px;"></td>
-        <td><b>Плашка писателей</b><br>Выдаётся за 100 баллов писателей.</td>
-      </tr>
-      <tr>
-        <td style="text-align: center;"><img src="https://i.ibb.co/FrxGcgY/image.png" alt="Плашка" style="width: 120px;"></td>
-        <td><b>Плашка оформителей</b><br>Выдаётся за 40 баллов оформителей.</td>
-      </tr>
-      <tr>
-        <td style="text-align: center;"><img src="https://i.ibb.co/WNK9mFsv/image.png" alt="Плашка" style="width: 120px;"></td>
-        <td><b>Плашка живописцев</b><br>Выдаётся за 250 баллов живописцев.</td>
-      </tr>
-      <tr>
-        <td style="text-align: center;"><img src="https://i.ibb.co/WNgYWPyF/3.png" alt="Костюм" style="width: 100px;"></td>
-        <td><b>Костюм писателей</b><br>Выдается писателям-активистам сезона [3 месяца] по двум категориям: игрок с наибольшим количеством баллов за работы; игрок с наибольшим количеством законченной работы.</td>
-      </tr>
-      <tr>
-        <td style="text-align: center;"><img src="https://i.ibb.co/RGSbKRTy/1.png" alt="Костюм" style="width: 100px;"></td>
-        <td><b>Костюм оформителей</b><br>Выдается оформителям-активистам сезона [3 месяца] по двум категориям: игрок с наибольшим количеством баллов за работы; игрок с наибольшим количеством законченной работы.</td>
-      </tr>
-      <tr>
-        <td style="text-align: center;"><img src="https://i.ibb.co/23Xm2FVL/1.png" alt="Костюм" style="width: 100px;"></td>
-        <td><b>Костюм живописцев</b><br>Выдается художникам-активистам сезона [3 месяца] по двум категориям: игрок с наибольшим количеством баллов за работы; игрок с наибольшим количеством законченной работы.</td>
-      </tr>
-      <tr>
-        <td style="text-align: center;"><img src="https://d.zaix.ru/Edpa.png" alt="Ачивка" style="width: 80px;"></td>
-        <td><b>Ачивка живописцев</b><br>Выдаётся за 100 баллов живописцев.</td>
-      </tr>
-      <tr>
-        <td style="text-align: center;"><img src="https://d.zaix.ru/GbGk.png" alt="След" style="width: 100px;"></td>
-        <td><b>След живописцев</b><br>Возможность оставить след на фоне сроком на полгода. Выдаётся за 400 баллов живописцев.</td>
-      </tr>
-    </tbody>
-  </table>
+  <div class="hr-wrap">
+    <p class="hr-lead">Что можно получить в Мастерской чудес и за что. Выберите свою ветвь, чтобы увидеть только свои награды.</p>
+    <div class="hr-filters" id="hrFilters"></div>
+    <div id="hrGroups"></div>
+  </div>
 </div>
 `;
 
@@ -921,6 +992,7 @@ function render(){
  if (view === '') {
    $('workspace').style.display = 'none';
    $('content').innerHTML = WELCOME_HTML;
+   initHomeRewards();
    return;
  }
  if (view === 'seasons') { renderSeasons(); return; }
