@@ -813,9 +813,11 @@ function makeRewardCard(ctx) {
     if (isTbd) {
       statusHtml = `<div class="reward-status status-no" style="background:#f0f0f0; color:#666; border-color:#ddd;">Цена уточняется</div>`;
     } else if (isSpecial) {
-      if (seasonHit) {
+      if (seasonHit && seasonHit.issued) {
+        statusHtml = `<div class="reward-status" style="display:block; background:#f0f0f0; color:#555; padding:5px; border-radius:6px; margin-top:8px; font-weight:700;">Костюм за сезон «${esc(seasonHit.title)}» выдан ✓</div>`;
+      } else if (seasonHit) {
         avail = true;
-        statusHtml = `<div class="reward-status status-avail" style="display:block; background:#e8f5e9; color:#2e7d32; padding:5px; border-radius:6px; margin-top:8px;">Активист сезона «${esc(seasonHit.title)}» (${esc(seasonHit.reasons)}). Костюм выдаётся с ${esc(seasonHit.issue)}${seasonHit.issued ? ' · ✓ Выдан' : ' · Ожидает выдачи'}.</div>`;
+        statusHtml = `<div class="reward-status status-avail" style="display:block; background:#e8f5e9; color:#2e7d32; padding:5px; border-radius:6px; margin-top:8px;">Активист сезона «${esc(seasonHit.title)}» (${esc(seasonHit.reasons)}). Костюм выдаётся с ${esc(seasonHit.issue)}${' · ожидает выдачи'}.</div>`;
       } else if (isBought) {
         statusHtml = `<div class="reward-status status-avail" style="display:block; background:#e8f5e9; color:#2e7d32; padding:5px; border-radius:6px; margin-top:8px;">Выдан (внесен в таблицу)</div>`;
       } else {
@@ -832,8 +834,9 @@ function makeRewardCard(ctx) {
     let descHtml = desc ? `<div class="reward-desc">${desc}</div>` : '';
 
     let cardClass = 'reward-card';
-    if (avail && (!isBought || seasonHit)) cardClass += ' available';
-    if (isBought && !seasonHit) cardClass += ' bought';
+    const seasonPending = !!(seasonHit && !seasonHit.issued);
+    if (avail && (!isBought || seasonPending)) cardClass += ' available';
+    if ((isBought && !seasonPending) || (seasonHit && seasonHit.issued)) cardClass += ' bought';
     else if (boughtBefore) cardClass += ' bought repeat';
 
     let priceDisplay = isTbd
@@ -1907,21 +1910,32 @@ function seasonStatus(info, now) {
   return 'done';
 }
 
-// Активисты: первый слот — максимум баллов; второй — максимум работ среди остальных.
-// Если число работ одинаковое, внутри этой группы решают баллы; ничья по баллам сохраняется.
+// Активисты сезона:
+// 1) больше всех баллов (ничья по баллам — получают все);
+// 2) больше всех работ; при равенстве работ решают баллы.
+//    Если это тот же человек, что в п.1, или у всех поровну работ — берётся следующий по баллам (ничья — все).
 function seasonPickWinners(rows) {
   const res = new Map();
   const add = (r, why) => { if (!res.has(r.person.id)) res.set(r.person.id, []); const a = res.get(r.person.id); if (!a.includes(why)) a.push(why); };
   const act = rows.filter(r => r.count > 0);
   if (!act.length) return res;
   const maxP = Math.max(...act.map(r => r.points));
-  act.filter(r => r.points === maxP).forEach(r => add(r, 'points'));
-  const rest = act.filter(r => !res.has(r.person.id));
-  if (!rest.length) return res;
-  const maxC = Math.max(...rest.map(r => r.count));
-  const workLeaders = rest.filter(r => r.count === maxC);
-  const maxWorkPoints = Math.max(...workLeaders.map(r => r.points));
-  workLeaders.filter(r => r.points === maxWorkPoints).forEach(r => add(r, 'works'));
+  if (maxP > 0) act.filter(r => r.points === maxP).forEach(r => add(r, 'points'));
+
+  const maxC = Math.max(...act.map(r => r.count));
+  let wl = act.filter(r => r.count === maxC);
+  const everyoneTied = wl.length === act.length;        // у всех одинаковое число работ
+  const maxWP = Math.max(...wl.map(r => r.points));     // при равенстве работ решают баллы
+  wl = wl.filter(r => r.points === maxWP);
+  const fresh = wl.filter(r => !res.has(r.person.id));
+  if (!everyoneTied) wl.forEach(r => add(r, 'works'));
+  if (!fresh.length) {
+    const rest = act.filter(r => !res.has(r.person.id));
+    if (rest.length) {
+      const maxR = Math.max(...rest.map(r => r.points));
+      if (maxR > 0) rest.filter(r => r.points === maxR).forEach(r => add(r, 'next'));
+    }
+  }
   return res;
 }
 
@@ -1958,15 +1972,20 @@ function seasonCalc(branch) {
   return map;
 }
 
-// Фактическая выдача: статус «Выдан» + дата выдачи совпадает с датой сезона.
+// Костюм выдан: в «Покупках» есть строка «Костюм …» со статусом «Выдан» и датой выдачи в пределах SEASON_ISSUE_DAYS
+// после начала выдачи этого сезона. Если даты нет — считается выданным только за сезон, по которому выдача идёт сейчас.
 function seasonIssued(branch, person, season) {
   const cfg = SEASON_BRANCHES[branch];
   const list = branch === 'painters' ? purchases : branch === 'designers' ? designerPurchases : writerPurchases;
   const idKey = branch === 'painters' ? 'artistId' : branch === 'designers' ? 'designerId' : 'writerId';
+  const now = new Date();
   return list.some(p => {
-    if (p[idKey] !== person.id || slug(p.rewardName) !== slug(cfg.costume) || slug(p.status) !== slug('Выдан')) return false;
-    const d = seasonDateParts(p.issuedDate); if (!d || d.y !== season.issue.getFullYear() || d.m !== season.issue.getMonth()+1) return false;
-    const day = String(p.issuedDate).match(/^(\d{1,2})/); return day && Number(day[1]) === season.issue.getDate();
+    if (p[idKey] !== person.id || slug(p.rewardName) !== slug(cfg.costume) || slug(p.status) !== 'выдан') return false;
+    const m = String(p.issuedDate || '').match(/(\d{1,2})\.(\d{1,2})\.(\d{4}|\d{2})(?!\d)/);
+    if (!m) return seasonStatus(season, now) === 'issuing';
+    let y = +m[3]; if (y < 100) y += 2000;
+    const d = new Date(y, +m[2] - 1, +m[1]);
+    return d >= season.issue && d < new Date(season.issue.getTime() + SEASON_ISSUE_DAYS * 864e5);
   });
 }
 
@@ -2059,8 +2078,8 @@ function renderSeasons() {
       <p style="margin:0 0 6px"><b>Как считается.</b> Сезон — 3 месяца подряд, у каждой ветви свои. Берутся работы, у которых указана дата; работы без даты не учитываются.</p>
       <ul style="margin:0">
         <li>Костюм получает <b>игрок с наибольшим количеством баллов</b> за сезон;</li>
-        <li>и <b>игрок с наибольшим количеством работ</b> за сезон (если это тот же человек — следующий по баллам);</li>
-        <li>если игрок уже победил по баллам, для категории работ берётся следующий по числу работ; при равенстве работ сравниваются баллы. Ничья сохраняется.</li><li>Костюм выдаётся в 1-й день после окончания сезона. При одной работе за сезон второй активист определяется по баллам среди остальных.</li>
+        <li>и <b>игрок с наибольшим количеством работ</b> за сезон.</li>
+        <li>Если работ поровну, решают баллы. Если это тот же человек или у всех работ поровну — костюм получает следующий по баллам. При ничьей по баллам костюм получают все, кто разделил место. Костюм выдаётся в 1-й день после окончания сезона.</li><li>Костюм выдаётся в 1-й день после окончания сезона. При одной работе за сезон второй активист определяется по баллам среди остальных.</li>
       </ul>
     </div>
 
