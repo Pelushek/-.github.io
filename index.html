@@ -306,12 +306,12 @@ let designers=[], designerWorks=[], designerPurchases=[], currentDesigner=null;
 let writers=[], writerWorks=[], writerPurchases=[], currentWriter=null;
 const SPEC_PAINTERS=document.getElementById('specFilter').innerHTML;
 const WRITER_CATS=['Работы'];
-const WRITER_REWARD_NAMES=['За проявление творческой жилки','Ачивка писателей','Плашка писателей','Отрядное оформление сокровищницы','Костюм писателей'];
+const WRITER_REWARD_NAMES=['За проявление творческой жилки','Ачивка писателей','Плашка писателей','Отрядное оформление сокровищницы','Костюм писателей','Медаль мероприятия'];
 const DESIGNER_CATS=['Осебе','Баннеры','Таблицы','Гугл-документы','Блоги','Уроки','Иное'];
-const DESIGNER_REWARD_NAMES=['За проявление творческой жилки','Ачивка оформителей','Плашка оформителей','Отрядное оформление сокровищницы','Костюм оформителей'];
+const DESIGNER_REWARD_NAMES=['За проявление творческой жилки','Ачивка оформителей','Плашка оформителей','Отрядное оформление сокровищницы','Костюм оформителей','Медаль мероприятия'];
 const SPEC_DESIGNERS='<option value="">Все специальности</option><option value="осебе">Осебе</option><option value="баннер">Баннеры</option><option value="таблиц">Таблицы</option><option value="гугл">Гугл-документы</option><option value="блог">Блоги</option><option value="урок">Уроки</option><option value="иное">Иное</option>';
 let importWarnings=[];
-const ANIMATOR_REWARD_NAMES = ['За фантазию и организованность', 'Ачивка аниматоров', 'Отрядное оформление сокровищницы'];
+const ANIMATOR_REWARD_NAMES = ['За фантазию и организованность', 'Ачивка аниматоров', 'Плашка аниматоров', 'Отрядное оформление сокровищницы', 'Медаль мероприятия'];
 function warnMissingColumn(sheet, colName){ importWarnings.push(`Лист «${sheet}»: не найдена колонка «${colName}» — строки не учтены.`); }
 function warnUnmatched(sheet, kind, set){
   if (!set.size) return;
@@ -350,7 +350,9 @@ function initHomeRewards(){
    // --- медали
    {g:'medals', br:['animators'], name:'За фантазию и организованность', desc:'Могут получить все аниматоры.', price:'40 баллов', img:'https://i.ibb.co/MxxJ86PF/500.png'},
    {g:'medals', br:['painters','designers','writers'], name:'За проявление творческой жилки', desc:'Могут получить художники, оформители, писатели и любой член племени.', price:'от 20 баллов', note:'20 / 50 / 100 — по ветви', prices:{painters:'100 баллов',designers:'20 баллов',writers:'50 баллов'}, img:'https://i.ibb.co/ccZYfcrk/223-1.png'},
+   {g:'medals', br:['painters','designers','writers','animators'], name:'Медаль мероприятия', desc:'На усмотрение Ведущего Творца.', price:'выдаётся вручную', manual:1, img:'https://i.ibb.co/ynk8nHDn/1890.png'},
    // --- плашки
+   {g:'plaques', br:['animators'], name:'Плашка аниматоров', desc:'Выдаётся за накопленные баллы аниматоров.', price:'цена уточняется', tbd:1},
    {g:'plaques', br:['painters'], name:'Плашка живописцев', desc:'Выдаётся за накопленные баллы живописцев.', price:'250 баллов', img:'https://i.ibb.co/WNK9mFsv/image.png'},
    {g:'plaques', br:['designers'], name:'Плашка оформителей', desc:'Выдаётся за накопленные баллы оформителей.', price:'40 баллов', img:'https://i.ibb.co/FrxGcgY/image.png'},
    {g:'plaques', br:['writers'], name:'Плашка писателей', desc:'Выдаётся за накопленные баллы писателей.', price:'100 баллов', img:'https://i.ibb.co/XfXbfVdS/Gb-Fj.png'},
@@ -840,7 +842,7 @@ const ALL_REWARDS = [
   { name: 'Отрядное оформление сокровищницы', price: 400, isNb: false },
   { name: 'Костюм живописцев', price: 0, isNb: false }, 
   { name: 'Обмен на жетоны', price: 1, isNb: true, repeat: true },
-  { name: 'Медаль мероприятия', price: 0, isNb: true },
+  { name: 'Медаль мероприятия', price: 0, isNb: false },
   { name: 'След на фоне (1 сезон)', price: 15, isNb: true, repeat: true },
   { name: 'Личный костюм (1 неделя)', price: 30, isNb: true, repeat: true },
   { name: 'Личный костюм (2 недели)', price: 50, isNb: true, repeat: true },
@@ -1217,7 +1219,9 @@ function renderAnimatorRewards() {
     <div class="rewards-grid" style="margin-top:15px;">
       ${card('За фантазию и организованность', 'Могут получить все аниматоры.', 40, false, 'https://i.ibb.co/MxxJ86PF/500.png')}
       ${card('Ачивка аниматоров', '', null, false, null)}
+      ${card('Плашка аниматоров', '', null, false, null)}
       ${card('Отрядное оформление сокровищницы', '', null, false, null)}
+      ${card('Медаль мероприятия', 'На усмотрение Ведущего Творца', 0, false, 'https://i.ibb.co/ynk8nHDn/1890.png')}
     </div>
 
     <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--line); padding-bottom:5px;">Информационная сводка</h3>
@@ -1369,13 +1373,13 @@ function renderRewards() {
       ${card('Плашки живописцев', '', 250, false, 'https://i.ibb.co/WNK9mFsv/image.png')}
       ${card('Отрядное оформление сокровищницы', '', 400, false, 'https://d.zaix.ru/GbGk.png')}
       ${card('Костюм живописцев', 'Выдается живописцам-активистам сезона [3 месяца].', 0, false, 'https://i.ibb.co/23Xm2FVL/1.png')}
+      ${card('Медаль мероприятия', 'На усмотрение Ведущего Творца', 0, false, 'https://i.ibb.co/ynk8nHDn/1890.png')}
     </div>
 
     <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--accent); padding-bottom:5px; color:var(--accent);">Награды за Наградные баллы (НБ)</h3>
     <h4 style="margin: 15px 0 10px 0; font-size:14px;">Магазин (Баллы снимаются)</h4>
     <div class="rewards-grid">
       ${card('Обмен на жетоны', 'Не более 15 в месяц', 1, true, 'https://i.ibb.co/zWkPkVyt/utt-BQa9-Xi0u-JUQs-Dx-GY8-Ll-HQ0-FF3se-Ql-Wy1p-TGFH54y-Qcd-Zgh-Q0b-Ge-Lpw-Kn-GX-KLflwnb1-G1-GGj-LU4-HLKz-R.png')}
-      ${card('Медаль мероприятия', 'На усмотрение Ведущего Творца', 0, true, 'https://i.ibb.co/ynk8nHDn/1890.png')}
       ${card('След на фоне (1 сезон)', 'Добавить свой след на любой фон сроком на 1 сезон', 15, true, 'https://i.ibb.co/0RFx5HZN/7-cmi-Hp73ct4n-ZZt-B0-Anq-Laep-HUqiv4-Y95jq-Y6u-SO6ne-WXZJ5-ahu-IIg-UIc-JCn5-6jo6-JSGZ-7-Xhvd-S08-Fg-CVr7.jpg')}
       ${card('Личный костюм (1 неделя)', 'Костюм на неделю', 30, true, 'https://i.ibb.co/jkHvSQmS/image.png')}
       ${card('Личный костюм (2 недели)', 'Костюм на две недели', 50, true, 'https://i.ibb.co/jkHvSQmS/image.png')}
@@ -1577,6 +1581,7 @@ function renderDesignerRewards() {
       ${card('Плашка оформителей', '', 40, false, 'https://i.ibb.co/FrxGcgY/image.png')}
       ${card('Отрядное оформление сокровищницы', '', null, false, 'https://d.zaix.ru/GbGk.png')}
       ${card('Костюм оформителей', 'Выдается оформителям-активистам сезона [3 месяца]<br>Подробности и условия выдачи можно узнать в Сезонке.', 0, false, 'https://i.ibb.co/RGSbKRTy/1.png')}
+      ${card('Медаль мероприятия', 'На усмотрение Ведущего Творца', 0, false, 'https://i.ibb.co/ynk8nHDn/1890.png')}
     </div>
 
     <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--line); padding-bottom:5px;">Информационная сводка</h3>
@@ -1827,6 +1832,7 @@ function renderWriterRewards() {
       ${card('Плашка писателей', '', 100, false, 'https://i.ibb.co/XfXbfVdS/Gb-Fj.png')}
       ${card('Отрядное оформление сокровищницы', '', null, false, 'https://d.zaix.ru/GbGk.png')}
       ${card('Костюм писателей', 'Выдается писателям-активистам сезона [3 месяца]<br>Подробности и условия выдачи можно узнать в Сезонке.', 0, false, 'https://i.ibb.co/WNgYWPyF/3.png')}
+      ${card('Медаль мероприятия', 'На усмотрение Ведущего Творца', 0, false, 'https://i.ibb.co/ynk8nHDn/1890.png')}
     </div>
 
     <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--line); padding-bottom:5px;">Информационная сводка</h3>
