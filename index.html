@@ -1315,7 +1315,6 @@ function renderAnimatorRewards() {
       <strong style="font-size:14px;">Проверить доступность наград для:</strong>
       <select id="rewardArtistSelect" style="flex:1; max-width:300px; padding:8px;">${options}</select>
     </div>
-    ${nbCheckLine('animators', checkedArtist)}
 
     <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--accent); padding-bottom:5px; color:var(--accent);">Награды аниматоров</h3>
     <div class="rewards-grid" style="margin-top:15px;">
@@ -1717,7 +1716,6 @@ function renderDesignerRewards() {
     </div>
 
     <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--accent); padding-bottom:5px; color:var(--accent);">Награды за Наградные баллы (НБ)</h3>
-    ${nbCheckLine('designers', checked)}
     <div class="rewards-grid" style="margin-top:15px;">
       ${nbc('Обмен на жетоны', 'Не более 15 в месяц', 1, true, 'https://i.ibb.co/zWkPkVyt/utt-BQa9-Xi0u-JUQs-Dx-GY8-Ll-HQ0-FF3se-Ql-Wy1p-TGFH54y-Qcd-Zgh-Q0b-Ge-Lpw-Kn-GX-KLflwnb1-G1-GGj-LU4-HLKz-R.png')}
       ${nbc('Личный костюм (1 неделя)', 'Костюм на неделю', 15, true, 'https://i.ibb.co/jkHvSQmS/image.png')}
@@ -1993,7 +1991,6 @@ function renderWriterRewards() {
     </div>
 
     <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--accent); padding-bottom:5px; color:var(--accent);">Награды за Наградные баллы (НБ)</h3>
-    ${nbCheckLine('writers', checked)}
     <div class="rewards-grid" style="margin-top:15px;">
       ${nbc('Обмен на жетоны', 'Не более 15 в месяц', 1, true, 'https://i.ibb.co/zWkPkVyt/utt-BQa9-Xi0u-JUQs-Dx-GY8-Ll-HQ0-FF3se-Ql-Wy1p-TGFH54y-Qcd-Zgh-Q0b-Ge-Lpw-Kn-GX-KLflwnb1-G1-GGj-LU4-HLKz-R.png')}
       ${nbc('Личный костюм (1 неделя)', 'Костюм на неделю', 25, true, 'https://i.ibb.co/jkHvSQmS/image.png')}
