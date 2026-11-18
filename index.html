@@ -306,12 +306,12 @@ let designers=[], designerWorks=[], designerPurchases=[], currentDesigner=null;
 let writers=[], writerWorks=[], writerPurchases=[], currentWriter=null;
 const SPEC_PAINTERS=document.getElementById('specFilter').innerHTML;
 const WRITER_CATS=['Работы'];
-const WRITER_REWARD_NAMES=['За проявление творческой жилки','Ачивка писателей','Плашка писателей','Отрядное оформление сокровищницы','Костюм писателей','Медаль мероприятия','Обмен на жетоны','Личный костюм (1 неделя)','Личный костюм (2 недели)','Оформление сокровищницы'];
+const WRITER_REWARD_NAMES=['Личная ачивка','Упоминание в блоге','За проявление творческой жилки','Ачивка писателей','Плашка писателей','Отрядное оформление сокровищницы','Костюм писателей','Медаль мероприятия','Обмен на жетоны','Личный костюм (1 неделя)','Личный костюм (2 недели)','Оформление сокровищницы'];
 const DESIGNER_CATS=['Осебе','Баннеры','Таблицы','Гугл-документы','Блоги','Уроки','Иное'];
-const DESIGNER_REWARD_NAMES=['За проявление творческой жилки','Ачивка оформителей','Плашка оформителей','Отрядное оформление сокровищницы','Костюм оформителей','Медаль мероприятия','Обмен на жетоны','Личный костюм (1 неделя)','Личный костюм (2 недели)','Оформление сокровищницы'];
+const DESIGNER_REWARD_NAMES=['Личная ачивка','Упоминание в блоге','За проявление творческой жилки','Ачивка оформителей','Плашка оформителей','Отрядное оформление сокровищницы','Костюм оформителей','Медаль мероприятия','Обмен на жетоны','Личный костюм (1 неделя)','Личный костюм (2 недели)','Оформление сокровищницы'];
 const SPEC_DESIGNERS='<option value="">Все специальности</option><option value="осебе">Осебе</option><option value="баннер">Баннеры</option><option value="таблиц">Таблицы</option><option value="гугл">Гугл-документы</option><option value="блог">Блоги</option><option value="урок">Уроки</option><option value="иное">Иное</option>';
 let importWarnings=[];
-const ANIMATOR_REWARD_NAMES = ['За фантазию и организованность', 'Ачивка аниматоров', 'Плашка аниматоров', 'Отрядное оформление сокровищницы', 'Медаль мероприятия', 'Обмен на жетоны','Личный костюм (1 неделя)','Личный костюм (2 недели)','Оформление сокровищницы'];
+const ANIMATOR_REWARD_NAMES = ['Личная ачивка','Упоминание в блоге','За фантазию и организованность', 'Ачивка аниматоров', 'Плашка аниматоров', 'Отрядное оформление сокровищницы', 'Медаль мероприятия', 'Обмен на жетоны','Личный костюм (1 неделя)','Личный костюм (2 недели)','Оформление сокровищницы'];
 function warnMissingColumn(sheet, colName){ importWarnings.push(`Лист «${sheet}»: не найдена колонка «${colName}» — строки не учтены.`); }
 function warnUnmatched(sheet, kind, set){
   if (!set.size) return;
@@ -352,7 +352,7 @@ function initHomeRewards(){
    {g:'medals', br:['painters','designers','writers'], name:'За проявление творческой жилки', desc:'Могут получить художники, оформители, писатели и любой член племени.', price:'от 20 баллов', note:'20 / 50 / 100 — по ветви', prices:{painters:'100 баллов',designers:'20 баллов',writers:'50 баллов'}, img:'https://i.ibb.co/ccZYfcrk/223-1.png'},
    {g:'medals', br:['painters','designers','writers','animators'], name:'Медаль мероприятия', desc:'На усмотрение Ведущего Творца.', price:'выдаётся вручную', manual:1, img:'https://i.ibb.co/ynk8nHDn/1890.png'},
    // --- плашки
-   {g:'plaques', br:['animators'], name:'Плашка аниматоров', desc:'Выдаётся за накопленные баллы аниматоров.', price:'цена уточняется', tbd:1},
+   {g:'plaques', br:['animators'], name:'Плашка аниматоров', desc:'Выдаётся за накопленные баллы аниматоров.', price:'100 баллов'},
    {g:'plaques', br:['painters'], name:'Плашка живописцев', desc:'Выдаётся за накопленные баллы живописцев.', price:'250 баллов', img:'https://i.ibb.co/WNK9mFsv/image.png'},
    {g:'plaques', br:['designers'], name:'Плашка оформителей', desc:'Выдаётся за накопленные баллы оформителей.', price:'40 баллов', img:'https://i.ibb.co/FrxGcgY/image.png'},
    {g:'plaques', br:['writers'], name:'Плашка писателей', desc:'Выдаётся за накопленные баллы писателей.', price:'100 баллов', img:'https://i.ibb.co/XfXbfVdS/Gb-Fj.png'},
@@ -360,21 +360,21 @@ function initHomeRewards(){
    {g:'marks', br:['painters'], name:'Ачивка живописцев', desc:'Личная ачивка за баллы живописцев.', price:'100 баллов', img:'https://d.zaix.ru/Edpa.png'},
    {g:'marks', br:['designers'], name:'Ачивка оформителей', desc:'Скоро.', price:'цена уточняется', tbd:1},
    {g:'marks', br:['writers'], name:'Ачивка писателей', desc:'Скоро.', price:'цена уточняется', tbd:1},
-   {g:'marks', br:['animators'], name:'Ачивка аниматоров', desc:'Скоро.', price:'цена уточняется', tbd:1},
-   {g:'marks', br:['painters','designers','writers','animators'], name:'Отрядное оформление сокровищницы', desc:'Одна из наград для всех ветвей, цены ветвей уточняются.', price:'цена уточняется', tbd:1, img:'https://d.zaix.ru/GbGk.png'},
+   {g:'marks', br:['animators'], name:'Ачивка аниматоров', desc:'Личная ачивка за баллы аниматоров.', price:'40 баллов'},
+   {g:'marks', br:['painters','designers','writers','animators'], name:'Отрядное оформление сокровищницы', desc:'Одна из наград для всех ветвей.', price:'от 160 баллов', prices:{painters:'400 баллов',animators:'160 баллов',designers:'цена уточняется',writers:'цена уточняется'}, img:'https://d.zaix.ru/GbGk.png'},
    // --- костюмы
    {g:'suits', br:['painters'], name:'Костюм живописцев', desc:'Активисту сезона [3 месяца]: больше всех баллов и больше всех работ.', price:'активист сезона', manual:1, img:'https://i.ibb.co/23Xm2FVL/1.png'},
    {g:'suits', br:['designers'], name:'Костюм оформителей', desc:'Активисту сезона [3 месяца]: больше всех баллов и больше всех работ.', price:'активист сезона', manual:1, img:'https://i.ibb.co/RGSbKRTy/1.png'},
    {g:'suits', br:['writers'], name:'Костюм писателей', desc:'Активисту сезона [3 месяца]: больше всех баллов и больше всех работ.', price:'активист сезона', manual:1, img:'https://i.ibb.co/WNgYWPyF/3.png'},
    // --- НБ (живописцы)
-   {g:'nb', br:['painters','designers','writers','animators'], name:'Обмен на жетоны', desc:'Не более 15 в месяц.', price:'1 НБ у живописцев', note:'у остальных ветвей цена уточняется', prices:{painters:'1 НБ',designers:'цена уточняется',writers:'цена уточняется',animators:'цена уточняется'}, nb:1, img:'https://i.ibb.co/zWkPkVyt/utt-BQa9-Xi0u-JUQs-Dx-GY8-Ll-HQ0-FF3se-Ql-Wy1p-TGFH54y-Qcd-Zgh-Q0b-Ge-Lpw-Kn-GX-KLflwnb1-G1-GGj-LU4-HLKz-R.png'},
-   {g:'nb', br:['painters','designers','writers','animators'], name:'Личный костюм', desc:'На неделю или на две.', price:'30–50 НБ у живописцев', note:'у остальных ветвей цена уточняется', prices:{painters:'30–50 НБ',designers:'цена уточняется',writers:'цена уточняется',animators:'цена уточняется'}, nb:1, img:'https://i.ibb.co/jkHvSQmS/image.png'},
+   {g:'nb', br:['painters','designers','writers','animators'], name:'Обмен на жетоны', desc:'Не более 15 в месяц.', price:'1 НБ у живописцев', note:'у остальных ветвей цена уточняется', prices:{painters:'1 НБ',designers:'цена уточняется',writers:'цена уточняется',animators:'1 НБ'}, nb:1, img:'https://i.ibb.co/zWkPkVyt/utt-BQa9-Xi0u-JUQs-Dx-GY8-Ll-HQ0-FF3se-Ql-Wy1p-TGFH54y-Qcd-Zgh-Q0b-Ge-Lpw-Kn-GX-KLflwnb1-G1-GGj-LU4-HLKz-R.png'},
+   {g:'nb', br:['painters','designers','writers','animators'], name:'Личный костюм', desc:'На неделю или на две.', price:'30–50 НБ у живописцев', note:'у остальных ветвей цена уточняется', prices:{painters:'30–50 НБ',designers:'цена уточняется',writers:'цена уточняется',animators:'20–30 НБ'}, nb:1, img:'https://i.ibb.co/jkHvSQmS/image.png'},
    {g:'nb', br:['painters'], name:'След на фоне (1 сезон)', desc:'Свой след на любой фон на 1 сезон.', price:'15 НБ', nb:1, img:'https://i.ibb.co/0RFx5HZN/7-cmi-Hp73ct4n-ZZt-B0-Anq-Laep-HUqiv4-Y95jq-Y6u-SO6ne-WXZJ5-ahu-IIg-UIc-JCn5-6jo6-JSGZ-7-Xhvd-S08-Fg-CVr7.jpg'},
    {g:'nb', br:['painters'], name:'Оформление плашки (Одаз/Манназ)', desc:'Личное оформление плашки живописцев.', price:'70 НБ', nb:1},
-   {g:'nb', br:['painters','designers','writers','animators'], name:'Оформление сокровищницы', desc:'Кастомное оформление.', price:'100 НБ у живописцев', note:'у остальных ветвей цена уточняется', prices:{painters:'100 НБ',designers:'цена уточняется',writers:'цена уточняется',animators:'цена уточняется'}, nb:1},
-   {g:'nb', br:['painters'], name:'Личная ачивка', desc:'Порог НБ за всё время. Выдаётся по желанию, НБ не списываются.', price:'50 НБ (порог)', nb:1, img:'https://i.ibb.co/9k037Wt1/54324234.png'},
+   {g:'nb', br:['painters','designers','writers','animators'], name:'Оформление сокровищницы', desc:'Кастомное оформление.', price:'100 НБ у живописцев', note:'у остальных ветвей цена уточняется', prices:{painters:'100 НБ',designers:'цена уточняется',writers:'цена уточняется',animators:'60 НБ'}, nb:1},
+   {g:'nb', br:['painters','designers','writers','animators'], name:'Личная ачивка', desc:'Порог НБ за всё время. Выдаётся по желанию, НБ не списываются.', price:'от 30 НБ (порог)', prices:{painters:'50 НБ (порог)',animators:'30 НБ (порог)',designers:'цена уточняется',writers:'цена уточняется'}, nb:1, img:'https://i.ibb.co/9k037Wt1/54324234.png'},
    {g:'nb', br:['painters'], name:'След на фоне (навсегда)', desc:'Порог НБ за всё время. Может потеряться, если фон перерисуют с нуля.', price:'100 НБ (порог)', nb:1, img:'https://i.ibb.co/TDY645GJ/L0-PCm4-Thb-QKCFGHJtc-T716es-X5o-L6-N1i9-Wx-Wc-ULk-M7k-Vbx-CHN-Nm-Y15-N-v-WSJLGLFat0i-RDOTuvp4-Z50q8-Zg-K8-D.jpg'},
-   {g:'nb', br:['painters'], name:'Упоминание в блоге', desc:'Упоминание в блоге мастерской чудес. Порог НБ за всё время, выдаётся по желанию.', price:'150 НБ (порог)', nb:1}
+   {g:'nb', br:['painters','designers','writers','animators'], name:'Упоминание в блоге', desc:'Упоминание в блоге мастерской чудес. Порог НБ за всё время, выдаётся по желанию.', price:'от 90 НБ (порог)', prices:{painters:'150 НБ (порог)',animators:'90 НБ (порог)',designers:'цена уточняется',writers:'цена уточняется'}, nb:1}
   ];
   const G = [
    {id:'medals',  t:'Медали', s:''},
@@ -737,21 +737,22 @@ function autoBonusPoints(a) {
     return Math.round(totalBonus * 10) / 10;
 }
 
-function manualNbList(a) { return manualNb.filter(m => m.artistId === a.id); }
-function manualNbSum(a) { return manualNbList(a).reduce((s, m) => s + m.amount, 0); }
+function manualNbList(a, br = 'painters') { return manualNb.filter(m => (m.branch || 'painters') === br && m.artistId === a.id); }
+function manualNbSum(a, br = 'painters') { return manualNbList(a, br).reduce((s, m) => s + m.amount, 0); }
 
 // все начисленные НБ: автоматические (каждая 3-я работа) + ручные (срочность/важность)
 function rawBonusPoints(a) {
     return Math.round((autoBonusPoints(a) + manualNbSum(a)) * 10) / 10;
 }
 
-function manualNbHTML(a) {
-    const list = manualNbList(a);
+function manualNbHTML(a, br = 'painters', autoVal = null) {
+    if (autoVal === null) autoVal = autoBonusPoints(a);
+    const list = manualNbList(a, br);
     if (!list.length) return '';
     const fmt = n => (n > 0 ? '+' : '') + (Math.round(n * 10) / 10);
     const items = list.slice().sort((x, y) => parseDate(y.date) - parseDate(x.date)).map(m =>
         `<li>${m.date ? esc(m.date) + ' · ' : ''}<b>${fmt(m.amount)}</b>${m.reason ? ' — ' + esc(m.reason) : ''}</li>`).join('');
-    return `<span style="margin-top:3px;font-size:10px;">авто ${autoBonusPoints(a)} · вручную ${fmt(manualNbSum(a))}</span>
+    return `<span style="margin-top:3px;font-size:10px;">авто ${autoVal} · вручную ${fmt(manualNbSum(a, br))}</span>
       <details style="margin-top:6px;text-align:left;font-size:11px;font-weight:400;"><summary style="cursor:pointer;text-align:center;color:var(--muted);">Ручные начисления (${list.length})</summary><ul style="margin:6px 0 0;padding-left:16px;">${items}</ul></details>`;
 }
 
@@ -769,6 +770,92 @@ function currentBonusPoints(a) {
 }
 
 // ===== ЛОГИКА ДЛЯ АНИМАТОРОВ =====
+
+// ===================== НБ ДЛЯ АНИМАТОРОВ / ОФОРМИТЕЛЕЙ / ПИСАТЕЛЕЙ =====================
+// Сейчас у аниматоров НБ = все баллы / 3. Когда запустят систему «баллы за мероприятие / 2» — поменять число на 2.
+const ANIMATOR_NB_DIVISOR = 3;
+// price: null = цена уточняется; spend:false = награда-порог (НБ не списываются, сравнивается с НБ за всё время); repeat = можно брать много раз
+const NB_REWARDS = {
+  animators: [
+    { name: 'Обмен на жетоны', price: 1, repeat: true },
+    { name: 'Личный костюм (1 неделя)', price: 20, repeat: true },
+    { name: 'Личный костюм (2 недели)', price: 30, repeat: true },
+    { name: 'Оформление сокровищницы', price: 60 },
+    { name: 'Личная ачивка', price: 30, spend: false },
+    { name: 'Упоминание в блоге', price: 90, spend: false }
+  ],
+  designers: [
+    { name: 'Обмен на жетоны', price: null, repeat: true },
+    { name: 'Личный костюм (1 неделя)', price: null, repeat: true },
+    { name: 'Личный костюм (2 недели)', price: null, repeat: true },
+    { name: 'Оформление сокровищницы', price: null },
+    { name: 'Личная ачивка', price: null, spend: false },
+    { name: 'Упоминание в блоге', price: null, spend: false }
+  ],
+  writers: [
+    { name: 'Обмен на жетоны', price: null, repeat: true },
+    { name: 'Личный костюм (1 неделя)', price: null, repeat: true },
+    { name: 'Личный костюм (2 недели)', price: null, repeat: true },
+    { name: 'Оформление сокровищницы', price: null },
+    { name: 'Личная ачивка', price: null, spend: false },
+    { name: 'Упоминание в блоге', price: null, spend: false }
+  ]
+};
+function nbPurchasesOf(br, p) {
+  if (br === 'animators') return animatorPurchases.filter(x => x.animatorId === p.id);
+  if (br === 'designers') return designerPurchases.filter(x => x.designerId === p.id);
+  return writerPurchases.filter(x => x.writerId === p.id);
+}
+function nbDef(br, title) { return (NB_REWARDS[br] || []).find(r => slug(r.name) === slug(title)); }
+function autoNbFor(br, p) {
+  if (br === 'animators') return Math.round(animatorPoints(p) / ANIMATOR_NB_DIVISOR * 10) / 10;
+  return 0; // формулы для оформителей и писателей пока не заданы
+}
+function rawNbFor(br, p) { return Math.round((autoNbFor(br, p) + manualNbSum(p, br)) * 10) / 10; }
+function spentNbFor(br, p) {
+  let spent = 0;
+  nbPurchasesOf(br, p).forEach(x => {
+    const d = nbDef(br, x.rewardName);
+    if (d && d.spend !== false && d.price) spent += d.price * (x.qty || 1);
+  });
+  return spent;
+}
+function curNbFor(br, p) { return Math.max(0, Math.round((rawNbFor(br, p) - spentNbFor(br, p)) * 10) / 10); }
+function nbCountFor(br, p, title) {
+  return nbPurchasesOf(br, p).filter(x => slug(x.rewardName) === slug(title)).reduce((s, x) => s + (x.qty || 1), 0);
+}
+function nbBoughtFor(br, p, title) {
+  const d = nbDef(br, title);
+  if (d && d.repeat) return false;
+  return nbPurchasesOf(br, p).some(x => slug(x.rewardName) === slug(title));
+}
+function nbTileHTML(br, p) {
+  const manual = manualNbList(p, br).length;
+  if (br !== 'animators' && !manual && !rawNbFor(br, p)) return '';
+  return `<div class="mini-stat full-width"><span>Текущие НБ (баланс)</span><b>${curNbFor(br, p)}</b>${manualNbHTML(p, br, autoNbFor(br, p))}</div>`;
+}
+function nbCheckLine(br, p) {
+  if (!p) return '';
+  return `<p style="font-size:13px; margin:10px 0 0;"><b>${esc(p.name)}</b>: баланс НБ — <b>${curNbFor(br, p)}</b> (начислено за всё время: ${rawNbFor(br, p)})</p>`;
+}
+function nbCard(br, checked, basePts) {
+  return makeRewardCard({
+    checked, pts: basePts, nb: checked ? curNbFor(br, checked) : 0, rawNb: checked ? rawNbFor(br, checked) : 0,
+    isBoughtFn: t => nbBoughtFor(br, checked, t) || (!nbDef(br, t) && nbPurchasesOf(br, checked).some(x => slug(x.rewardName) === slug(t))),
+    countFn: t => nbCountFor(br, checked, t),
+    seasonFn: br === 'animators' ? null : (t => seasonCostumeHit(br, checked, t))
+  });
+}
+function nbBranchOf(text) {
+  const t = norm(text || '');
+  if (!t) return 'painters';
+  if (t.startsWith('живопис') || t.startsWith('худож')) return 'painters';
+  if (t.startsWith('аниматор')) return 'animators';
+  if (t.startsWith('оформ')) return 'designers';
+  if (t.startsWith('писат')) return 'writers';
+  return null;
+}
+
 function aEvents(a){return animatorEvents.filter(e=>e.animatorId===a.id)}
 function animatorPoints(a){return aEvents(a).reduce((s,e)=>s+(Number(e.points)||0),0)}
 
@@ -1186,6 +1273,7 @@ function animatorBoardHTML(a) {
       <div class="mini-stats">
         <div class="mini-stat"><span>Всего баллов</span><b>${animatorPoints(a)}</b></div>
         <div class="mini-stat"><span>Мероприятий</span><b>${evs.length}</b></div>
+        ${nbTileHTML('animators', a)}
       </div>
     </section>
     <section class="work-area">
@@ -1208,31 +1296,38 @@ function renderAnimatorRewards() {
   let aNb = 0;
   let aRawNb = 0;
 
-  const card = makeRewardCard({checked: checkedArtist, pts: aPts, nb: aNb, rawNb: aRawNb, isBoughtFn: t => animatorPurchases.some(p => p.animatorId === checkedArtist.id && slug(p.rewardName) === slug(t))});
+  const card = nbCard('animators', checkedArtist, aPts);
+  const nbCardA = card;
 
   let html = `
     <div class="info-block" style="padding:15px; margin-bottom:20px; display:flex; align-items:center; gap:15px;">
       <strong style="font-size:14px;">Проверить доступность наград для:</strong>
       <select id="rewardArtistSelect" style="flex:1; max-width:300px; padding:8px;">${options}</select>
     </div>
+    ${nbCheckLine('animators', checkedArtist)}
 
     <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--accent); padding-bottom:5px; color:var(--accent);">Награды аниматоров</h3>
     <div class="rewards-grid" style="margin-top:15px;">
       ${card('За фантазию и организованность', 'Могут получить все аниматоры.', 40, false, 'https://i.ibb.co/MxxJ86PF/500.png')}
-      ${card('Ачивка аниматоров', '', null, false, null)}
-      ${card('Плашка аниматоров', '', null, false, null)}
-      ${card('Отрядное оформление сокровищницы', '', null, false, null)}
+      ${card('Ачивка аниматоров', '', 40, false, null)}
+      ${card('Плашка аниматоров', '', 100, false, null)}
+      ${card('Отрядное оформление сокровищницы', '', 160, false, null)}
       ${card('Медаль мероприятия', 'На усмотрение Ведущего Творца', 0, false, 'https://i.ibb.co/ynk8nHDn/1890.png')}
     </div>
 
     <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--accent); padding-bottom:5px; color:var(--accent);">Награды за Наградные баллы (НБ)</h3>
-    <p style="font-size:12px; color:var(--muted); margin:8px 0 0;">Формула начисления НБ для этой ветви пока уточняется. Цены наград будут добавлены позже.</p>
-    <!-- TODO: расчёт НБ для ветви (заглушка) -->
-    <div class="rewards-grid" style="margin-top:15px;">
-      ${card('Обмен на жетоны', 'Не более 15 в месяц', null, true, 'https://i.ibb.co/zWkPkVyt/utt-BQa9-Xi0u-JUQs-Dx-GY8-Ll-HQ0-FF3se-Ql-Wy1p-TGFH54y-Qcd-Zgh-Q0b-Ge-Lpw-Kn-GX-KLflwnb1-G1-GGj-LU4-HLKz-R.png')}
-      ${card('Личный костюм (1 неделя)', 'Костюм на неделю', null, true, 'https://i.ibb.co/jkHvSQmS/image.png')}
-      ${card('Личный костюм (2 недели)', 'Костюм на две недели', null, true, 'https://i.ibb.co/jkHvSQmS/image.png')}
-      ${card('Оформление сокровищницы', 'Кастомное оформление', null, true, null)}
+    <h4 style="margin: 15px 0 10px 0; font-size:14px;">Магазин (НБ снимаются)</h4>
+    <div class="rewards-grid">
+      ${card('Обмен на жетоны', 'Не более 15 в месяц', 1, true, 'https://i.ibb.co/zWkPkVyt/utt-BQa9-Xi0u-JUQs-Dx-GY8-Ll-HQ0-FF3se-Ql-Wy1p-TGFH54y-Qcd-Zgh-Q0b-Ge-Lpw-Kn-GX-KLflwnb1-G1-GGj-LU4-HLKz-R.png')}
+      ${card('Личный костюм (1 неделя)', 'Костюм на неделю', 20, true, 'https://i.ibb.co/jkHvSQmS/image.png')}
+      ${card('Личный костюм (2 недели)', 'Костюм на две недели', 30, true, 'https://i.ibb.co/jkHvSQmS/image.png')}
+      ${card('Оформление сокровищницы', 'Кастомное оформление', 60, true, null)}
+    </div>
+
+    <h4 style="margin: 20px 0 10px 0; font-size:14px;">Награды за достижение определенного порога НБ (выдается по желанию игрока, НБ не списываются)</h4>
+    <div class="rewards-grid">
+      ${card('Личная ачивка', 'Убирается при смене персонажа, но можно поставить снова', 30, true, 'https://i.ibb.co/9k037Wt1/54324234.png', true)}
+      ${card('Упоминание в блоге', 'Упоминание в блоге мастерской чудес', 90, true, null, true)}
     </div>
 
     <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--line); padding-bottom:5px;">Информационная сводка</h3>
@@ -1240,9 +1335,14 @@ function renderAnimatorRewards() {
         <div class="info-block">
             <h3 style="border-bottom:none; color:var(--accent);">Мероприятия</h3>
             <ul>
-                <li><b>Кудесник</b> за организацию получает 20 баллов;</li>
-                <li><b>Подмастерье</b> за участие в организации получает от 5 баллов на усмотрение главного организатора или Ведущего творца;</li>
-                <li><b>Главный помощник</b> за свою работу получает 20 баллов.</li>
+                <li><b>Кудесник</b> за организацию — 30 баллов;</li>
+                <li><b>Подмастерье</b> за участие в организации — баллы по вовлечённости, итоговая сумма не более 20:
+                    <ol style="margin:6px 0 6px 18px; padding:0;">
+                        <li><b>Актёрство в игровой</b> (количество раз за ивент и сложность): обычный день актёрства в афк-режиме (задача в ОС, принимается в любое время до конца дня) — 1 балл; активная актёрская работа (слежка за игровой, реагирование в пределах нескольких часов, по возможности внос баллов в таблицу) — 4 балла;</li>
+                        <li><b>Одобренные идеи заданий</b> — от 1 до 5 баллов за задание (зависит от задания и объёма);</li>
+                        <li><b>Помощь в игровой</b> (закапывание/разнос предметов и т.д.) — от 1 до 2 баллов по сложности.</li>
+                    </ol></li>
+                <li><b>Главный помощник</b> за работу — 20 баллов.</li>
             </ul>
         </div>
         <div class="info-block">
@@ -1250,6 +1350,14 @@ function renderAnimatorRewards() {
             <ul>
                 <li><b>Главный организатор</b> получает 15 баллов;</li>
                 <li><b>Каждый помощник</b> получает от 5 до 10 баллов (на усмотрение главного организатора).</li>
+            </ul>
+        </div>
+        <div class="info-block" style="grid-column:1 / -1;">
+            <h3 style="border-bottom:none; color:var(--accent);">За что можно получить НБ</h3>
+            <ul>
+                <li><b>Фиксированная выдача НБ</b>: сумма ваших баллов за одно мероприятие, делённая на два, равна вашим НБ.</li>
+                <li><b>Сейчас</b>, пока система не введена, все баллы аниматоров делятся на <b>три</b> — это и есть ваши НБ. После введения системы начисление идёт по правилу выше.</li>
+                <li><b>Вручную</b>: дополнительные НБ могут вноситься на усмотрение Ведущего Творца.</li>
             </ul>
         </div>
     </div>
@@ -1480,6 +1588,7 @@ function designerBoardHTML(a){
   <div class="mini-stats">
     <div class="mini-stat"><span>Текущие баллы</span><b>${dPoints(a)}</b></div>
     <div class="mini-stat"><span>Работ</span><b>${aw.length}</b></div>
+    ${nbTileHTML('designers', a)}
   </div>
  </section>
  <section class="work-area">
@@ -1577,6 +1686,7 @@ function renderDesignerRewards() {
   const checked = designers.find(d => d.id === rewardCheckDesignerId);
   const pts = checked ? dPoints(checked) : 0;
   const card = makeRewardCard({checked, pts, nb: 0, rawNb: 0, isBoughtFn: t => isDesignerRewardBought(checked, t), seasonFn: t => seasonCostumeHit('designers', checked, t)});
+  const nbc = nbCard('designers', checked, pts);
 
   $('content').innerHTML = `
     <div class="info-block" style="padding:15px; margin-bottom:20px; display:flex; align-items:center; gap:15px;">
@@ -1596,13 +1706,19 @@ function renderDesignerRewards() {
     </div>
 
     <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--accent); padding-bottom:5px; color:var(--accent);">Награды за Наградные баллы (НБ)</h3>
+    ${nbCheckLine('designers', checked)}
     <p style="font-size:12px; color:var(--muted); margin:8px 0 0;">Формула начисления НБ для этой ветви пока уточняется. Цены наград будут добавлены позже.</p>
-    <!-- TODO: расчёт НБ для ветви (заглушка) -->
     <div class="rewards-grid" style="margin-top:15px;">
-      ${card('Обмен на жетоны', 'Не более 15 в месяц', null, true, 'https://i.ibb.co/zWkPkVyt/utt-BQa9-Xi0u-JUQs-Dx-GY8-Ll-HQ0-FF3se-Ql-Wy1p-TGFH54y-Qcd-Zgh-Q0b-Ge-Lpw-Kn-GX-KLflwnb1-G1-GGj-LU4-HLKz-R.png')}
-      ${card('Личный костюм (1 неделя)', 'Костюм на неделю', null, true, 'https://i.ibb.co/jkHvSQmS/image.png')}
-      ${card('Личный костюм (2 недели)', 'Костюм на две недели', null, true, 'https://i.ibb.co/jkHvSQmS/image.png')}
-      ${card('Оформление сокровищницы', 'Кастомное оформление', null, true, null)}
+      ${nbc('Обмен на жетоны', 'Не более 15 в месяц', null, true, 'https://i.ibb.co/zWkPkVyt/utt-BQa9-Xi0u-JUQs-Dx-GY8-Ll-HQ0-FF3se-Ql-Wy1p-TGFH54y-Qcd-Zgh-Q0b-Ge-Lpw-Kn-GX-KLflwnb1-G1-GGj-LU4-HLKz-R.png')}
+      ${nbc('Личный костюм (1 неделя)', 'Костюм на неделю', null, true, 'https://i.ibb.co/jkHvSQmS/image.png')}
+      ${nbc('Личный костюм (2 недели)', 'Костюм на две недели', null, true, 'https://i.ibb.co/jkHvSQmS/image.png')}
+      ${nbc('Оформление сокровищницы', 'Кастомное оформление', null, true, null)}
+    </div>
+
+    <h4 style="margin: 20px 0 10px 0; font-size:14px;">Награды за достижение определенного порога НБ (выдается по желанию игрока, НБ не списываются)</h4>
+    <div class="rewards-grid">
+      ${nbc('Личная ачивка', 'Убирается при смене персонажа, но можно поставить снова', null, true, 'https://i.ibb.co/9k037Wt1/54324234.png', true)}
+      ${nbc('Упоминание в блоге', 'Упоминание в блоге мастерской чудес', null, true, null, true)}
     </div>
 
     <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--line); padding-bottom:5px;">Информационная сводка</h3>
@@ -1615,6 +1731,13 @@ function renderDesignerRewards() {
             <li><b>Гугл-документы</b> — 1–4 балла;</li>
             <li><b>Блоги</b> (на ивенты/конкурсы и прочее) — 4–8 баллов;</li>
             <li><b>Уроки</b> — 4 балла.</li>
+        </ul>
+    </div>
+    <div class="info-block" style="margin-top:15px;">
+        <h3 style="border-bottom:none; color:var(--accent);">За что можно получить НБ</h3>
+        <ul>
+            <li><b>Фиксированная выдача НБ</b>: формула для этой ветви уточняется.</li>
+            <li><b>Вручную</b>: НБ могут вноситься на усмотрение Ведущего Творца.</li>
         </ul>
     </div>
   `;
@@ -1689,7 +1812,7 @@ function importDesignerPurchases(rows){
  let headers=rows[0].map(norm),idx=makeIdx(headers);
  let ni=idx('имя оформителя','имя художника','имя','оформитель');
  let ri=idx('что куплено','что выдано','награда','предмет');
- let di=idx('дата выдачи','дата'); let si=idx('статус','состояние');
+ let di=idx('дата выдачи','дата'); let si=idx('статус','состояние'); let qi=idx('количество','кол-во','шт');
  if (ni < 0) { warnMissingColumn('Покупки оформителей', 'Имя оформителя'); return; }
  if (ri < 0) { warnMissingColumn('Покупки оформителей', 'Что куплено'); return; }
  const unknownNames = new Set(), unknownRewards = new Set();
@@ -1700,7 +1823,7 @@ function importDesignerPurchases(rows){
    let d=designers.find(x=>slug(x.name)===slug(name));
    if(!d){ unknownNames.add(name); return; }
    if(!DESIGNER_REWARD_NAMES.some(x=>slug(x)===slug(rewardName))) unknownRewards.add(rewardName);
-   designerPurchases.push({designerId:d.id, rewardName, issuedDate:di>=0?(r[di]||'').trim():'', status:si>=0?(r[si]||'').trim():''});
+   designerPurchases.push({designerId:d.id, rewardName, qty: qi>=0?(Number(String(r[qi]||'').replace(',','.'))||1):1, issuedDate:di>=0?(r[di]||'').trim():'', status:si>=0?(r[si]||'').trim():''});
  });
  warnUnmatched('Покупки оформителей', 'имена не найдены среди оформителей', unknownNames);
  warnUnmatched('Покупки оформителей', 'названия наград не совпадают с сайтом', unknownRewards);
@@ -1760,6 +1883,7 @@ function writerBoardHTML(a){
   <div class="mini-stats">
     <div class="mini-stat"><span>Текущие баллы</span><b>${wPoints(a)}</b></div>
     <div class="mini-stat"><span>Работ</span><b>${aw.length}</b></div>
+    ${nbTileHTML('writers', a)}
     ${volParts.length ? `<div class="mini-stat full-width"><span>Объём</span><b style="font-size:14px">${esc(volParts.join(' · '))}</b></div>` : ''}
   </div>
  </section>
@@ -1838,6 +1962,7 @@ function renderWriterRewards() {
   const checked = writers.find(d => d.id === rewardCheckWriterId);
   const pts = checked ? wPoints(checked) : 0;
   const card = makeRewardCard({checked, pts, nb: 0, rawNb: 0, isBoughtFn: t => isWriterRewardBought(checked, t), seasonFn: t => seasonCostumeHit('writers', checked, t)});
+  const nbc = nbCard('writers', checked, pts);
 
   $('content').innerHTML = `
     <div class="info-block" style="padding:15px; margin-bottom:20px; display:flex; align-items:center; gap:15px;">
@@ -1857,13 +1982,19 @@ function renderWriterRewards() {
     </div>
 
     <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--accent); padding-bottom:5px; color:var(--accent);">Награды за Наградные баллы (НБ)</h3>
+    ${nbCheckLine('writers', checked)}
     <p style="font-size:12px; color:var(--muted); margin:8px 0 0;">Формула начисления НБ для этой ветви пока уточняется. Цены наград будут добавлены позже.</p>
-    <!-- TODO: расчёт НБ для ветви (заглушка) -->
     <div class="rewards-grid" style="margin-top:15px;">
-      ${card('Обмен на жетоны', 'Не более 15 в месяц', null, true, 'https://i.ibb.co/zWkPkVyt/utt-BQa9-Xi0u-JUQs-Dx-GY8-Ll-HQ0-FF3se-Ql-Wy1p-TGFH54y-Qcd-Zgh-Q0b-Ge-Lpw-Kn-GX-KLflwnb1-G1-GGj-LU4-HLKz-R.png')}
-      ${card('Личный костюм (1 неделя)', 'Костюм на неделю', null, true, 'https://i.ibb.co/jkHvSQmS/image.png')}
-      ${card('Личный костюм (2 недели)', 'Костюм на две недели', null, true, 'https://i.ibb.co/jkHvSQmS/image.png')}
-      ${card('Оформление сокровищницы', 'Кастомное оформление', null, true, null)}
+      ${nbc('Обмен на жетоны', 'Не более 15 в месяц', null, true, 'https://i.ibb.co/zWkPkVyt/utt-BQa9-Xi0u-JUQs-Dx-GY8-Ll-HQ0-FF3se-Ql-Wy1p-TGFH54y-Qcd-Zgh-Q0b-Ge-Lpw-Kn-GX-KLflwnb1-G1-GGj-LU4-HLKz-R.png')}
+      ${nbc('Личный костюм (1 неделя)', 'Костюм на неделю', null, true, 'https://i.ibb.co/jkHvSQmS/image.png')}
+      ${nbc('Личный костюм (2 недели)', 'Костюм на две недели', null, true, 'https://i.ibb.co/jkHvSQmS/image.png')}
+      ${nbc('Оформление сокровищницы', 'Кастомное оформление', null, true, null)}
+    </div>
+
+    <h4 style="margin: 20px 0 10px 0; font-size:14px;">Награды за достижение определенного порога НБ (выдается по желанию игрока, НБ не списываются)</h4>
+    <div class="rewards-grid">
+      ${nbc('Личная ачивка', 'Убирается при смене персонажа, но можно поставить снова', null, true, 'https://i.ibb.co/9k037Wt1/54324234.png', true)}
+      ${nbc('Упоминание в блоге', 'Упоминание в блоге мастерской чудес', null, true, null, true)}
     </div>
 
     <h3 style="margin-top:30px; font-size:18px; border-bottom:2px solid var(--line); padding-bottom:5px;">Информационная сводка</h3>
@@ -1872,6 +2003,13 @@ function renderWriterRewards() {
         <ul>
             <li>Писатели получают по <b>1 баллу</b> за каждые <b>100 слов</b> текста / <b>4 строки</b> стиха.</li>
             <li>Учитываются работы на съезд, на ивент, для оформления постов по заказу, сборников, текстов в блог и прочее.</li>
+        </ul>
+    </div>
+    <div class="info-block" style="margin-top:15px;">
+        <h3 style="border-bottom:none; color:var(--accent);">За что можно получить НБ</h3>
+        <ul>
+            <li><b>Фиксированная выдача НБ</b>: формула для этой ветви уточняется.</li>
+            <li><b>Вручную</b>: НБ могут вноситься на усмотрение Ведущего Творца.</li>
         </ul>
     </div>
   `;
@@ -1946,7 +2084,7 @@ function importWriterPurchases(rows){
  let headers=rows[0].map(norm),idx=makeIdx(headers);
  let ni=idx('имя писателя','имя автора','имя','писатель','автор');
  let ri=idx('что куплено','что выдано','награда','предмет');
- let di=idx('дата выдачи','дата'); let si=idx('статус','состояние');
+ let di=idx('дата выдачи','дата'); let si=idx('статус','состояние'); let qi=idx('количество','кол-во','шт');
  if (ni < 0) { warnMissingColumn('Покупки писателей', 'Имя писателя'); return; }
  if (ri < 0) { warnMissingColumn('Покупки писателей', 'Что куплено'); return; }
  const unknownNames = new Set(), unknownRewards = new Set();
@@ -1957,7 +2095,7 @@ function importWriterPurchases(rows){
    let d=writers.find(x=>slug(x.name)===slug(name));
    if(!d){ unknownNames.add(name); return; }
    if(!WRITER_REWARD_NAMES.some(x=>slug(x)===slug(rewardName))) unknownRewards.add(rewardName);
-   writerPurchases.push({writerId:d.id, rewardName, issuedDate:di>=0?(r[di]||'').trim():'', status:si>=0?(r[si]||'').trim():''});
+   writerPurchases.push({writerId:d.id, rewardName, qty: qi>=0?(Number(String(r[qi]||'').replace(',','.'))||1):1, issuedDate:di>=0?(r[di]||'').trim():'', status:si>=0?(r[si]||'').trim():''});
  });
  warnUnmatched('Покупки писателей', 'имена не найдены среди писателей', unknownNames);
  warnUnmatched('Покупки писателей', 'названия наград не совпадают с сайтом', unknownRewards);
@@ -2594,6 +2732,7 @@ function importAnimatorPurchases(rows) {
   let headers = rows[0].map(norm), idx = makeIdx(headers);
   let ni = idx('имя аниматора', 'имя', 'аниматор');
   let ri = idx('что выдано', 'что куплено', 'награда', 'предмет');
+  let qi = idx('количество', 'кол-во', 'шт');
   if (ni < 0) { warnMissingColumn('Награды аниматоров', 'Имя аниматора'); return; }
   if (ri < 0) { warnMissingColumn('Награды аниматоров', 'Награда'); return; }
   const unknownNames = new Set(), unknownRewards = new Set();
@@ -2604,7 +2743,7 @@ function importAnimatorPurchases(rows) {
     let a = animators.find(a => slug(a.name) === slug(name));
     if (!a) { unknownNames.add(name); return; }
     if (!ANIMATOR_REWARD_NAMES.some(x => slug(x) === slug(rewardName))) unknownRewards.add(rewardName);
-    animatorPurchases.push({ animatorId: a.id, rewardName });
+    animatorPurchases.push({ animatorId: a.id, rewardName, qty: qi >= 0 ? (Number(String(r[qi]||'').replace(',','.')) || 1) : 1 });
   });
   warnUnmatched('Награды аниматоров', 'имена не найдены среди аниматоров', unknownNames);
   warnUnmatched('Награды аниматоров', 'названия наград не совпадают с сайтом', unknownRewards);
@@ -2614,28 +2753,35 @@ function importManualNb(rows) {
   manualNb = [];
   if (!rows.length) return;
   let headers = rows[0].map(norm), idx = makeIdx(headers);
-  let ni = idx('имя художника', 'имя', 'художник');
+  let ni = idx('имя художника', 'имя', 'художник', 'ник');
   let ai = idx('нб', 'баллы', 'количество');
   let ri = idx('причина', 'за что', 'комментарий');
   let di = idx('дата');
+  let si = idx('сфера', 'ветвь', 'ветка', 'направление');
   if (ni < 0) { warnMissingColumn('НБ вручную', 'Имя художника'); return; }
   if (ai < 0) { warnMissingColumn('НБ вручную', 'НБ'); return; }
-  const unknownNames = new Set();
+  const unknownNames = new Set(), unknownSpheres = new Set();
+  const pools = { painters: () => artists, animators: () => animators, designers: () => designers, writers: () => writers };
   rows.slice(1).forEach(r => {
     let name = (r[ni] || '').trim();
     if (!name) return;
     let amount = Number(String(r[ai] || '').replace(',', '.'));
     if (!amount) return;
-    let a = artists.find(a => slug(a.name) === slug(name));
-    if (!a) { unknownNames.add(name); return; }
+    let sphereText = si >= 0 ? (r[si] || '').trim() : '';
+    let br = nbBranchOf(sphereText);
+    if (!br) { unknownSpheres.add(sphereText); return; }
+    let a = pools[br]().find(a => slug(a.name) === slug(name));
+    if (!a) { unknownNames.add(name + (sphereText ? ' (' + sphereText + ')' : '')); return; }
     manualNb.push({
+      branch: br,
       artistId: a.id,
       amount,
       reason: ri >= 0 ? (r[ri] || '').trim() : '',
       date: di >= 0 ? (r[di] || '').trim() : ''
     });
   });
-  warnUnmatched('НБ вручную', 'имена не найдены среди художников', unknownNames);
+  warnUnmatched('НБ вручную', 'имена не найдены в указанной сфере (пустая «Сфера» = живописцы)', unknownNames);
+  warnUnmatched('НБ вручную', 'сфера не распознана (нужно: Живописцы / Аниматоры / Оформители / Писатели)', unknownSpheres);
 }
 
 $('search').oninput=render;
