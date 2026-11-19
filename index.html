@@ -151,9 +151,9 @@ html[data-theme="dark"]{--bg:#16151a;--paper:#1f1e24;--ink:#ece8e2;--muted:#9a95
 html[data-theme="ph"]{--bg:#000;--paper:#141414;--ink:#fff;--muted:#a8a8a8;--line:#2d2d2d;--accent:#ff9000;--green:#ff9000;--shadow:0 8px 28px #0008;
   --soft:#1e1e1e;--soft2:#262626;--ok-bg:#2a1a00;--ok-fg:#ffb347;--side:#0a0a0a;--side-hi:#222;--logo:#ff9000;--logo-ink:#000;--warn-bg:#2a1a00;--warn-fg:#ffb347;--ink-inv:#000;
   --pill-bg:#2e1c00;--pill-fg:#ffa31a;--pill-nb:#262626;--pill-nb-fg:#ddd}
-html[data-theme="nether"]{--bg:#1a0808;--paper:#2a1111;--ink:#f6ddd0;--muted:#bb917f;--line:#4d2121;--accent:#ff6a1a;--green:#e0a82e;--shadow:0 8px 28px #0008;
-  --soft:#381616;--soft2:#431a1a;--ok-bg:#3a2a08;--ok-fg:#ffd36b;--side:#110404;--side-hi:#3b1515;--logo:#ff6a1a;--logo-ink:#110404;--warn-bg:#3a2208;--warn-fg:#ffc27a;--ink-inv:#1a0808;
-  --pill-bg:#43200f;--pill-fg:#ff9a5c;--pill-nb:#4a1a1a;--pill-nb-fg:#ffb089}
+html[data-theme="nether"]{--bg:#221212;--paper:#2e1a19;--ink:#f1e3cf;--muted:#b79f86;--line:#523e3c;--accent:#d3a975;--green:#2fa02f;--shadow:0 8px 28px #0008;
+  --soft:#3a2826;--soft2:#523e3c;--ok-bg:#1c2c19;--ok-fg:#86d986;--no-bg:#3a1010;--no-fg:#ff7b7b;--no-line:#8a1a1a;--side:#1c0e10;--side-hi:#3a2826;--logo:#d3a975;--logo-ink:#1c0e10;--warn-bg:#3a2a14;--warn-fg:#e6c89a;--ink-inv:#1c0e10;
+  --pill-bg:#523e3c;--pill-fg:#e6c89a;--pill-nb:#3a2826;--pill-nb-fg:#d3a975}
 html[data-theme] body{background:var(--bg);color:var(--ink)}
 html[data-theme] .sidebar{background:var(--side)}
 html[data-theme] .logo{background:var(--logo);color:var(--logo-ink)}
@@ -195,7 +195,7 @@ html[data-theme] table th,html[data-theme] table td{border-color:var(--line)}
 .theme-pick button[data-t="light"]{background:linear-gradient(135deg,#f5f2ee 50%,#c86f52 50%)}
 .theme-pick button[data-t="dark"]{background:linear-gradient(135deg,#1f1e24 50%,#e08a6c 50%)}
 .theme-pick button[data-t="ph"]{background:linear-gradient(135deg,#000 50%,#ff9000 50%)}
-.theme-pick button[data-t="nether"]{background:linear-gradient(135deg,#2a1111 50%,#ff6a1a 50%)}
+.theme-pick button[data-t="nether"]{background:linear-gradient(135deg,#221212 50%,#d3a975 50%)}
 </style></head>
 <body>
 <div id="loadingOverlay">Загрузка данных из Google Таблицы...</div>
@@ -443,9 +443,9 @@ function initHomeRewards(){
   const G = [
    {id:'medals',  t:'Медали', s:''},
    {id:'plaques', t:'Плашки', s:'Выдаются при достижении порога баллов своей ветви'},
-   {id:'marks',   t:'Ачивки, следы и оформление', s:'Личные награды за баллы'},
+   {id:'marks',   t:'Ачивки, следы и оформление', s:'Выдаются при достижении порога баллов своей ветви; баллы не списываются'},
    {id:'suits',   t:'Костюмы-активистам сезона', s:'Не за баллы, а по итогам сезона (3 месяца)', season:1, note:true},
-   {id:'nb',      t:'Наградные баллы (НБ)', s:'Магазин и пороги наградных баллов. Пороги за всё время есть только у живописцев'}
+   {id:'nb',      t:'Наградные баллы (НБ)', s:'Магазин (НБ списываются) и пороги: пороги есть во всех сферах, считаются по НБ, набранным в сфере за всё время, и не списываются'}
   ];
   let cur = 'all';
   
