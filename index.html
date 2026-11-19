@@ -2258,19 +2258,18 @@ function seasonCostumeHit(branch, person, title) {
   const before = new Date(cur.start.getTime() - 864e5);
   const prev = seasonOf(cfg, before.getFullYear(), before.getMonth() + 1);
   const map = seasonCalc(branch);
-  // идём по завершённым сезонам от новых к старым: берём первый, где человек стал активистом
-  const done = [...map.values()].filter(o => ['issuing', 'done'].includes(seasonStatus(o.info, now)))
-    .sort((x, y) => y.info.start - x.info.start);
-  for (const o of done) {
-    const w = o.winners.get(person.id);
-    if (!w) continue;
-    const st = seasonStatus(o.info, now);
-    const reasons = w.map(x => SEASON_REASON[x]).join(', ');
-    if (st === 'issuing') return { title: seasonTitle(o.info), issue: seasonFmt(o.info.issue), reasons, issued: seasonIssued(branch, person, o.info) };
-    if (!seasonIssuedEver(branch, person, o.info)) return { title: seasonTitle(o.info), issue: seasonFmt(o.info.issue), reasons, issued: false };
+  const st = seasonStatus(prev, now);
+  const sObj = map.get(prev.key);
+  const why = sObj && sObj.winners.get(person.id);
+  if (why && st === 'issuing') {
+    return { title: seasonTitle(prev), issue: seasonFmt(prev.issue), reasons: why.map(x => SEASON_REASON[x]).join(', '), issued: seasonIssued(branch, person, prev) };
+  }
+  // окно выдачи прошло, но костюм так и не отмечен выданным — продолжаем показывать «ожидает выдачи»
+  if (why && st === 'done' && !seasonIssuedEver(branch, person, prev)) {
+    return { title: seasonTitle(prev), issue: seasonFmt(prev.issue), reasons: why.map(x => SEASON_REASON[x]).join(', '), issued: false };
   }
   // текущий сезон ещё идёт: подсвечиваем тех, кто сейчас в топе
-  {
+  if (!why || st === 'issuing' || st === 'done') {
     const cObj = map.get(cur.key);
     const cw = cObj && cObj.winners.get(person.id);
     if (cw) return { live: true, title: seasonTitle(cur), end: seasonFmt(cur.end), reasons: cw.map(x => SEASON_REASON[x]).join(', '), issued: false };
