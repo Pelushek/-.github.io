@@ -349,7 +349,7 @@ function initHomeRewards(){
   const R = [
    // --- медали
    {g:'medals', br:['animators'], name:'За фантазию и организованность', desc:'Могут получить все аниматоры.', price:'40 баллов', img:'https://i.ibb.co/MxxJ86PF/500.png'},
-   {g:'medals', br:['painters','designers','writers'], name:'За проявление творческой жилки', desc:'Могут получить художники, оформители, писатели и любой член племени.', price:'от 20 баллов', note:'20 / 50 / 100 — по ветви', prices:{painters:'100 баллов',designers:'20 баллов',writers:'50 баллов'}, img:'https://i.ibb.co/ccZYfcrk/223-1.png'},
+   {g:'medals', br:['painters','designers','writers'], name:'За проявление творческой жилки', desc:'Могут получить художники, оформители, писатели и любой член племени.', price:'от 20 баллов', prices:{painters:'100 баллов',designers:'20 баллов',writers:'50 баллов'}, img:'https://i.ibb.co/ccZYfcrk/223-1.png'},
    {g:'medals', br:['painters','designers','writers','animators'], name:'Медаль мероприятия', desc:'На усмотрение Ведущего Творца.', price:'выдаётся вручную', manual:1, img:'https://i.ibb.co/ynk8nHDn/1890.png'},
    // --- плашки
    {g:'plaques', br:['animators'], name:'Плашка аниматоров', desc:'Выдаётся за накопленные баллы аниматоров.', price:'100 баллов'},
@@ -367,11 +367,11 @@ function initHomeRewards(){
    {g:'suits', br:['designers'], name:'Костюм оформителей', desc:'Активисту сезона [3 месяца]: больше всех баллов и больше всех работ.', price:'активист сезона', manual:1, img:'https://i.ibb.co/RGSbKRTy/1.png'},
    {g:'suits', br:['writers'], name:'Костюм писателей', desc:'Активисту сезона [3 месяца]: больше всех баллов и больше всех работ.', price:'активист сезона', manual:1, img:'https://i.ibb.co/WNgYWPyF/3.png'},
    // --- НБ (живописцы)
-   {g:'nb', br:['painters','designers','writers','animators'], name:'Обмен на жетоны', desc:'Не более 15 в месяц.', price:'1 НБ у живописцев', note:'у остальных ветвей цена уточняется', prices:{painters:'1 НБ',designers:'1 НБ',writers:'1 НБ',animators:'1 НБ'}, nb:1, img:'https://i.ibb.co/zWkPkVyt/utt-BQa9-Xi0u-JUQs-Dx-GY8-Ll-HQ0-FF3se-Ql-Wy1p-TGFH54y-Qcd-Zgh-Q0b-Ge-Lpw-Kn-GX-KLflwnb1-G1-GGj-LU4-HLKz-R.png'},
-   {g:'nb', br:['painters','designers','writers','animators'], name:'Личный костюм', desc:'На неделю или на две.', price:'30–50 НБ у живописцев', note:'у остальных ветвей цена уточняется', prices:{painters:'30–50 НБ',designers:'15–25 НБ',writers:'25–40 НБ',animators:'20–30 НБ'}, nb:1, img:'https://i.ibb.co/jkHvSQmS/image.png'},
+   {g:'nb', br:['painters','designers','writers','animators'], name:'Обмен на жетоны', desc:'Не более 15 в месяц.', price:'1 НБ', prices:{painters:'1 НБ',designers:'1 НБ',writers:'1 НБ',animators:'1 НБ'}, nb:1, img:'https://i.ibb.co/zWkPkVyt/utt-BQa9-Xi0u-JUQs-Dx-GY8-Ll-HQ0-FF3se-Ql-Wy1p-TGFH54y-Qcd-Zgh-Q0b-Ge-Lpw-Kn-GX-KLflwnb1-G1-GGj-LU4-HLKz-R.png'},
+   {g:'nb', br:['painters','designers','writers','animators'], name:'Личный костюм', desc:'На неделю или на две.', price:'от 15 НБ', prices:{painters:'30–50 НБ',designers:'15–25 НБ',writers:'25–40 НБ',animators:'20–30 НБ'}, nb:1, img:'https://i.ibb.co/jkHvSQmS/image.png'},
    {g:'nb', br:['painters'], name:'След на фоне (1 сезон)', desc:'Свой след на любой фон на 1 сезон.', price:'15 НБ', nb:1, img:'https://i.ibb.co/0RFx5HZN/7-cmi-Hp73ct4n-ZZt-B0-Anq-Laep-HUqiv4-Y95jq-Y6u-SO6ne-WXZJ5-ahu-IIg-UIc-JCn5-6jo6-JSGZ-7-Xhvd-S08-Fg-CVr7.jpg'},
    {g:'nb', br:['painters'], name:'Оформление плашки (Одаз/Манназ)', desc:'Личное оформление плашки живописцев.', price:'70 НБ', nb:1},
-   {g:'nb', br:['painters','designers','writers','animators'], name:'Оформление сокровищницы', desc:'Кастомное оформление.', price:'100 НБ у живописцев', note:'у остальных ветвей цена уточняется', prices:{painters:'100 НБ',designers:'50 НБ',writers:'80 НБ',animators:'60 НБ'}, nb:1},
+   {g:'nb', br:['painters','designers','writers','animators'], name:'Оформление сокровищницы', desc:'Кастомное оформление.', price:'от 50 НБ', prices:{painters:'100 НБ',designers:'50 НБ',writers:'80 НБ',animators:'60 НБ'}, nb:1},
    {g:'nb', br:['painters','designers','writers','animators'], name:'Личная ачивка', desc:'Порог НБ за всё время. Выдаётся по желанию, НБ не списываются.', price:'от 25 НБ (порог)', prices:{painters:'50 НБ (порог)',animators:'30 НБ (порог)',designers:'25 НБ (порог)',writers:'40 НБ (порог)'}, nb:1, img:'https://i.ibb.co/9k037Wt1/54324234.png'},
    {g:'nb', br:['painters'], name:'След на фоне (навсегда)', desc:'Порог НБ за всё время. Может потеряться, если фон перерисуют с нуля.', price:'100 НБ (порог)', nb:1, img:'https://i.ibb.co/TDY645GJ/L0-PCm4-Thb-QKCFGHJtc-T716es-X5o-L6-N1i9-Wx-Wc-ULk-M7k-Vbx-CHN-Nm-Y15-N-v-WSJLGLFat0i-RDOTuvp4-Z50q8-Zg-K8-D.jpg'},
    {g:'nb', br:['painters','designers','writers','animators'], name:'Упоминание в блоге', desc:'Упоминание в блоге мастерской чудес. Порог НБ за всё время, выдаётся по желанию.', price:'от 75 НБ (порог)', prices:{painters:'150 НБ (порог)',animators:'90 НБ (порог)',designers:'75 НБ (порог)',writers:'120 НБ (порог)'}, nb:1}
@@ -988,9 +988,12 @@ function makeRewardCard(ctx) {
     } else if (isSpecial) {
       if (seasonHit && seasonHit.issued) {
         statusHtml = `<div class="reward-status" style="display:block; background:#f0f0f0; color:#555; padding:5px; border-radius:6px; margin-top:8px; font-weight:700;">Костюм за сезон «${esc(seasonHit.title)}» выдан ✓</div>`;
+      } else if (seasonHit && seasonHit.live) {
+        avail = true;
+        statusHtml = `<div class="reward-status status-avail" style="display:block; background:#e8f5e9; color:#2e7d32; padding:5px; border-radius:6px; margin-top:8px;">Сейчас в топе сезона «${esc(seasonHit.title)}» (${esc(seasonHit.reasons)}). Итоги сезона — ${esc(seasonHit.end)}.</div>`;
       } else if (seasonHit) {
         avail = true;
-        statusHtml = `<div class="reward-status status-avail" style="display:block; background:#e8f5e9; color:#2e7d32; padding:5px; border-radius:6px; margin-top:8px;">Активист сезона «${esc(seasonHit.title)}» (${esc(seasonHit.reasons)}). Костюм выдаётся с ${esc(seasonHit.issue)}${' · ожидает выдачи'}.</div>`;
+        statusHtml = `<div class="reward-status status-avail" style="display:block; background:#e8f5e9; color:#2e7d32; padding:5px; border-radius:6px; margin-top:8px;">Активист сезона «${esc(seasonHit.title)}» (${esc(seasonHit.reasons)}). Костюм выдаётся с ${esc(seasonHit.issue)} · ожидает выдачи.</div>`;
       } else if (isBought) {
         statusHtml = `<div class="reward-status status-avail" style="display:block; background:#e8f5e9; color:#2e7d32; padding:5px; border-radius:6px; margin-top:8px;">Выдан (внесен в таблицу)</div>`;
       } else {
@@ -2254,11 +2257,37 @@ function seasonCostumeHit(branch, person, title) {
   const cur = seasonOf(cfg, now.getFullYear(), now.getMonth() + 1);
   const before = new Date(cur.start.getTime() - 864e5);
   const prev = seasonOf(cfg, before.getFullYear(), before.getMonth() + 1);
-  if (seasonStatus(prev, now) !== 'issuing') return null;
-  const sObj = seasonCalc(branch).get(prev.key);
+  const map = seasonCalc(branch);
+  const st = seasonStatus(prev, now);
+  const sObj = map.get(prev.key);
   const why = sObj && sObj.winners.get(person.id);
-  if (!why) return null;
-  return { title: seasonTitle(prev), issue: seasonFmt(prev.issue), reasons: why.map(x => SEASON_REASON[x]).join(', '), issued: seasonIssued(branch, person, prev) };
+  if (why && st === 'issuing') {
+    return { title: seasonTitle(prev), issue: seasonFmt(prev.issue), reasons: why.map(x => SEASON_REASON[x]).join(', '), issued: seasonIssued(branch, person, prev) };
+  }
+  // окно выдачи прошло, но костюм так и не отмечен выданным — продолжаем показывать «ожидает выдачи»
+  if (why && st === 'done' && !seasonIssuedEver(branch, person, prev)) {
+    return { title: seasonTitle(prev), issue: seasonFmt(prev.issue), reasons: why.map(x => SEASON_REASON[x]).join(', '), issued: false };
+  }
+  // текущий сезон ещё идёт: подсвечиваем тех, кто сейчас в топе
+  if (!why || st === 'issuing' || st === 'done') {
+    const cObj = map.get(cur.key);
+    const cw = cObj && cObj.winners.get(person.id);
+    if (cw) return { live: true, title: seasonTitle(cur), end: seasonFmt(cur.end), reasons: cw.map(x => SEASON_REASON[x]).join(', '), issued: false };
+  }
+  return null;
+}
+
+function seasonIssuedEver(branch, person, season) {
+  const cfg = SEASON_BRANCHES[branch];
+  const list = branch === 'painters' ? purchases : branch === 'designers' ? designerPurchases : writerPurchases;
+  const idKey = branch === 'painters' ? 'artistId' : branch === 'designers' ? 'designerId' : 'writerId';
+  return list.some(p => {
+    if (p[idKey] !== person.id || slug(p.rewardName) !== slug(cfg.costume) || slug(p.status) !== 'выдан') return false;
+    const m = String(p.issuedDate || '').match(/(\d{1,2})\.(\d{1,2})\.(\d{4}|\d{2})(?!\d)/);
+    if (!m) return true;
+    let y = +m[3]; if (y < 100) y += 2000;
+    return new Date(y, +m[2] - 1, +m[1]) >= season.issue;
+  });
 }
 
 function seasonWinnersHTML(sObj, branch, showPending = false) {
