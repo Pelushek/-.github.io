@@ -2835,4 +2835,199 @@ document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active
 document.querySelector(`.nav > button[data-view=""]`).classList.add('active');
 
 fetchData();
+
+<!-- ================= ТЕМЫ ОФОРМЛЕНИЯ ================= -->
+<script>
+(function(){
+  // ---------- 1. CSS: переменные тем + правки хардкодов ----------
+  const css = `
+    /* Базовые (светлая — как сейчас) */
+    :root{
+      --sidebar-bg:#292824;--sidebar-ink:#f8f4ee;--sidebar-muted:#aaa49b;--sidebar-active:#414039;--nav-ink:#d7d0c7;
+      --card-alt:#f7f4ef;--thumb-bg:#f0ebe5;--info-bg:#f9f7f4;--warm-block:#fdf6f3;
+      --chip-bg:#f2e9e1;--chip-ink:#765d4e;
+      --avail-bg:#f4f9f4;--no-bg:#fff1f0;--no-ink:#c0392b;--no-line:#ffcdd2;
+      --badge-bg:#e8f5e9;--badge-ink:#2e7d32;
+      --price-bg:#f3e3dc;--price-ink:#a4452b;
+      --price-nb-bg:#e3ecf5;--price-nb-ink:#2f5a86;
+      --price-manual-bg:#e5eee4;--price-manual-ink:#3f6a3c;
+      --dark-btn-bg:#2b3b2b;--dark-btn-ink:#f2eeef;--mini-badge:#e0dbd3;
+      --warn-bg:#fff7e6;--warn-line:#f0d9a8;--warn-ink:#7a5a12;
+      --hover-row:#faf7f2;
+    }
+    /* Чёрно-рыжая (ПХ) */
+    body.theme-ph{
+      --bg:#1a1512;--paper:#241d18;--ink:#f0e4d8;--muted:#a89886;--line:#3a2f27;--accent:#e8781f;--green:#8fa67a;--shadow:0 8px 28px #00000055;
+      --sidebar-bg:#120e0b;--sidebar-ink:#f0e4d8;--sidebar-muted:#9a8a7a;--sidebar-active:#3a2a1e;--nav-ink:#d8c8b8;
+      --card-alt:#2a211b;--thumb-bg:#332821;--info-bg:#2a211b;--warm-block:#2a1e16;
+      --chip-bg:#3a2a1e;--chip-ink:#e8b68a;
+      --avail-bg:#1f2a1c;--no-bg:#3a1a15;--no-ink:#e08070;--no-line:#5a2a22;
+      --badge-bg:#1f2a1c;--badge-ink:#a8c294;
+      --price-bg:#3a2a1e;--price-ink:#f0a86a;
+      --price-nb-bg:#1e2a38;--price-nb-ink:#a8c8e8;
+      --price-manual-bg:#1f2a1c;--price-manual-ink:#a8c294;
+      --dark-btn-bg:#3a2a1e;--dark-btn-ink:#f0e4d8;--mini-badge:#3a2a1e;
+      --warn-bg:#3a2a15;--warn-line:#6a4a1e;--warn-ink:#e8c888;
+      --hover-row:#2a211b;
+    }
+    /* Тёмная */
+    body.theme-dark{
+      --bg:#16181c;--paper:#1e2026;--ink:#e4e6ea;--muted:#8a8f98;--line:#2e323a;--accent:#7aa2d8;--green:#79b08e;--shadow:0 8px 28px #00000066;
+      --sidebar-bg:#0e1013;--sidebar-ink:#e4e6ea;--sidebar-muted:#8a8f98;--sidebar-active:#2e323a;--nav-ink:#c4c8d0;
+      --card-alt:#24272e;--thumb-bg:#2a2e36;--info-bg:#24272e;--warm-block:#24272e;
+      --chip-bg:#2e323a;--chip-ink:#a8b4c4;
+      --avail-bg:#1c2420;--no-bg:#2a1a1c;--no-ink:#d88a88;--no-line:#4a2a2e;
+      --badge-bg:#1c2420;--badge-ink:#a0c8b0;
+      --price-bg:#2e323a;--price-ink:#a8b4c4;
+      --price-nb-bg:#1e2a3a;--price-nb-ink:#a0c8e8;
+      --price-manual-bg:#1c2420;--price-manual-ink:#a0c8b0;
+      --dark-btn-bg:#2e323a;--dark-btn-ink:#e4e6ea;--mini-badge:#2e323a;
+      --warn-bg:#3a2a15;--warn-line:#6a4a1e;--warn-ink:#e8c888;
+      --hover-row:#24272e;
+    }
+    /* Незер (GTNH) */
+    body.theme-nether{
+      --bg:#1a0d0b;--paper:#241311;--ink:#f2d8c4;--muted:#b09080;--line:#3a1f1a;--accent:#ff6b1a;--green:#d9a05a;--shadow:0 8px 28px #00000066;
+      --sidebar-bg:#120807;--sidebar-ink:#f2d8c4;--sidebar-muted:#a08070;--sidebar-active:#4a1f12;--nav-ink:#e0c0a8;
+      --card-alt:#2e1815;--thumb-bg:#3a1f1a;--info-bg:#2e1815;--warm-block:#2a1410;
+      --chip-bg:#4a1f12;--chip-ink:#f0b080;
+      --avail-bg:#2a1a0f;--no-bg:#3a1410;--no-ink:#ff8a70;--no-line:#5a2018;
+      --badge-bg:#2a1a0f;--badge-ink:#f0c080;
+      --price-bg:#4a1f12;--price-ink:#ffb070;
+      --price-nb-bg:#2a1a38;--price-nb-ink:#c0a8e8;
+      --price-manual-bg:#2a1a0f;--price-manual-ink:#f0c080;
+      --dark-btn-bg:#4a1f12;--dark-btn-ink:#f2d8c4;--mini-badge:#3a1f1a;
+      --warn-bg:#3a2a15;--warn-line:#6a4a1e;--warn-ink:#e8c888;
+      --hover-row:#2e1815;
+    }
+    body{transition:background-color .2s ease,color .2s ease;}
+
+    /* Переключатель тем */
+    .theme-dot{width:30px;height:30px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;transition:.15s}
+    .theme-dot:hover{transform:scale(1.1)}
+    .theme-dot.active{border-color:#fff;box-shadow:0 0 0 2px var(--sidebar-active)}
+
+    /* Правки хардкодов из исходного CSS */
+    .sidebar{background:var(--sidebar-bg) !important;color:var(--sidebar-ink) !important;}
+    .brand small,.side-label{color:var(--sidebar-muted) !important;}
+    .nav button{color:var(--nav-ink) !important;}
+    .nav button.active,.nav button:hover{background:var(--sidebar-active) !important;color:var(--sidebar-ink) !important;}
+    .sub-nav{border-left-color:var(--sidebar-active) !important;}
+    .sub-nav button{color:var(--sidebar-muted) !important;}
+    .sub-nav button.active,.sub-nav button:hover{color:var(--sidebar-ink) !important;}
+    .logo{background:var(--accent) !important;color:var(--sidebar-bg) !important;}
+    .avatar{background:var(--card-alt) !important;color:var(--muted) !important;}
+    .links a{color:var(--accent) !important;border-bottom-color:var(--line) !important;}
+    .links a:hover{color:var(--ink) !important;}
+    .work-col{background:var(--card-alt) !important;}
+    .mini-stat{background:var(--card-alt) !important;}
+    .mini-stat.full-width{background:var(--chip-bg) !important;}
+    .chip{background:var(--chip-bg) !important;color:var(--chip-ink) !important;}
+    .work-card{background:var(--paper) !important;border-color:var(--line) !important;}
+    .work-card .thumb,.work-card .thumb-fallback{background:var(--thumb-bg) !important;color:var(--muted) !important;}
+    .show-more-btn{background:var(--paper) !important;}
+    .show-more-btn:hover{background:var(--card-alt) !important;}
+    .reward-card.available{background:var(--avail-bg) !important;}
+    .reward-card.bought{background:var(--card-alt) !important;border-color:var(--line) !important;}
+    .reward-card.bought::after{background:var(--muted) !important;}
+    .reward-status.status-no{background:var(--no-bg) !important;color:var(--no-ink) !important;border-color:var(--no-line) !important;}
+    .reward-img{background:var(--thumb-bg) !important;color:var(--muted) !important;}
+    .sbadge{background:var(--badge-bg) !important;color:var(--badge-ink) !important;}
+    .sbadge.gray{background:var(--card-alt) !important;color:var(--muted) !important;}
+    .s-table tr.win td{background:var(--avail-bg) !important;}
+    .s-table tr.clickable:hover td{background:var(--hover-row) !important;}
+    .hr-price{background:var(--price-bg) !important;color:var(--price-ink) !important;}
+    .hr-price.nb{background:var(--price-nb-bg) !important;color:var(--price-nb-ink) !important;}
+    .hr-price.manual{background:var(--price-manual-bg) !important;color:var(--price-manual-ink) !important;}
+    .hr-price.tbd{background:var(--card-alt) !important;color:var(--muted) !important;}
+    .hr-frame{background:linear-gradient(var(--card-alt),var(--thumb-bg)) !important;}
+    .hr-ph{border-color:var(--line) !important;color:var(--muted) !important;}
+    .hr-note{background:var(--avail-bg) !important;border-color:var(--line) !important;}
+    .hr-chip.active{color:var(--bg) !important;}
+    .empty{color:var(--muted) !important;}
+    .empty-state{border-color:var(--line) !important;}
+    .bb-content h3,.bb-content th{background:var(--card-alt) !important;}
+    #loadingOverlay{background:color-mix(in srgb,var(--bg) 82%,transparent) !important;}
+    #dataWarn{background:var(--warn-bg) !important;border-color:var(--warn-line) !important;color:var(--warn-ink) !important;}
+  `;
+  const styleEl = document.createElement('style');
+  styleEl.id = 'theme-styles';
+  styleEl.textContent = css;
+  document.head.appendChild(styleEl);
+
+  // ---------- 2. Переключатель в сайдбар ----------
+  function addSwitcher(){
+    const sidebar = document.querySelector('.sidebar');
+    if (!sidebar || sidebar.querySelector('#themeSwitcher')) return;
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'margin-top:auto;padding-top:14px;border-top:1px solid var(--sidebar-active);';
+    wrap.innerHTML =
+      '<div class="side-label">Тема</div>' +
+      '<div id="themeSwitcher" style="display:flex;gap:8px;flex-wrap:wrap;padding:0 7px;">' +
+        '<button class="theme-dot active" data-theme="light"  title="Светлая"     style="background:#f5f2ee;"></button>' +
+        '<button class="theme-dot"        data-theme="ph"     title="Чёрно-рыжая" style="background:linear-gradient(135deg,#1a1512 50%,#e8781f 50%);"></button>' +
+        '<button class="theme-dot"        data-theme="dark"   title="Тёмная"      style="background:linear-gradient(135deg,#16181c 50%,#7aa2d8 50%);"></button>' +
+        '<button class="theme-dot"        data-theme="nether" title="Незер"       style="background:linear-gradient(135deg,#1a0d0b 50%,#ff6b1a 50%);"></button>' +
+      '</div>';
+    sidebar.appendChild(wrap);
+    wrap.querySelectorAll('.theme-dot').forEach(b => {
+      b.addEventListener('click', () => applyTheme(b.dataset.theme));
+    });
+  }
+
+  // ---------- 3. Применение темы ----------
+  function applyTheme(name){
+    name = name || 'light';
+    document.body.classList.remove('theme-ph','theme-dark','theme-nether');
+    if (name !== 'light') document.body.classList.add('theme-' + name);
+    try { localStorage.setItem('mch-theme', name); } catch(e){}
+    document.querySelectorAll('.theme-dot').forEach(b => b.classList.toggle('active', b.dataset.theme === name));
+    fixInlineColors(document);
+  }
+
+  // ---------- 4. Замена инлайн-цветов (в WELCOME_HTML и т.п.) ----------
+  const inlineMap = {
+    '#fdf6f3': 'var(--warm-block)',
+    '#2b3b2b': 'var(--dark-btn-bg)',
+    '#f2eeef': 'var(--dark-btn-ink)',
+    '#e0dbd3': 'var(--mini-badge)',
+    '#f9f7f4': 'var(--info-bg)',
+    '#f7f4ef': 'var(--card-alt)',
+    '#faf6f0': 'var(--card-alt)',
+    '#444':    'var(--ink)',
+    '#fff':    'var(--bg)'
+  };
+  function fixInlineColors(root){
+    root = root || document;
+    root.querySelectorAll('[style]').forEach(el => {
+      let s = el.getAttribute('style');
+      if (!s) return;
+      let changed = false;
+      for (const from in inlineMap) {
+        if (s.indexOf(from) !== -1) { s = s.split(from).join(inlineMap[from]); changed = true; }
+      }
+      if (changed) el.setAttribute('style', s);
+    });
+  }
+
+  // ---------- 5. Observer на динамически рендерящийся контент ----------
+  const content = document.getElementById('content');
+  if (content) {
+    new MutationObserver(() => fixInlineColors(content))
+      .observe(content, { childList: true, subtree: true });
+  }
+
+  // ---------- 6. Инициализация ----------
+  function init(){
+    addSwitcher();
+    applyTheme(localStorage.getItem('mch-theme') || 'light');
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+  
 </script></body></html>
